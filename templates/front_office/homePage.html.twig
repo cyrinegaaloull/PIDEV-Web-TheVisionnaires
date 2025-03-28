@@ -1,0 +1,85 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block body %}
+  <!-- Hero Section -->
+  <section class="hero-wrap js-fullheight" style="background-image: url('{{ asset('assets/front_office/images/Web-Bg.jpg') }}');">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row no-gutters slider-text js-fullheight align-items-center" data-scrollax-parent="true">
+        <div class="col-md-7 ftco-animate">
+          <h1 class="mb-4">Découvrez votre <br> Ville intelligente </h1>
+          <p class="caps">Accédez aux meilleures adresses, services d'urgence, <br> événements et plus encore en un seul clic.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Services Section -->
+<section class="ftco-section services-section bg-light" style="padding-top: 40px; padding-bottom: 40px;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-12 text-center heading-section ftco-animate">
+          <span class="subheading" style="font-size: 40px;">Nos Services</span>
+          <h2 class="mb-4" style="padding-bottom: 40px;">Nous offrons les meilleurs services.</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4 ftco-animate">
+          <div class="service-item text-center">
+            <div class="icon d-flex align-items-center justify-content-center mb-3">
+              <img src="{{ asset('assets/front_office/images/calendar.png') }}" alt="Planification" style="height: 150px;">
+            </div>
+            <h3>Planification de Trajets</h3>
+            <p>Planifiez vos trajets avec les meilleurs itinéraires.</p>
+          </div>
+        </div>
+        <div class="col-md-4 ftco-animate">
+          <div class="service-item text-center">
+            <div class="icon d-flex align-items-center justify-content-center mb-3">
+              <img src="{{ asset('assets/front_office/images/message.png') }}" alt="Forum" style="height: 150px;">
+            </div>
+            <h3>Forum Communautaire</h3>
+            <p>Partagez vos idées, posez vos questions.</p>
+          </div>
+        </div>
+        <div class="col-md-4 ftco-animate">
+          <div class="service-item text-center">
+            <div class="icon d-flex align-items-center justify-content-center mb-3">
+              <img src="{{ asset('assets/front_office/images/vieassociative.png') }}" alt="VieAssociative" style="height: 150px;">
+            </div>
+            <h3>Vie associative</h3>
+            <p>Rejoignez des clubs et associations pour participer à des activités.</p>
+          </div>
+        </div>
+        <div class="col-md-4 ftco-animate">
+          <div class="service-item text-center">
+            <div class="icon d-flex align-items-center justify-content-center mb-3">
+              <img src="{{ asset('assets/front_office/images/earth.png') }}" alt="Lieux" style="height: 150px;">
+            </div>
+            <h3>Explorer les Lieux</h3>
+            <p>Découvrez les meilleurs lieux près de chez vous.</p>
+          </div>
+        </div>
+        <div class="col-md-4 ftco-animate">
+          <div class="service-item text-center">
+            <div class="icon d-flex align-items-center justify-content-center mb-3">
+              <img src="{{ asset('assets/front_office/images/services.png') }}" alt="Services" style="height: 150px;">
+            </div>
+            <h3>Services Gouvernementaux</h3>
+            <p>Trouvez les hôpitaux, services publics et ressources.</p>
+          </div>
+        </div>
+        <div class="col-md-4 ftco-animate">
+          <div class="service-item text-center">
+            <div class="icon d-flex align-items-center justify-content-center mb-3">
+              <img src="{{ asset('assets/front_office/images/events.png') }}" alt="Events" style="height: 150px;">
+            </div>
+            <h3>Événements Locaux</h3>
+            <p>Soyez au courant des événements, expositions et activités.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}
