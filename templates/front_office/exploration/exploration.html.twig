@@ -1,0 +1,167 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+  
+{% block body %}
+<link rel="stylesheet" href="{{ asset('assets/exploration/css/style.css') }}">
+<section class="ftco-section">
+  <div class="container">
+    <div class="row justify-content-center pb-4">
+      <div class="col-md-12 heading-section text-center ftco-animate">
+        <span class="subheading">Découverte</span>
+        <h2 class="mb-4">Découvrez les lieux populaires</h2>
+      </div>
+    </div>
+    <div class="row mb-4 align-items-center">
+      <div class="col-md-8">
+        <form id="live-search-form" method="get" action="{{ path('app_exploration') }}">
+          <div class="input-group">
+            <input type="text" name="search" id="search-input" class="form-control" placeholder="Rechercher un lieu..." autocomplete="off">
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="submit">Rechercher</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-4 text-md-right mt-3 mt-md-0 position-relative">
+        <button class="btn btn-outline-secondary" id="filterToggle">
+          Trier par ▼
+        </button>
+        <div id="filterMenu" class="dropdown-menu show" style="display: none; position: absolute; top: 100%; right: 0; z-index: 1000;">
+          <a class="dropdown-item" href="#" data-filter="nearest">📍 Le plus proche</a>
+          <a class="dropdown-item" href="#" data-filter="default">✨ Par défaut</a>
+        </div>
+      </div>
+    </div>
+    
+    <div id="lieux-results">
+      {% include 'front_office/exploration/_lieux_results.html.twig' %}
+    </div>
+  </div>
+</section>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const filterToggle = document.getElementById('filterToggle');
+    const filterMenu = document.getElementById('filterMenu');
+    const resultsContainer = document.getElementById('lieux-results');
+
+    // Toggle dropdown
+    filterToggle.addEventListener('click', () => {
+      filterMenu.style.display = filterMenu.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Click outside to close dropdown
+    document.addEventListener('click', function (e) {
+      if (!filterMenu.contains(e.target) && !filterToggle.contains(e.target)) {
+        filterMenu.style.display = 'none';
+      }
+    });
+
+    // Reinit animations after AJAX (FTCO-style)
+    function reinitAnimations() {
+      if (window.jQuery && typeof $.fn.waypoint === 'function') {
+        $('.ftco-animate').waypoint(function () {
+          if (!$(this.element).hasClass('ftco-animated')) {
+            $(this.element).addClass('item-animate');
+            setTimeout(() => {
+              $('body .ftco-animate.item-animate').each(function (k) {
+                const el = $(this);
+                setTimeout(function () {
+                  const effect = el.data('animate-effect');
+                  if (effect === 'fadeIn') {
+                    el.addClass('fadeIn ftco-animated');
+                  } else {
+                    el.addClass('fadeInUp ftco-animated');
+                  }
+                  el.removeClass('item-animate');
+                }, k * 50, 'easeInOutExpo');
+              });
+            }, 100);
+          }
+        }, { offset: '95%' });
+        $.waypoints('refresh'); // ✨ force refresh
+      }
+    }
+
+    // AJAX loader template
+    function showLoader() {
+      resultsContainer.innerHTML = `
+        <div class="text-center p-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Chargement...</span>
+          </div>
+        </div>`;
+    }
+
+    // Fetch and inject lieux
+    function loadLieux(url) {
+      showLoader();
+
+      fetch(url, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(res => res.text())
+      .then(html => {
+        resultsContainer.innerHTML = html;
+        console.log('✅ HTML injected from URL:', url);
+        console.log(resultsContainer.innerHTML);
+
+        reinitAnimations();
+        window.dispatchEvent(new Event('resize')); // 🔁 fix layout issues
+        window.history.pushState({}, '', url); // 🧭 update URL
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // Handle filter dropdown click
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+      item.addEventListener('click', function (e) {
+        e.preventDefault();
+        const filter = this.dataset.filter;
+        let url = '/exploration';
+
+        if (filter === 'nearest') {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+              url = `/exploration?filter=nearest&lat=${lat}&lon=${lon}&_ajax=1`;
+              loadLieux(url);
+            });
+          } else {
+            alert('La géolocalisation est désactivée.');
+          }
+        } else {
+          url = `/exploration?_ajax=1`;
+          loadLieux(url);
+        }
+
+        filterMenu.style.display = 'none';
+      });
+    });
+
+    // Handle favorite toggle
+    document.addEventListener('click', function (e) {
+      const target = e.target.closest('.favorite-toggle');
+      if (!target) return;
+
+      const id = target.dataset.id;
+
+      fetch(`/toggle-favorite/${id}`, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(res => res.json())
+      .then(() => {
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('_ajax', '1');
+        loadLieux(currentUrl.toString());
+      });
+    });
+  });
+
+</script>
+
+
+{% endblock %}

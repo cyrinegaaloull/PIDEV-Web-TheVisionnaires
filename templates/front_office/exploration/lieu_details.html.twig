@@ -1,0 +1,161 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+  
+
+{% block body %}
+<link rel="stylesheet" href="{{ asset('assets/exploration/css/style.css') }}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<section class="ftco-section ftco-no-pb">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 d-flex align-items-stretch">
+        <div class="img w-100" style="background-image: url('{{ asset('assets/exploration/images/' ~ (lieu.lieuImage ?: 'default.jpg')) }}'); background-size: cover; border-radius: 12px;"></div>
+      </div>
+      <div class="col-md-6 pl-md-5 py-5">
+        <div class="heading-section">
+          <h2 class="mb-4">{{ lieu.lieuName }}</h2>
+          <p><strong>Catégorie:</strong> {{ lieu.lieuCategory }}</p>
+          <p><strong>Adresse:</strong> {{ lieu.lieuAddress }}</p>
+          <p><strong>Description:</strong> {{ lieu.lieuDescription }}</p>
+          <p><strong>Ouverture:</strong> {{ lieu.lieuOpeningHours }}</p>
+          <p><strong>Fermeture:</strong> {{ lieu.lieuClosingHours }}</p>
+          <a href="{{ path('app_exploration') }}" class="btn btn-primary mt-3">&larr; Retour</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ftco-section bg-light">
+  <div class="container">
+    <h4 class="mb-4">Emplacement sur la carte</h4>
+    <div id="lieu-map" style="height: 300px; border-radius: 10px;"></div>
+  </div>
+</section>
+
+{% if events is not empty %}
+<section class="ftco-section">
+  <div class="container">
+    <h3 class="mb-4">🎛 Événements à venir</h3>
+    <div class="row">
+      {% for event in events %}
+        <div class="col-md-4">
+          <div class="project-wrap">
+            <a class="img" style="background-image: url('{{ asset('assets/exploration/images/' ~ (event.eventImage ?: 'default.jpg')) }}');"></a>
+            <div class="text p-4">
+              <span class="days">{{ event.eventDate ? event.eventDate|date('d/m/Y') : 'Non précisée' }}</span>
+              <h3>{{ event.eventName }}</h3>
+              <p class="location"><span class="fa fa-map-marker"></span> {{ lieu.lieuAddress }}</p>
+              <p>{{ event.eventDescription }}</p>
+              <p><strong>Catégorie:</strong> {{ event.eventCategory }}</p>
+              <p><strong>Prix:</strong> {{ event.ticketPrice }} TND</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="ftco-section testimony-section" style="background-image: url('{{ asset('assets/front-office/images/bg_1.jpg') }}');">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row justify-content-center pb-4">
+      <div class="col-md-7 text-center heading-section heading-section-white">
+        <span class="subheading">Avis</span>
+        <h2 class="mb-4">Ce que disent les visiteurs</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        {% if reviews is empty %}
+          <p class="text-center text-white">Aucun avis pour l'instant.</p>
+        {% else %}
+          <div class="carousel-testimony owl-carousel">
+            {% for review in reviews %}
+              <div class="item">
+                <div class="testimony-wrap py-4">
+                  <div class="text">
+                    <p class="star">
+                      {% for i in 1..5 %}
+                        <span class="fa {% if i <= review.rating %}fa-star{% else %}fa-star-o{% endif %}"></span>
+                      {% endfor %}
+                    </p>
+                    <p class="mb-4">{{ review.comment }}</p>
+                    <div class="d-flex align-items-center">
+                      <div class="pl-3">
+                        <p class="name">Anonymous</p>
+                        <span class="position">{{ review.reviewDate ? review.reviewDate|date('d/m/Y') : '' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ftco-section">
+  <div class="container">
+    <h4>Ajouter un avis</h4>
+    <form method="post" action="{{ path('add_review', { id: lieu.lieuid }) }}">
+      <div class="form-group">
+        <label>Note :</label>
+        <div id="star-rating">
+          {% for i in 1..5 %}
+            <i class="fa fa-star-o fa-2x text-warning star" data-value="{{ i }}"></i>
+          {% endfor %}
+        </div>
+        <input type="hidden" name="rating" id="rating" required>
+      </div>
+      <div class="form-group">
+        <label for="comment">Commentaire</label>
+        <textarea class="form-control" name="comment" rows="3" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Envoyer</button>
+    </form>
+  </div>
+</section>
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const stars = document.querySelectorAll('#star-rating .star');
+    const ratingInput = document.getElementById('rating');
+    stars.forEach(star => {
+      star.addEventListener('click', function () {
+        const rating = this.dataset.value;
+        ratingInput.value = rating;
+        stars.forEach(s => {
+          s.classList.remove('fa-star');
+          s.classList.add('fa-star-o');
+        });
+        for (let i = 0; i < rating; i++) {
+          stars[i].classList.remove('fa-star-o');
+          stars[i].classList.add('fa-star');
+        }
+      });
+    });
+
+    const lat = {{ lieu.latitude ?: 0 }};
+    const lng = {{ lieu.longitude ?: 0 }};
+    const map = L.map('lieu-map').setView([lat, lng], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    const marker = L.marker([lat, lng]).addTo(map)
+      .bindPopup("{{ lieu.lieuName|e('js') }}").openPopup();
+
+    document.getElementById('lieu-map').addEventListener('click', function () {
+      this.style.height = '500px';
+      setTimeout(() => map.invalidateSize(), 200);
+    });
+  });
+</script>
+{% endblock %}
