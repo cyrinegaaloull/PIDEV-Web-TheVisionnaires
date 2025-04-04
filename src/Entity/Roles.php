@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -61,5 +60,20 @@ class Roles
     public function getRole()
     {
         return $this->role;
+    }
+    
+    /**
+     * Get name - Alias for getRole() to work with Symfony security.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        // Make sure the role string starts with ROLE_
+        $roleName = $this->role;
+        if (!str_starts_with($roleName, 'ROLE_')) {
+            $roleName = 'ROLE_' . strtoupper($roleName);
+        }
+        return $roleName;
     }
 }

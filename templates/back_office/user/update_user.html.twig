@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Update User{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            <h1>Update User</h1>
+            <form action="{{ path('update_user', {'id': user.userId}) }}" method="post" enctype="multipart/form-data">
+                <div>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" value="{{ user.username }}" required>
+                    {% if usernameError is defined and usernameError %}
+                        <span style="color: red;">{{ usernameError }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" value="{{ user.password }}" required>
+                </div>
+                <!-- Confirm Password Input -->
+                <div>
+                    <label for="confirm_password">Confirm Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                    {% if passwordError is defined and passwordError %}
+                        <span style="color: red;">{{ passwordError }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="nom">Nom:</label>
+                    <input type="text" id="nom" name="nom" value="{{ user.nom }}" required>
+                </div>
+                <div>
+                    <label for="prenom">Prenom:</label>
+                    <input type="text" id="prenom" name="prenom" value="{{ user.prenom }}" required>
+                </div>
+                <div>
+                    <label for="avatar">Avatar:</label>
+                    {# Use a file input to let the user select a local file #}
+                    <input type="file" id="avatar" name="avatar" accept="image/*">
+                    {# Optionally, display the current avatar (if any) #}
+                    {% if user.avatar %}
+                        <div>
+                            <p>Current Avatar:</p>
+                            <img src="{{ asset(user.avatar) }}" alt="Current Avatar" style="max-width: 150px;">
+                        </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="role_id">Role:</label>
+                    <select id="role_id" name="role_id" required>
+                        <option value="">-- Select a Role --</option>
+                        {% for role in roles %}
+                            <option value="{{ role.id }}" {% if user.role and user.role.id == role.id %}selected{% endif %}>
+                                {{ role.role }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <input type="hidden" name="_token" value="{{ csrf_token('update_user' ~ user.userId) }}">
+                <button type="submit">Update User</button>
+            </form>
+            <br>
+            <a href="{{ path('list_users') }}">
+                <button type="button">Back to List</button>
+            </a>
+        {% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

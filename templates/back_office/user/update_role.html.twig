@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Update Role{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            <h1>Update Role</h1>
+            <form action="{{ path('update_role', {'id': role.id}) }}" method="post">
+                <div>
+                    <label for="role">Role Name:</label>
+                    <input type="text" id="role" name="role" value="{{ role.role }}" required>
+                </div>
+                <input type="hidden" name="_token" value="{{ csrf_token('update_role' ~ role.id) }}">
+                <button type="submit">Update Role</button>
+            </form>
+            <br>
+            <a href="{{ path('list_roles') }}">
+                <button type="button">Back to List</button>
+            </a>
+        {% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

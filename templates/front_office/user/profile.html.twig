@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Profile</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 20px;
+                background-color: #f4f4f4;
+            }
+            .container {
+                background: #fff;
+                padding: 20px;
+                border-radius: 5px;
+                max-width: 600px;
+                margin: 0 auto;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+            h1 {
+                text-align: center;
+            }
+            p {
+                font-size: 16px;
+            }
+            .avatar {
+                text-align: center;
+                margin-top: 20px;
+            }
+            .avatar img {
+                max-width: 150px;
+                border-radius: 50%;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Your Profile</h1>
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Full Name:</strong> {{ user.nom }} {{ user.prenom }}</p>
+            {% if user.avatar %}
+                <div class="avatar">
+                    <p><strong>Avatar:</strong></p>
+                    <img src="{{ asset(user.avatar) }}" alt="User Avatar">
+                </div>
+            {% endif %}
+        </div>
+    </body>
+</html>

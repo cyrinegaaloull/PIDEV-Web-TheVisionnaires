@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-use App\Entity\Roles; 
- 
+use App\Entity\Roles;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * Users
@@ -12,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="users", indexes={@ORM\Index(name="role_id", columns={"role_id"})})
  * @ORM\Entity
  */
-class Users
+class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @var int
@@ -153,7 +154,7 @@ class Users
      *
      * @return string
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -252,5 +253,47 @@ class Users
     public function getRole()
     {
         return $this->role;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $userRoles = [];
+        if ($this->role) {
+            $userRoles[] = $this->role->getName();
+        }
+        
+        // Always include ROLE_USER as a fallback
+        $userRoles[] = 'ROLE_USER';
+        
+        return array_unique($userRoles);
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getSalt(): ?string
+    {
+        // Not needed for plaintext passwords
+        return null;
     }
 }

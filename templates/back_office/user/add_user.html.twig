@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Add New User{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            <h1>Add a New User</h1>
+            <form action="{{ path('add_user') }}" method="post" enctype="multipart/form-data">
+                <div>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" value="{{ username|default('') }}" required>
+                    {% if usernameError is defined and usernameError %}
+                        <span style="color: red;">{{ usernameError }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="{{ email|default('') }}" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <!-- Confirm Password Input -->
+                <div>
+                    <label for="confirm_password">Confirm Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                    {% if passwordError is defined and passwordError %}
+                        <span style="color: red;">{{ passwordError }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="nom">Nom:</label>
+                    <input type="text" id="nom" name="nom" value="{{ nom|default('') }}" required>
+                </div>
+                <div>
+                    <label for="prenom">Prenom:</label>
+                    <input type="text" id="prenom" name="prenom" value="{{ prenom|default('') }}" required>
+                </div>
+                <div>
+                    <label for="avatar">Avatar:</label>
+                    <input type="file" id="avatar" name="avatar" accept="image/*" required>
+                </div>
+                <div>
+                    <label for="role_id">Role:</label>
+                    <select id="role_id" name="role_id" required>
+                        <option value="">-- Select a Role --</option>
+                        {% for role in roles %}
+                            <option value="{{ role.id }}" {% if role_id is defined and role.id == role_id %}selected{% endif %}>
+                                {{ role.role }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <input type="hidden" name="_token" value="{{ csrf_token('user_item') }}">
+                <button type="submit">Add User</button>
+            </form>
+            <br>
+            <a href="{{ path('list_users') }}">
+                <button type="button">View All Users</button>
+            </a>
+        {% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>
