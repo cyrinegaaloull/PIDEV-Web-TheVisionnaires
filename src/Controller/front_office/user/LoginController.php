@@ -42,4 +42,6 @@ class LoginController extends AbstractController
         // The logout is handled by Symfony's security system
         throw new \LogicException('This method should not be reached!');
     }
+
+    
 }
