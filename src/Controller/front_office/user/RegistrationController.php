@@ -18,53 +18,66 @@ class RegistrationController extends AbstractController
     public function register(
         Request $request, 
         EntityManagerInterface $entityManager,
-        SluggerInterface $slugger = null // Make optional since we'll add error handling
+        SluggerInterface $slugger
     ): Response {
         // If the user is already logged in, redirect to home
         if ($this->getUser()) {
             return $this->redirectToRoute('app_home');
         }
         
-        // Debug request method
         if (!$request->isMethod('POST')) {
             return $this->redirectToRoute('app_login');
         }
         
+        // Get form data
+        $username = $request->request->get('username');
+        $email = $request->request->get('email');
+        $password = $request->request->get('password');
+        $confirmPassword = $request->request->get('confirm_password');
+        $nom = $request->request->get('nom');
+        $prenom = $request->request->get('prenom');
+        
+        // Store form data for repopulation
+        $formData = [
+            'username' => $username,
+            'email' => $email,
+            'nom' => $nom,
+            'prenom' => $prenom
+        ];
+        
+        $errors = [];
+        
         try {
-            // Get form data
-            $username = $request->request->get('username');
-            $email = $request->request->get('email');
-            $password = $request->request->get('password');
-            $confirmPassword = $request->request->get('confirm_password');
-            $nom = $request->request->get('nom');
-            $prenom = $request->request->get('prenom');
-            
-            // Debug received data (temporarily log or dump)
-            // dump($username, $email, $password, $confirmPassword, $nom, $prenom);
-            
             // Basic validation
             if (empty($username) || empty($email) || empty($password) || empty($nom) || empty($prenom)) {
-                $this->addFlash('signup_error', 'All fields are required');
-                return $this->redirectToRoute('app_login');
+                $errors[] = 'All fields are required';
             }
             
             if ($password !== $confirmPassword) {
-                $this->addFlash('signup_error', 'Passwords do not match');
-                return $this->redirectToRoute('app_login');
+                $errors[] = 'Passwords do not match';
             }
             
             // Check if username already exists
             $existingUser = $entityManager->getRepository(Users::class)->findOneBy(['username' => $username]);
             if ($existingUser) {
-                $this->addFlash('signup_error', 'Username already exists');
-                return $this->redirectToRoute('app_login');
+                $errors[] = 'Username already exists';
             }
             
             // Check if email already exists
             $existingEmail = $entityManager->getRepository(Users::class)->findOneBy(['email' => $email]);
             if ($existingEmail) {
-                $this->addFlash('signup_error', 'Email already exists');
-                return $this->redirectToRoute('app_login');
+                $errors[] = 'Email already exists';
+            }
+            
+            // If there are any errors, render the login template but stay on signup
+            if (!empty($errors)) {
+                return $this->render('front_office/user/login.html.twig', [
+                    'last_username' => '',
+                    'error' => null,
+                    'signup_errors' => $errors,
+                    'form_data' => $formData,
+                    'show_signup' => true
+                ]);
             }
             
             // Create a new user
@@ -74,7 +87,7 @@ class RegistrationController extends AbstractController
             $user->setNom($nom);
             $user->setPrenom($prenom);
             
-            // Store password
+            // Using plaintext as per your security.yaml
             $user->setPassword($password);
             
             // Set default role as USER
@@ -84,33 +97,26 @@ class RegistrationController extends AbstractController
                 $userRole = new Roles();
                 $userRole->setRole('USER');
                 $entityManager->persist($userRole);
-                $entityManager->flush(); // Flush now to get the ID
+                $entityManager->flush();
             }
             $user->setRole($userRole);
             
             // Handle avatar upload
             $avatarFile = $request->files->get('avatar');
-            if ($avatarFile && $slugger) {
+            if ($avatarFile) {
                 $originalFilename = pathinfo($avatarFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $avatarFile->guessExtension();
                 
                 try {
-                    // Check if avatars_directory parameter exists
-                    if (!$this->getParameter('avatars_directory')) {
-                        throw new \Exception('avatars_directory parameter is not defined');
-                    }
-                    
                     $avatarFile->move(
                         $this->getParameter('avatars_directory'),
                         $newFilename
                     );
                     $user->setAvatar($newFilename);
-                } catch (FileException | \Exception $e) {
-                    // Use a default avatar if there's an error with file upload
+                } catch (FileException $e) {
+                    // Use default avatar on error
                     $user->setAvatar('default-avatar.png');
-                    // Log error but proceed with registration
-                    $this->addFlash('warning', 'Avatar could not be uploaded. Using default avatar.');
                 }
             } else {
                 // Set default avatar
@@ -121,16 +127,22 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
             
+            // Add success flash message
             $this->addFlash('success', 'Account created successfully! You can now log in.');
             
-        } catch (\Exception $e) {
-            // Log the exception
-            // $this->get('logger')->error('Registration error: ' . $e->getMessage());
+            // Redirect with success parameter
+            return $this->redirectToRoute('app_login', ['registration' => 'success']);
             
-            // Add a flash message with the error
-            $this->addFlash('signup_error', 'An error occurred during registration: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            $errors[] = 'An error occurred during registration. Please try again.';
+            
+            return $this->render('front_office/user/login.html.twig', [
+                'last_username' => '',
+                'error' => null,
+                'signup_errors' => $errors,
+                'form_data' => $formData,
+                'show_signup' => true
+            ]);
         }
-        
-        return $this->redirectToRoute('app_login');
     }
 }

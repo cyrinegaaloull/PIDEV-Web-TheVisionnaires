@@ -10,6 +10,11 @@
     --google-color: #DB4437;
     --twitter-color: #1DA1F2;
     --insta-color: #E1306C;
+    
+    /* Flash message colors */
+    --success-color: #4CAF50;
+    --danger-color: #F44336;
+    --warning-color: #FF9800;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
@@ -66,6 +71,53 @@ body {
     transition-delay: 1s;
 }
 
+/* Flash message styling */
+.flash-message {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-weight: 500;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    display: block; /* Ensure visibility */
+}
+
+.flash-success {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+}
+
+.flash-danger {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
+}
+
+.flash-warning {
+    background-color: rgba(255, 152, 0, 0.1);
+    color: var(--warning-color);
+    border: 1px solid var(--warning-color);
+}
+
+/* Animation for flash messages */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.flash-animate {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Flash container styling */
+#login-flash-container,
+#signup-flash-container {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
 .input-group {
     position: relative;
     width: 100%;
@@ -95,6 +147,48 @@ body {
     border: 0.125rem solid var(--primary-color);
 }
 
+/* Custom file input styling */
+.input-file-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.input-file-group i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.4rem;
+    color: var(--gray-2);
+}
+
+.file-label {
+    display: inline-block;
+    padding: 1rem 3rem;
+    background-color: var(--gray);
+    border: 0.125rem solid var(--white);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1rem;
+}
+
+.input-file-group input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
 .form button {
     cursor: pointer;
     width: 100%;
@@ -105,6 +199,13 @@ body {
     color: var(--white);
     font-size: 1.2rem;
     outline: none;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .form p {
@@ -191,6 +292,13 @@ body {
     transform: scale(1);
 }
 
+/* Ensure flash messages are visible regardless of form state */
+.container.sign-in #login-flash-container .flash-message,
+.container.sign-up #signup-flash-container .flash-message {
+    display: block;
+    opacity: 1;
+}
+
 .content-row {
     position: absolute;
     top: 0;
@@ -273,6 +381,15 @@ body {
     right: 50%;
 }
 
+/* Form titles */
+.form-title {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--primary-color);
+}
+
 /* RESPONSIVE */
 
 @media only screen and (max-width: 425px) {
@@ -338,5 +455,14 @@ body {
         font-size: 2rem;
     }
 
+    /* Ensure flash messages are visible on mobile */
+    #login-flash-container,
+    #signup-flash-container {
+        margin-bottom: 10px;
+    }
 
+    .flash-message {
+        padding: 8px;
+        font-size: 0.9rem;
+    }
 }
