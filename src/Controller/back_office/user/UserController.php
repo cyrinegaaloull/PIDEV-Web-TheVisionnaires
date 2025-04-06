@@ -67,7 +67,7 @@ class UserController extends AbstractController
                     $newFilename = uniqid() . '.' . $avatarFile->guessExtension();
                     try {
                         $avatarFile->move($this->getParameter('avatars_directory'), $newFilename);
-                        $avatarPath = 'uploads/avatars/' . $newFilename;
+                        $avatarPath = $newFilename; // Store only the filename
                     } catch (FileException $e) {
                         $usernameError = "Avatar upload failed";
                         $roles = $entityManager->getRepository(Roles::class)->findAll();
@@ -83,7 +83,7 @@ class UserController extends AbstractController
                     }
                 } else {
                     // If no file is uploaded, you can set a default avatar
-                    $avatarPath = 'uploads/avatars/default.png';
+                    $avatarPath = null;
                 }
                 
                 // Retrieve the Roles entity for the given role_id
@@ -185,7 +185,7 @@ public function updateUser(Request $request, EntityManagerInterface $entityManag
                 $newFilename = uniqid() . '.' . $avatarFile->guessExtension();
                 try {
                     $avatarFile->move($this->getParameter('avatars_directory'), $newFilename);
-                    $avatarPath = 'uploads/avatars/' . $newFilename;
+                    $avatarPath = $newFilename; // Store only the filename
                 } catch (FileException $e) {
                     // Handle the exception if the file upload fails
                     $usernameError = "Avatar upload failed";
@@ -198,7 +198,7 @@ public function updateUser(Request $request, EntityManagerInterface $entityManag
                 }
             } else {
                 // If no new file is uploaded, keep the current avatar
-                $avatarPath = $user->getAvatar();
+                $avatarPath = null;
             }
             
             // Retrieve the Roles entity for the given role_id

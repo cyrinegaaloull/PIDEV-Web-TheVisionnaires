@@ -79,9 +79,13 @@
           <!-- If the user is logged in, display their info -->
           <li class="nav-item dropdown user-dropdown">
             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button">
-              <div class="avatar avatar-online">
-                <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
-              </div>
+             <div class="avatar avatar-online">
+  {% if user and user.avatar %}
+    <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="seif" class="rounded-circle" style="width: 35px; height: 35px;">
+  {% else %}
+    <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
+  {% endif %}
+</div>
               <span class="ml-2 username-toggle font-weight-bold">{{ user.userIdentifier }}</span>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">

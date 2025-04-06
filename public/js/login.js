@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 message.style.display = 'none';
             }, 500); // Wait for fade out animation to complete
-        }, 7000);
+        }, 1000);
     });
 });
 
