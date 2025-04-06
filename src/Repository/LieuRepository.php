@@ -85,5 +85,18 @@ public function findNonFavorites(): array
         ->getQuery()
         ->getResult();
 }
+public function findRecommendedNearest(array $categories, float $lat, float $lon): array
+{
+    return $this->createQueryBuilder('l')
+        ->where('l.lieucategory IN (:categories)')
+        ->setParameter('categories', $categories)
+        ->addSelect('((l.latitude - :lat)*(l.latitude - :lat) + (l.longitude - :lon)*(l.longitude - :lon)) AS HIDDEN distance')
+        ->setParameter('lat', $lat)
+        ->setParameter('lon', $lon)
+        ->orderBy('distance', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
+
 
 }

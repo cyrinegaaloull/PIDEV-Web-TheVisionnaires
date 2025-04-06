@@ -36,28 +36,25 @@
     <div id="lieux-results">
       {% include 'front_office/exploration/_lieux_results.html.twig' %}
     </div>
+    <div id="weather-recommendations" class="mt-5 ftco-animate">
+      <div class="text-center p-4" id="weather-loader">
+        <div class="spinner-border text-info" role="status"></div>
+        <p class="mt-2">Chargement des recommandations météo...</p>
+      </div>
+    </div>
+    
   </div>
 </section>
+<style>
+  #weather-recommendations h3 {
+    color: #602080;
+    border-left: 4px solid #602080;
+    padding-left: 10px;
+  }
+</style>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const filterToggle = document.getElementById('filterToggle');
-    const filterMenu = document.getElementById('filterMenu');
-    const resultsContainer = document.getElementById('lieux-results');
-
-    // Toggle dropdown
-    filterToggle.addEventListener('click', () => {
-      filterMenu.style.display = filterMenu.style.display === 'none' ? 'block' : 'none';
-    });
-
-    // Click outside to close dropdown
-    document.addEventListener('click', function (e) {
-      if (!filterMenu.contains(e.target) && !filterToggle.contains(e.target)) {
-        filterMenu.style.display = 'none';
-      }
-    });
-
-    // Reinit animations after AJAX (FTCO-style)
-    function reinitAnimations() {
+  // Reinit animations after AJAX (FTCO-style)
+  function reinitAnimations() {
       if (window.jQuery && typeof $.fn.waypoint === 'function') {
         $('.ftco-animate').waypoint(function () {
           if (!$(this.element).hasClass('ftco-animated')) {
@@ -82,6 +79,65 @@
       }
     }
 
+document.addEventListener('DOMContentLoaded', function () {
+  fetchWeatherAndLoadRecommendations();
+
+  function fetchWeatherAndLoadRecommendations() {
+    const container = document.getElementById('weather-recommendations');
+    const apiKey = '6a6c2bff6bb599f64dabe16808c8cf58'; // ✅ Your OpenWeatherMap API key
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async position => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        try {
+          const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
+          const weatherData = await weatherRes.json();
+          const weatherCondition = weatherData.weather[0].main;
+
+          // ✅ Send lat/lon + weather to Symfony controller
+          fetch(`/recommendations?weather=${weatherCondition}&lat=${lat}&lon=${lon}&_ajax=1`)
+  .then(res => res.text())
+  .then(html => {
+    container.innerHTML = html;
+    reinitAnimations(); // ✅ triggers FTCO animation manually
+  });
+
+
+        } catch (error) {
+          console.error("Erreur lors de la récupération météo :", error);
+          container.innerHTML = '<p class="text-muted">Impossible de charger les recommandations météo.</p>';
+        }
+      }, error => {
+        console.error("Erreur de géolocalisation :", error);
+        container.innerHTML = '<p class="text-muted">Géolocalisation désactivée. Aucune recommandation météo possible.</p>';
+      });
+    } else {
+      container.innerHTML = '<p class="text-muted">Géolocalisation non supportée par votre navigateur.</p>';
+    }
+  }
+});
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const filterToggle = document.getElementById('filterToggle');
+    const filterMenu = document.getElementById('filterMenu');
+    const resultsContainer = document.getElementById('lieux-results');
+
+    // Toggle dropdown
+    filterToggle.addEventListener('click', () => {
+      filterMenu.style.display = filterMenu.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Click outside to close dropdown
+    document.addEventListener('click', function (e) {
+      if (!filterMenu.contains(e.target) && !filterToggle.contains(e.target)) {
+        filterMenu.style.display = 'none';
+      }
+    });
+
+    
     // AJAX loader template
     function showLoader() {
       resultsContainer.innerHTML = `

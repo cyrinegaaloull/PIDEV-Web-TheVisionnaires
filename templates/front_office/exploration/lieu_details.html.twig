@@ -41,17 +41,18 @@
     <div class="row">
       {% for event in events %}
         <div class="col-md-4">
-          <div class="project-wrap">
-            <a class="img" style="background-image: url('{{ asset('assets/exploration/images/' ~ (event.eventImage ?: 'default.jpg')) }}');"></a>
-            <div class="text p-4">
-              <span class="days">{{ event.eventDate ? event.eventDate|date('d/m/Y') : 'Non précisée' }}</span>
-              <h3>{{ event.eventName }}</h3>
-              <p class="location"><span class="fa fa-map-marker"></span> {{ lieu.lieuAddress }}</p>
-              <p>{{ event.eventDescription }}</p>
-              <p><strong>Catégorie:</strong> {{ event.eventCategory }}</p>
-              <p><strong>Prix:</strong> {{ event.ticketPrice }} TND</p>
-            </div>
-          </div>
+          <a href="{{ path('event_details', { id: event.eventid }) }}" class="project-wrap text-decoration-none text-dark">
+  <div class="img" style="background-image: url('{{ asset('assets/exploration/images/' ~ (event.eventImage ?: 'default.jpg')) }}'); height: 200px; background-size: cover;"></div>
+  <div class="text p-4">
+    <span class="days">{{ event.eventDate ? event.eventDate|date('d/m/Y') : 'Non précisée' }}</span>
+    <h3>{{ event.eventName }}</h3>
+    <p class="location"><span class="fa fa-map-marker"></span> {{ lieu.lieuAddress }}</p>
+    <p>{{ event.eventDescription }}</p>
+    <p><strong>Catégorie:</strong> {{ event.eventCategory }}</p>
+    <p><strong>Prix:</strong> {{ event.ticketPrice }} TND</p>
+  </div>
+</a>
+
         </div>
       {% endfor %}
     </div>

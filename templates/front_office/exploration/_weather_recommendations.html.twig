@@ -1,0 +1,13 @@
+{% if recommended is not empty %}
+  <h3 class="mb-4 font-weight-bold">Recommandé selon la météo</h3>
+  <div class="row">
+    {% for lieu in recommended %}
+      {% include 'front_office/exploration/_lieu_card.html.twig' with {
+        lieu: lieu,
+        ratings: ratings
+      } %}
+    {% endfor %}
+  </div>
+{% else %}
+<p>Aucun lieu recommandé pour la météo actuelle (<strong>{{ weather }}</strong> - catégories: {{ categories|join(', ') }}).</p>
+{% endif %}

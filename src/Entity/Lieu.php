@@ -4,7 +4,10 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+<<<<<<< HEAD
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+=======
+>>>>>>> ed8b8e6 (removed secrets from .env)
 
 #[ORM\Entity(repositoryClass: "App\Repository\LieuRepository")]
 #[ORM\Table(name: "lieu")]
@@ -15,6 +18,7 @@ class Lieu
     #[ORM\Column(name: "lieuID", type: "integer")]
     private ?int $lieuid = null;
 
+<<<<<<< HEAD
     #[ORM\Column(name: "lieuName", type: "string", length: 100)]
     #[Assert\NotBlank(message: "Le nom du lieu est requis.")]
     #[Assert\Length(min: 3, max: 100)]
@@ -54,6 +58,74 @@ class Lieu
 
     #[ORM\Column(name: "lieuNumber", type: "integer", nullable: true)]
     private ?int $lieunumber = null;
+=======
+    /**
+     * @var string
+ * @ORM\Column(name="lieuName", type="string", length=100, nullable=false)
+ * @Assert\NotBlank(message="Le nom du lieu est requis.")
+ * @Assert\Length(
+ *      min=3,
+ *      max=100,
+ *      minMessage="Le nom du lieu doit contenir au moins {{ limit }} caractères.",
+ *      maxMessage="Le nom du lieu ne peut pas dépasser {{ limit }} caractères."
+ * )
+ */
+    private $lieuname;
+
+   /**
+    *  @var string
+ * @ORM\Column(name="lieuAddress", type="string", length=100, nullable=false)
+ * @Assert\NotBlank(message="L'adresse est obligatoire.")
+ */
+    private $lieuaddress;
+
+    /**
+ * @var string
+ * @ORM\Column(name="lieuDescription", type="string", length=255, nullable=false)
+ * @Assert\NotBlank(message="La description est obligatoire.")
+ * @Assert\Length(
+ *     min=10,
+ *     max=255,
+ *     minMessage="La description doit contenir au moins {{ limit }} caractères.",
+ *     maxMessage="La description ne peut pas dépasser {{ limit }} caractères."
+ * )
+ */
+private $lieudescription;
+
+
+    /**
+     * @var string
+ * @ORM\Column(name="lieuCategory", type="string", length=30, nullable=false)
+ * @Assert\NotBlank(message="La catégorie est requise.")
+ */
+    private $lieucategory;
+
+    /**
+     * @var string
+ * @ORM\Column(name="lieuOpeningHours", type="text", length=65535, nullable=false)
+ * @Assert\NotBlank(message="L'heure d'ouverture est requise.")
+ */
+    private $lieuopeninghours;
+
+    /**
+     *  @var string
+ * @ORM\Column(name="lieuClosingHours", type="text", length=65535, nullable=false)
+ * @Assert\NotBlank(message="L'heure de fermeture est requise.")
+ */
+    private $lieuclosinghours;
+
+  /**
+ * @var int|null
+ * @ORM\Column(name="lieuNumber", type="integer", nullable=true)
+ * @Assert\Range(
+ *   min=10000000,
+ *   max=99999999,
+ *   notInRangeMessage="Le numéro du lieu doit contenir exactement 8 chiffres."
+
+ * )
+ */
+private $lieunumber;
+>>>>>>> ed8b8e6 (removed secrets from .env)
 
     #[ORM\Column(name: "lieuImage", type: "string", length: 20, nullable: true)]
     private ?string $lieuimage = null;
@@ -64,8 +136,16 @@ class Lieu
     #[ORM\Column(type: "float", nullable: true)]
     private ?float $longitude = null;
 
+<<<<<<< HEAD
     #[ORM\Column(type: "boolean", nullable: true)]
     private ?bool $isfavorite = false;
+=======
+    /**
+     * @var bool|null
+ * @ORM\Column(name="isFavorite", type="boolean", nullable=true)
+ */
+private $isfavorite = false; // ✅ change from '0' (string) to false (bool)
+>>>>>>> ed8b8e6 (removed secrets from .env)
 
     #[Assert\Callback]
     public static function validate(self $object, ExecutionContextInterface $context, $payload = null): void

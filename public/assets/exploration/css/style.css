@@ -10160,9 +10160,36 @@ textarea.form-control {
   transition: color 0.3s ease;
 }
 
-.ftco-navbar-light.scrolled .username-toggle {
-  color: #212529 !important; /* Same as nav links */
+
+.project-wrap {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
 }
+.project-wrap:hover {
+  transform: translateY(-4px);
+}
+
+.project-wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Force all .text blocks in cards to equal height */
+.project-wrap .text {
+  height: 300px; /* 🔧 Adjust this to fit your card layout */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+
+
+
 
 
 

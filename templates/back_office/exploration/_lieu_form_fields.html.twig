@@ -1,0 +1,56 @@
+<div class="row g-4">
+  <div class="col-md-6">
+    <label class="form-label">Nom du lieu</label>
+    {{ form_widget(form.lieuname, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.lieuname) }}
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Adresse</label>
+    {{ form_widget(form.lieuaddress, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.lieuaddress) }}
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Numéro du lieu</label>
+    {{ form_widget(form.lieunumber, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.lieunumber) }}
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Catégorie</label>
+    {{ form_widget(form.lieucategory, {'attr': {'class': 'form-select'}}) }}
+    {{ form_errors(form.lieucategory) }}
+  </div>
+
+  <div class="col-12">
+    <label class="form-label">Description</label>
+    {{ form_widget(form.lieudescription, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+    {{ form_errors(form.lieudescription) }}
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Heure d'ouverture</label>
+    {{ form_widget(form.lieuopeninghours, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.lieuopeninghours) }}
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Heure de fermeture</label>
+    {{ form_widget(form.lieuclosinghours, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.lieuclosinghours) }}
+  </div>
+
+  <div class="col-12">
+    <label class="form-label">Image du lieu</label>
+    {{ form_widget(form.lieuimage, {'attr': {'class': 'form-control', 'onchange': 'previewImage(event)'}}) }}
+    {{ form_errors(form.lieuimage) }}
+<img 
+  id="preview" 
+  src="{{ lieu.lieuimage ? asset('assets/exploration/images/' ~ lieu.lieuimage) : '#' }}" 
+  alt="Preview" 
+  class="mt-2 rounded shadow-sm border" 
+  style="max-width: 200px; {{ lieu.lieuimage ? '' : 'display: none;' }}"
+/>
+  </div>
+</div>

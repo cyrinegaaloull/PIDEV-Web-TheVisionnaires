@@ -5,9 +5,11 @@ use App\Entity\Lieu;
 use App\Repository\EventRepository;
 use App\Repository\ReviewRepository;
 
+use App\Form\LieuType;
 use App\Entity\Review;
 use App\Repository\UsersRepository;
 use App\Service\NeutrinoService;
+use App\Service\NotificationService;
 
 use App\Repository\LieuRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -133,4 +135,104 @@ public function addReview(
 
     return $this->redirectToRoute('lieu_details', ['id' => $id]);
 }
+
+#[Route('/event/{id}', name: 'event_details')]
+public function eventDetails(int $id, EventRepository $eventRepo, UsersRepository $userRepo): Response
+{
+    // ⚠️ Simulate or manually fetch a user (temporary)
+    $user = $userRepo->findOneBy(['username' => 'cyrine']);
+    $event = $eventRepo->find($id);
+    if (!$event) {
+        throw $this->createNotFoundException('Événement introuvable.');
+    }
+
+    return $this->render('front_office/exploration/event_details.html.twig', [
+        'event' => $event, 'user' => $user,
+    ]);
 }
+#[Route('/event/{id}/notify', name: 'event_notify', methods: ['POST'])]
+public function notifyUser(
+    int $id,
+    EventRepository $eventRepo,
+    NotificationService $notifier,
+    UsersRepository $userRepo // 👈 add this!
+): Response {
+    $event = $eventRepo->find($id);
+    if (!$event) {
+        throw $this->createNotFoundException('Event not found');
+    }
+
+    // 🔐 Simulated user (you can later use getUser() if auth is added)
+    $user = $userRepo->findOneBy(['username' => 'cyrine']);
+    if (!$user) {
+        throw $this->createNotFoundException('Utilisateur introuvable');
+    }
+
+    $userPhone = '+21653968669'; //hardcoded
+    $userEmail = $user->getEmail(); 
+    $notifier->sendWhatsApp($userPhone, "🎉 Rappel: L’événement '{$event->getEventname()}' aura lieu le " . $event->getEventdate()->format('d/m/Y'));
+    $notifier->sendEmail($userEmail, 'Rappel événement', "🎫 Ne manquez pas '{$event->getEventname()}' le " . $event->getEventdate()->format('d/m/Y'));
+
+    $this->addFlash('success', 'Notification envoyée avec succès.');
+    return $this->redirectToRoute('lieu_details', ['id' => $event->getLieuid()]);
+}
+#[Route('/recommendations', name: 'weather_recommendations')]
+public function recommendByWeather(
+    Request $request,
+    LieuRepository $repo,
+    ReviewRepository $reviewRepo
+): Response {
+    
+    $weather = $request->query->get('weather', 'Clear');
+    $lat = $request->query->get('lat');
+    $lon = $request->query->get('lon');
+
+    $categories = match ($weather) {
+        'Clear' => ['PLAGE', 'PARK', 'STADE', 'CENTRE_SHOPPING'],
+        'Clouds', 'Mist', 'Fog' => ['HOTEL', 'RESTAURANT', 'CINEMA', 'CENTRE_SHOPPING'],
+        'Rain', 'Drizzle', 'Thunderstorm' => ['CINEMA', 'MUSEE', 'LIBRAIRIE', 'CENTRE_SHOPPING'],
+        'Snow' => ['HOTEL', 'LIBRAIRIE', 'CENTRE_SHOPPING'],
+        default => ['RESTAURANT', 'HOTEL', 'CENTRE_SHOPPING'],
+    };
+    dump([$weather, $lat, $lon, $categories]);
+
+    
+
+    if ($lat && $lon) {
+        $recommended = $repo->createQueryBuilder('l')
+        ->where('l.lieucategory IN (:categories)')
+        ->setParameter('categories', $categories)
+        ->getQuery()
+        ->getResult();
+        } else {
+        $recommended = $repo->findBy(['lieucategory' => $categories]);
+        dump([
+            'weather' => $weather,
+            'lat' => $lat,
+            'lon' => $lon,
+            'categories' => $categories,
+            'results_count' => count($recommended),
+            'results' => $recommended,
+        ]);
+        exit;
+        
+    }
+
+    $ratings = [];
+    foreach ($recommended as $lieu) {
+        $ratings[$lieu->getLieuid()] = $reviewRepo->calculateAverageRating($lieu->getLieuid());
+    }
+
+    return $this->render('front_office/exploration/_weather_recommendations.html.twig', [
+        'recommended' => $recommended,
+        'ratings' => $ratings,
+        'weather' => $weather,           // ✅ add this
+        'categories' => $categories,     // ✅ and this
+    ]);
+    
+}
+
+
+
+}
+

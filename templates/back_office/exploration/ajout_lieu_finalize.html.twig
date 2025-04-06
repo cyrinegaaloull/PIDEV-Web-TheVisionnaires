@@ -1,0 +1,90 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<h4 class="fw-bold mb-4 text-primary">Étape 2 : Complétez les détails du lieu</h4>
+
+<div class="card shadow border rounded-3 p-4">
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    {% for label, messages in app.flashes %}
+  {% for message in messages %}
+    <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endfor %}
+
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.lieuname, null, {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.lieuname, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.lieuname) }}
+        </div>
+        
+        
+        
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.lieuaddress, null, {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.lieuaddress, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.lieuaddress) }}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.lieunumber, null, {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.lieunumber, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.lieunumber) }}
+        </div>
+
+        <div class="col-12 mb-3">
+            {{ form_label(form.lieudescription, null, {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.lieudescription, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+            {{ form_errors(form.lieudescription) }}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.lieucategory, null, {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.lieucategory, {'attr': {'class': 'form-select'}}) }}
+            {{ form_errors(form.lieucategory) }}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.lieuimage, 'Image du lieu', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.lieuimage, {'attr': {'onchange': 'previewImage(event)', 'class': 'form-control'}}) }}
+            {{ form_errors(form.lieuimage) }}
+            <img id="preview" src="#" alt="Preview" class="mt-2 rounded shadow-sm border" style="max-width: 200px; display: none;" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.lieuopeninghours, null, {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.lieuopeninghours, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.lieuopeninghours) }}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.lieuclosinghours, null, {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.lieuclosinghours, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.lieuclosinghours) }}
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary btn-lg shadow">
+            <i class="fas fa-save me-2"></i> Enregistrer le lieu
+        </button>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+
+<script>
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById('preview');
+            output.src = reader.result;
+            output.style.display = 'block';
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+{% endblock %}

@@ -167,6 +167,7 @@ public function incrementReservedTickets(): self {
         return $this->eventimage;
     }
 
+<<<<<<< HEAD
     public function setEventimage(?string $eventimage): self
     {
         $this->eventimage = $eventimage;
@@ -194,4 +195,42 @@ public function incrementReservedTickets(): self {
         $this->notificationscheduledat = $time;
         return $this;
     }
+=======
+    /**
+ * @var string|null
+ *
+ * @ORM\Column(name="notificationMethod", type="string", length=20, nullable=true)
+ */
+private $notificationmethod;
+
+/**
+ * @var \DateTime|null
+ *
+ * @ORM\Column(name="notificationScheduledAt", type="datetime", nullable=true)
+ */
+private $notificationscheduledat;
+
+public function getNotificationmethod(): ?string
+{
+    return $this->notificationmethod;
+}
+
+public function setNotificationmethod(?string $method): self
+{
+    $this->notificationmethod = $method;
+    return $this;
+}
+
+public function getNotificationscheduledat(): ?\DateTime
+{
+    return $this->notificationscheduledat;
+}
+
+public function setNotificationscheduledat(?\DateTime $time): self
+{
+    $this->notificationscheduledat = $time;
+    return $this;
+}
+
+>>>>>>> ed8b8e6 (removed secrets from .env)
 }

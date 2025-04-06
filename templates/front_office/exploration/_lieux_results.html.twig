@@ -1,5 +1,5 @@
 {% if favorites|length > 0 %}
-  <h3 class="mb-3 font-weight-bold">❤️ Vos favoris</h3>
+  <h3 class="mb-3 font-weight-bold">Vos favoris</h3>
   <div class="row">
     {% for lieu in favorites %}
       {% include 'front_office/exploration/_lieu_card.html.twig' with { lieu: lieu, ratings: ratings } %}
@@ -8,7 +8,7 @@
 {% endif %}
 
 {% if lieux is not empty %}
-  <h3 class="mb-3 mt-5 font-weight-bold">🔎 Autres lieux</h3>
+  <h3 class="mb-3 mt-5 font-weight-bold">Autres lieux</h3>
   <div class="row">
     {% for lieu in lieux %}
       {% include 'front_office/exploration/_lieu_card.html.twig' with { lieu: lieu, ratings: ratings } %}
