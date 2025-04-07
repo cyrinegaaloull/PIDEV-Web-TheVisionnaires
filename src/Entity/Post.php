@@ -1,158 +1,129 @@
 <?php
 
-
 namespace App\Entity;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Post
- *
- * @ORM\Table(name="post")
  * @ORM\Entity
+ * @ORM\Table(name="post")
  */
 class Post
 {
     /**
-     * @var int
-     *
-     * @ORM\Column(name="post_id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(name="post_id", type="integer")
      */
-    private $postId;
+    private ?int $postId = null;
 
     /**
-     * @var int|null
-     *
      * @ORM\Column(name="user_id", type="integer", nullable=true)
      */
-    private $userId;
+    private ?int $userId = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="title", type="string", length=255, nullable=false)
+     * @ORM\Column(name="title", type="string", length=255)
      */
-    private $title;
+    private string $title;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="content", type="text", length=65535, nullable=false)
+     * @ORM\Column(name="content", type="text")
      */
-    private $content;
+    private string $content;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="category", type="string", length=255, nullable=false)
+     * @ORM\Column(name="category", type="string", length=255)
      */
-    private $category;
-
+    private string $category;
 
     /**
-     * Get postId.
-     *
-     * @return int
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post", cascade={"remove"})
      */
-    public function getPostId()
+    private Collection $comments;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+    }
+
+    public function getPostId(): ?int
     {
         return $this->postId;
     }
 
-    /**
-     * Set userId.
-     *
-     * @param int|null $userId
-     *
-     * @return Post
-     */
-    public function setUserId($userId = null)
-    {
-        $this->userId = $userId;
-
-        return $this;
-    }
-
-    /**
-     * Get userId.
-     *
-     * @return int|null
-     */
-    public function getUserId()
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
 
-    /**
-     * Set title.
-     *
-     * @param string $title
-     *
-     * @return Post
-     */
-    public function setTitle($title)
+    public function setUserId(?int $userId): self
     {
-        $this->title = $title;
-
+        $this->userId = $userId;
         return $this;
     }
 
-    /**
-     * Get title.
-     *
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * Set content.
-     *
-     * @param string $content
-     *
-     * @return Post
-     */
-    public function setContent($content)
+    public function setTitle(string $title): self
     {
-        $this->content = $content;
-
+        $this->title = $title;
         return $this;
     }
 
-    /**
-     * Get content.
-     *
-     * @return string
-     */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
 
-    /**
-     * Set category.
-     *
-     * @param string $category
-     *
-     * @return Post
-     */
-    public function setCategory($category)
+    public function setContent(string $content): self
+    {
+        $this->content = $content;
+        return $this;
+    }
+
+    public function getCategory(): string
+    {
+        return $this->category;
+    }
+
+    public function setCategory(string $category): self
     {
         $this->category = $category;
-
         return $this;
     }
 
     /**
-     * Get category.
-     *
-     * @return string
+     * @return Collection<int, Comment>
      */
-    public function getCategory()
+    public function getComments(): Collection
     {
-        return $this->category;
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            if ($comment->getPost() === $this) {
+                $comment->setPost(null);
+            }
+        }
+
+        return $this;
     }
 }

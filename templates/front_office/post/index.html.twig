@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Post Index{% endblock %}
+
+{% block body %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(220, 220, 220, 0.6);
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .card-category {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .card-content {
+            text-align: center;
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+    </style>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">📋 All Posts</h1>
+
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <a href="{{ path('app_post_new') }}" class="btn btn-success">➕ Add Post</a>
+
+            <form method="get" action="" class="d-flex gap-2">
+                <input type="text" name="search" class="form-control" placeholder="Search posts...">
+                <button type="submit" class="btn btn-primary">🔍</button>
+                <a href="{{ path('app_post_index') }}" class="btn btn-secondary">⟲ Reset</a>
+            </form>
+        </div>
+
+        <div class="row">
+            {% for post in posts %}
+                <div class="col-md-4 d-flex mb-4">
+                    <div class="glass-card w-100">
+                        <div>
+                            <div class="card-title">{{ post.title }}</div>
+                            <div class="card-category">📂 {{ post.category }}</div>
+                            <div class="card-content">{{ post.content|length > 100 ? post.content|slice(0, 100) ~ '...' : post.content }}</div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="{{ path('app_post_show', {'postId': post.postId}) }}" class="btn btn-outline-info btn-sm">👁 View</a>
+                            <a href="{{ path('app_post_edit', {'postId': post.postId}) }}" class="btn btn-outline-warning btn-sm">✏️ Edit</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">No posts available.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
