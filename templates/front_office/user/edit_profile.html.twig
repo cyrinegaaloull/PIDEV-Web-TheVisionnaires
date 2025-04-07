@@ -1,0 +1,712 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block body %}
+
+<style>
+    /* --- Define Color Variables --- */
+    :root {
+        --primary-color: #4E0260;
+        --secondary-color: #4B0082;
+        --primary-color-rgb: 78, 2, 96;
+        --secondary-color-rgb: 75, 0, 130;
+        --primary-darker: #3A014A;
+        --focus-glow-color: rgba(var(--secondary-color-rgb), 0.25);
+        --button-hover-shadow-color: rgba(var(--primary-color-rgb), 0.4);
+        --input-bg: #fdfaff;
+        --input-border: #e0d1e4;
+        --label-color: #333;
+    }
+    
+    /* --- Base Styling --- */
+    body.edit-profile-page {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        background-attachment: fixed;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* --- Card Modernization --- */
+    .modern-card {
+        background-color: rgba(255, 255, 255, 0.98);
+        border-radius: 24px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        border: none;
+        margin-top: 3rem;
+        overflow: hidden;
+        animation: fadeInScaleUp 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        opacity: 0;
+        transform: translateY(30px);
+        backdrop-filter: blur(10px);
+    }
+    
+    .modern-card .card-header {
+        background-color: transparent;
+        border-bottom: 1px solid rgba(238, 238, 238, 0.5);
+        padding: 1.8rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .modern-card .card-header h2 {
+        margin-bottom: 0;
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 1.8rem;
+        letter-spacing: -0.3px;
+        text-shadow: 0px 1px 1px rgba(255,255,255,0.8);
+        position: relative;
+        display: inline-block;
+    }
+    
+    .modern-card .card-header h2::after {
+        content: '';
+        position: absolute;
+        bottom: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+    
+    .modern-card .card-header:hover h2::after {
+        width: 100px;
+    }
+    
+    .modern-card .card-body {
+        padding: 2.5rem 2.5rem 2.5rem 2.5rem;
+    }
+
+    /* --- Top Profile Picture Display --- */
+    .profile-avatar-top {
+        text-align: center;
+        margin-bottom: 3rem;
+        margin-top: 1rem;
+        position: relative;
+    }
+    
+    .profile-avatar-container {
+        position: relative;
+        display: inline-block;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        cursor: pointer;
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease;
+    }
+    
+    .profile-avatar-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(78, 2, 96, 0) 0%, rgba(78, 2, 96, 0.7) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1;
+    }
+    
+    .profile-avatar-container:hover::before {
+        opacity: 1;
+    }
+    
+    .profile-avatar-container:hover {
+        transform: scale(1.05) translateY(-5px);
+        box-shadow: 0 15px 40px rgba(var(--secondary-color-rgb), 0.45);
+    }
+    
+    .profile-avatar-container:hover .img-display {
+        transform: scale(1.1);
+    }
+    
+    .profile-avatar-container:hover .avatar-edit-overlay {
+        opacity: 1;
+    }
+    
+    .profile-avatar-top .img-display {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+        display: block;
+    }
+    
+    .avatar-edit-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        text-align: center;
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 2;
+    }
+    
+    .avatar-edit-overlay span {
+        display: inline-block;
+        transform: translateY(5px);
+        transition: transform 0.3s ease;
+    }
+    
+    .profile-avatar-container:hover .avatar-edit-overlay span {
+        transform: translateY(0);
+    }
+
+    /* --- Form Elements Refined --- */
+    .form-group {
+        margin-bottom: 1.8rem;
+        position: relative;
+    }
+    
+    .modern-card .form-label {
+        font-weight: 600;
+        color: var(--label-color);
+        margin-bottom: 0.8rem;
+        font-size: 0.95rem;
+        display: block;
+        transition: color 0.3s ease;
+        position: relative;
+        padding-left: 0.3rem;
+    }
+    
+    .form-group:focus-within .form-label {
+        color: var(--primary-color);
+    }
+    
+    .form-label::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 0;
+        background: var(--primary-color);
+        border-radius: 3px;
+        transition: height 0.3s ease;
+    }
+    
+    .form-group:focus-within .form-label::before {
+        height: 80%;
+    }
+    
+    .modern-card .form-control {
+        border-radius: 12px;
+        border: 2px solid var(--input-border);
+        padding: 0.95rem 1.2rem;
+        transition: all 0.3s ease;
+        background-color: var(--input-bg);
+        color: #333;
+        font-size: 0.95rem;
+        font-family: 'Poppins', sans-serif;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .modern-card .form-control:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 4px var(--focus-glow-color), 0 8px 16px rgba(0, 0, 0, 0.07);
+        background-color: #fff;
+        outline: none;
+        transform: translateY(-2px);
+    }
+    
+    .modern-card .form-control[type="file"] {
+        padding: 0.85rem 1.1rem;
+        position: relative;
+        z-index: 1;
+        cursor: pointer;
+    }
+    
+    .modern-card .form-control[type="file"]::file-selector-button {
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        margin-right: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        box-shadow: 0 4px 8px rgba(var(--primary-color-rgb), 0.3);
+    }
+    
+    .modern-card .form-control[type="file"]::file-selector-button:hover {
+        background: var(--primary-darker);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(var(--primary-color-rgb), 0.4);
+    }
+    
+    .modern-card .form-control.is-invalid {
+        border-color: #dc3545;
+        background-color: #fbebeb;
+        animation: invalidShake 0.4s ease;
+    }
+    
+    .modern-card .form-control.is-invalid:focus {
+        box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.25);
+        border-color: #dc3545;
+    }
+    
+    .modern-card .invalid-feedback {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #dc3545;
+        margin-top: 0.5rem;
+        padding-left: 0.3rem;
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .modern-card .form-text {
+        color: #777;
+        font-size: 0.85em;
+        margin-top: 0.6rem;
+        padding-left: 0.3rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-group:focus-within .form-text {
+        color: #555;
+    }
+
+    /* --- Section Titles --- */
+    .modern-card .form-section-title {
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        margin-top: 2.5rem;
+        font-size: 1.2rem;
+        border-bottom: 2px solid rgba(var(--primary-color-rgb), 0.2);
+        padding-bottom: 0.8rem;
+        position: relative;
+    }
+    
+    .modern-card .form-section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        transition: width 0.3s ease;
+    }
+    
+    .modern-card .form-section-title:hover::after {
+        width: 100px;
+    }
+
+    /* --- Change Avatar Input Section (Bottom) --- */
+    .change-avatar-section {
+        margin-top: 2.5rem;
+        padding: 1.8rem;
+        border-radius: 16px;
+        border: 2px dashed var(--input-border);
+        transition: all 0.3s ease;
+        background-color: rgba(var(--primary-color-rgb), 0.03);
+        position: relative;
+    }
+    
+    .change-avatar-section:hover {
+        border-color: var(--secondary-color);
+        background-color: rgba(var(--primary-color-rgb), 0.05);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(var(--secondary-color-rgb), 0.1);
+    }
+    
+    .change-avatar-section .form-label {
+        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
+        display: block;
+    }
+    
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 0.5rem;
+    }
+    
+    .file-upload-icon {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        color: var(--primary-color);
+        font-size: 1.2rem;
+        pointer-events: none;
+        opacity: 0.7;
+        transition: all 0.3s ease;
+    }
+    
+    .file-upload-wrapper:hover .file-upload-icon {
+        right: 15px;
+        opacity: 1;
+    }
+
+    /* --- Buttons --- */
+    .modern-card .btn {
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        font-weight: 700;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        border: none;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .modern-card .btn-primary {
+        background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+    }
+    
+    .modern-card .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.7s ease;
+    }
+    
+    .modern-card .btn:hover::before {
+        left: 100%;
+    }
+    
+    .modern-card .btn-primary:hover {
+        background: var(--primary-darker);
+        box-shadow: 0 12px 25px var(--button-hover-shadow-color);
+        transform: translateY(-5px);
+    }
+    
+    .modern-card .btn-secondary {
+        background-color: #f4f4f4;
+        color: #555;
+        border: 1px solid #ddd;
+    }
+    
+    .modern-card .btn-secondary:hover {
+        background-color: #e8e8e8;
+        color: #333;
+        border-color: #ccc;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+    }
+    
+    .btn-group {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2.5rem;
+    }
+
+    /* --- Flash Messages --- */
+    .modern-card .alert {
+        border-radius: 12px;
+        border-left: 5px solid;
+        padding: 1.3rem 1.8rem;
+        opacity: 0;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .modern-card .alert-success {
+        background-color: #e7f9f0;
+        border-color: #52c41a;
+        color: #135200;
+        animation: alertFadeIn 0.6s ease-out forwards, alertSlideIn 0.6s ease-out forwards;
+    }
+    
+    .modern-card .alert-danger {
+        background-color: #fff2f0;
+        border-color: #ff4d4f;
+        color: #a8071a;
+        animation: alertFadeIn 0.6s ease-out forwards, alertSlideIn 0.6s ease-out forwards;
+    }
+    
+    .alert::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        transform: translateX(-100%);
+        animation: alertShine 3s infinite;
+    }
+    
+    /* --- Form Field Animations --- */
+    .form-control-animated {
+        animation: formFieldFadeIn 0.5s ease-out forwards;
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    
+    .form-group:nth-child(1) .form-control-animated { animation-delay: 0.2s; }
+    .form-group:nth-child(2) .form-control-animated { animation-delay: 0.3s; }
+    .form-group:nth-child(3) .form-control-animated { animation-delay: 0.4s; }
+    .form-group:nth-child(4) .form-control-animated { animation-delay: 0.5s; }
+    
+    /* --- Form Divider --- */
+    .form-divider {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(var(--primary-color-rgb), 0.2), transparent);
+        margin: 2.5rem 0;
+        position: relative;
+    }
+    
+    .form-divider::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 30px;
+        height: 30px;
+        background-color: white;
+        border-radius: 50%;
+        box-shadow: 0 0 0 5px rgba(var(--primary-color-rgb), 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14' fill='%234E0260'%3E%3Cpath d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm-1-13v5h5v2h-7V7h2z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeInScaleUp {
+        0% {
+            opacity: 0;
+            transform: scale(0.96) translateY(30px);
+        }
+        70% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    @keyframes formFieldFadeIn {
+        0% {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes alertFadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    
+    @keyframes alertSlideIn {
+        0% { transform: translateY(-20px); }
+        100% { transform: translateY(0); }
+    }
+    
+    @keyframes alertShine {
+        0% { transform: translateX(-100%); }
+        20% { transform: translateX(100%); }
+        100% { transform: translateX(100%); }
+    }
+    
+    @keyframes invalidShake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    
+    /* --- Responsive Adjustments --- */
+    @media (max-width: 768px) {
+        .modern-card {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modern-card .card-body {
+            padding: 1.5rem;
+        }
+        
+        .profile-avatar-container {
+            width: 150px;
+            height: 150px;
+        }
+        
+        .modern-card .btn {
+            padding: 0.8rem 1.5rem;
+        }
+    }
+</style>
+
+<div class="edit-profile-page-wrapper">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="card modern-card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Edit Your Profile</h2>
+                    </div>
+                    <div class="card-body">
+                        {# Flash Messages #}
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                        {% for message in app.flashes('error') %}
+                            <div class="alert alert-danger">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+
+                        <form method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="_token" value="{{ csrf_token('edit_profile' ~ user.getUserId()) }}">
+
+                            {# --- Display Current Avatar (Top) --- #}
+                            <div class="profile-avatar-top">
+                                <div class="profile-avatar-container">
+                                    {% if user.avatar %}
+                                        <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="Current Profile Picture" class="img-display">
+                                    {% else %}
+                                        <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Default Profile Picture" class="img-display">
+                                    {% endif %}
+                                    <div class="avatar-edit-overlay">
+                                        <span>Click to edit</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# --- Basic Information --- #}
+                            {# Username #}
+                            <div class="form-group">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" id="username" name="username" class="form-control form-control-animated {% if usernameError is defined and usernameError %}is-invalid{% endif %}" value="{{ user.username }}" required>
+                                {% if usernameError is defined and usernameError %} <div class="invalid-feedback">{{ usernameError }}</div> {% endif %}
+                            </div>
+
+                            {# Email #}
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" name="email" class="form-control form-control-animated" value="{{ user.email }}" required>
+                            </div>
+
+                            {# Last Name #}
+                            <div class="form-group">
+                                <label for="nom" class="form-label">Last Name</label>
+                                <input type="text" id="nom" name="nom" class="form-control form-control-animated" value="{{ user.nom }}">
+                            </div>
+
+                            {# First Name #}
+                            <div class="form-group">
+                                <label for="prenom" class="form-label">First Name</label>
+                                <input type="text" id="prenom" name="prenom" class="form-control form-control-animated" value="{{ user.prenom }}">
+                            </div>
+
+                            {# --- Form Divider --- #}
+                            <div class="form-divider"></div>
+
+                            {# --- Change Password Section --- #}
+                            <h5 class="form-section-title">Change Password (Optional)</h5>
+                            <div class="form-group">
+                                <label for="password" class="form-label">New Password</label>
+                                <input type="password" id="password" name="password" class="form-control form-control-animated {% if passwordError is defined and passwordError %}is-invalid{% endif %}" placeholder="Leave blank to keep current password">
+                                {% if passwordError is defined and passwordError %} <div class="invalid-feedback">{{ passwordError }}</div> {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                <input type="password" id="confirm_password" name="confirm_password" class="form-control form-control-animated" placeholder="Confirm new password">
+                            </div>
+
+                  
+
+                            {# --- Action Buttons --- #}
+                            <div class="btn-group">
+                                <a href="{{ path('app_home') }}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div> {# End card-body #}
+                </div> {# End modern-card #}
+            </div> {# End col #}
+        </div> {# End row #}
+    </div> {# End container #}
+</div> {# End wrapper #}
+
+{# JavaScript Enhancements #}
+<script>
+    document.body.classList.add('edit-profile-page');
+    
+    // Function to connect the avatar click with the file input
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarContainer = document.querySelector('.profile-avatar-container');
+        const fileInput = document.getElementById('avatar');
+        
+        if (avatarContainer && fileInput) {
+            avatarContainer.addEventListener('click', function() {
+                fileInput.click();
+            });
+        }
+        
+        // Add input focus animation
+        const formControls = document.querySelectorAll('.form-control');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function() {
+                this.closest('.form-group').classList.add('is-focused');
+            });
+            
+            control.addEventListener('blur', function() {
+                this.closest('.form-group').classList.remove('is-focused');
+            });
+        });
+        
+        // Image preview on file select
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    const avatarImg = document.querySelector('.img-display');
+                    
+                    reader.onload = function(e) {
+                        avatarImg.src = e.target.result;
+                        avatarImg.style.animation = 'fadeIn 0.5s ease';
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}
