@@ -7,9 +7,12 @@
 parameters:
     avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
     your_upload_directory: '%kernel.project_dir%/public/assets/exploration/images'
+    uploads_directory: '%kernel.project_dir%/public/uploads'
+    uploads_directory_web: '/uploads'
 
-
+    
 services:
+    # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.

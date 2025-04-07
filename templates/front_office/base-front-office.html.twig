@@ -50,8 +50,14 @@
                 <li class="nav-item {% if app.request.attributes.get('_route') == 'app_exploration' %}active{% endif %}">
                     <a href="{{ path('app_exploration') }}" class="nav-link">Exploration</a>
                 </li>
-                <li class="nav-item {% if app.request.attributes.get('_route') == 'app_clubs' %}active{% endif %}">
-                    <a href="#" class="nav-link">Clubs</a>
+                <li class="nav-item dropdown {% if app.request.attributes.get('_route') starts with 'app_clubs' %}active{% endif %}">
+                    <a class="nav-link dropdown-toggle" href="#" id="clubsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Clubs
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="clubsDropdown">
+                    <a class="dropdown-item" href="{{ path('app_clubs') }}">Clubs</a>
+                    <a class="dropdown-item" href="{{path('app_activites')}}">Activités</a>
+                    </div>
                 </li>
                 <li class="nav-item {% if app.request.attributes.get('_route') == 'app_assistance' %}active{% endif %}">
                     <a href="#" class="nav-link">Assistance</a>

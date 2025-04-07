@@ -1,0 +1,90 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}Clubs Sociaux{% endblock %}
+
+{% block body %}
+<section class="hero-wrap hero-wrap-2 js-fullheight" style="background-image: url('{{ asset('assets/front_office/images/Web-Bg.jpg') }}'); min-height: 600px; opacity: 90%;">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row no-gutters slider-text js-fullheight align-items-center justify-content-center">
+      <div class="col-md-7 ftco-animate pb-5 text-center">
+        <p class="breadcrumbs"><span><a>Accueil <i class="fa fa-chevron-right"></i></a></span> <span>Clubs Sociaux <i class="fa fa-chevron-right"></i></span></p>
+        <h1 class="mb-4">Nos Clubs</h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ftco-section ftco-no-pt ftco-no-pb">
+  <div class="container">
+    <div class="ftco-search d-flex justify-content-center" style="margin-top: -100px;">
+      <form action="{{ path('app_clubs') }}" method="get" class="club-filter-bar">
+        
+        <!-- Search -->
+        <div class="form-group">
+          <label for="search">Recherche</label>
+          <div class="form-field">
+            <div class="icon"><span class="fa fa-search"></span></div>
+            <input type="text" name="search" id="search" class="form-control" placeholder="Rechercher un club..." value="{{ app.request.get('search') }}">
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label for="category">Catégorie</label>
+          <div class="form-field select-wrap">
+            <div class="icon"><span class="fa fa-chevron-down"></span></div>
+            <select name="category" id="category" class="form-control">
+              <option value="">Toutes les catégories</option>
+              {% for cat in categories %}
+                <option value="{{ cat }}" {% if app.request.get('category') == cat %}selected{% endif %}>{{ cat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="form-group d-flex align-items-end">
+          <input type="submit" value="Filtrer" class="button">
+        </div>
+
+      </form>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="ftco-section">
+  <div class="container">
+    <div class="row">
+      {% for club in clubs %}
+        <div class="col-md-4 ftco-animate">
+          <div class="project-wrap hotel">
+            <a href="#" class="img" style="background-image: url('{{ asset('uploads/clubs/' ~ club.bannerImage) }}');">
+              <span class="club-category">{{ club.clubCategory }}</span>
+            </a>
+            <div class="text p-4">
+              <h3><a href="#">{{ club.clubName }}</a></h3>
+              <p class="location"><span class="fa fa-map-marker"></span> {{ club.clubLocation }}</p>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <p class="text-center">Aucun club disponible pour le moment.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if clubs|length > 0 %}
+    <div class="row mt-5">
+      <div class="col text-center">
+        <div class="block-27">
+          {{ knp_pagination_render(clubs) }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
