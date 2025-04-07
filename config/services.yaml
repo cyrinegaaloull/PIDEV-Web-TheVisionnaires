@@ -10,7 +10,12 @@ parameters:
     # Add the OpenRouter API key parameter
     openrouter_api_key: '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'
 
+    uploads_directory: '%kernel.project_dir%/public/uploads'
+    uploads_directory_web: '/uploads'
+
+    
 services:
+    # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.

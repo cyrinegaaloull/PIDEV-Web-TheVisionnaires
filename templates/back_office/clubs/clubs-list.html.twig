@@ -1,0 +1,111 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Liste des clubs</h5>
+    <a href="{{ path('admin_club_new') }}" class="btn btn-primary">
+      <i class="ri-add-line me-1"></i> Nouveau Club
+    </a>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <input type="text" id="search-input" class="form-control" placeholder="Rechercher un club...">
+    </div>
+    <div class="col-md-3">
+      <select id="filter-select" class="form-select">
+        <option value="">Filtrer par</option>
+        <option value="az">A → Z</option>
+        <option value="za">Z → A</option>
+        <option value="oldest">Plus ancien</option>
+        <option value="newest">Plus récent</option>
+      </select>
+    </div>
+    <div class="col-md-3 text-end text-muted pt-2">
+      Total : {{ totalClubs }} clubs
+    </div>
+  </div>
+
+  <div id="clubs-table-container">
+    {% include 'back_office/clubs/_clubs_table.html.twig' with {'clubs': clubs} %}
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Êtes-vous sûr de vouloir supprimer ce club ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <a href="#" class="btn btn-danger" id="confirm-delete-btn">Supprimer</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function fetchClubs(page = 1) {
+    const search = document.getElementById('search-input').value;
+    const filter = document.getElementById('filter-select').value;
+
+    const url = new URL("{{ path('admin_club_list') }}", window.location.origin);
+    url.searchParams.append('page', page);
+    if (search) url.searchParams.append('search', search);
+    if (filter) url.searchParams.append('filter', filter);
+
+    fetch(url, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('clubs-table-container').innerHTML = html;
+    });
+  }
+
+  // Search & Filter events
+  document.getElementById('search-input').addEventListener('input', () => fetchClubs(1));
+  document.getElementById('filter-select').addEventListener('change', () => fetchClubs(1));
+
+  // AJAX pagination
+ document.addEventListener('click', function (e) {
+  if (e.target.classList.contains('page-link-ajax')) {
+    e.preventDefault();
+    const page = e.target.dataset.page;
+
+    const search = document.getElementById('search-input').value;
+    const filter = document.getElementById('filter-select').value;
+
+    fetch(`{{ path('admin_club_list') }}?search=${search}&filter=${filter}&page=${page}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('clubs-table-container').innerHTML = html;
+    });
+  }
+});
+</script>
+<style>
+.pagination-rounded .page-link {
+  border-radius: 1.5rem !important;
+}
+.btn-circle {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50% !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+</style>
+{% endblock %}

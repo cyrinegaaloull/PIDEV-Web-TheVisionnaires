@@ -1,0 +1,80 @@
+{# templates/back_office/clubs/_clubs_table.html.twig #}
+<table class="table table-hover text-center">
+  <thead class="table-light">
+    <tr>
+      <th>Logo</th>
+      <th>Nom</th>
+      <th>Date de création</th>
+      <th>Catégorie</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for club in clubs %}
+      <tr>
+        <td>
+          <img src="{{ asset('uploads/' ~ club.clublogo) }}" class="rounded-circle" width="40" height="40" alt="logo">
+        </td>
+        <td>{{ club.clubname }}</td>
+        <td>{{ club.creationdate|date('d/m/Y') }}</td>
+        <td>{{ club.clubcategory }}</td>
+        <td>
+          <a href="{{ path('admin_club_edit', {id: club.clubid}) }}" class="btn btn-sm btn-warning btn-circle">
+            <i class="ri-pencil-line"></i>
+          </a>
+          <button class="btn btn-sm btn-danger btn-circle btn-delete" data-url="{{ path('admin_club_delete', {id: club.clubid}) }}">
+            <i class="ri-delete-bin-line"></i>
+          </button>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">Aucun club trouvé.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<style>
+.pagination-rounded .page-link {
+  border-radius: 1.5rem !important;
+}
+.btn-circle {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50% !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+</style>
+
+{% if clubs.pageCount > 1 %}
+  <nav>
+    <ul class="pagination pagination-rounded justify-content-center mt-3">
+      {% if clubs.previousPageNumber is defined %}
+        <li class="page-item">
+          <a href="#" class="page-link page-link-ajax" data-page="{{ clubs.previousPageNumber }}">
+            <i class="ri-arrow-left-s-line"></i>
+          </a>
+        </li>
+      {% endif %}
+
+      {% for page in 1..clubs.pageCount %}
+        <li class="page-item {% if page == clubs.currentPageNumber %}active{% endif %}">
+          <a href="#" class="page-link page-link-ajax" data-page="{{ page }}">{{ page }}</a>
+        </li>
+      {% endfor %}
+
+      {% if clubs.nextPageNumber is defined %}
+        <li class="page-item">
+          <a href="#" class="page-link page-link-ajax" data-page="{{ clubs.nextPageNumber }}">
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+
+

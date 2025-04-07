@@ -47,32 +47,29 @@
         <span class="oi oi-menu"></span> Menu
       </button>
 
-    <div class="collapse navbar-collapse" id="ftco-nav">
-      <ul class="navbar-nav ml-auto align-items-center">
-        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_home' %}active{% endif %}">
-          <a href="{{ path('app_home') }}" class="nav-link">Home</a>
-        </li>
-        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_exploration' %}active{% endif %}">
-          <a href="#" class="nav-link">Exploration</a>
-        </li>
-        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_clubs' %}active{% endif %}">
-          <a href="#" class="nav-link">Clubs</a>
-        </li>
-        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_assistance' %}active{% endif %}">
-          <a href="#" class="nav-link">Assistance</a>
-        </li>
-        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_social' %}active{% endif %}">
-          <a href="#" class="nav-link">Fil Social</a>
-        </li>
-        {% if user %}
-        <li class="nav-item">
-          <a href="navigation" class="nav-link">Navigation</a>
-        </li>
-        {% else %}
-        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">
-          <a href="#" class="nav-link">Contactez-Nous</a>
-        </li>
-        {% endif %}
+        <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav ml-auto align-items-center">
+                <li class="nav-item {% if app.request.attributes.get('_route') == 'app_home' %}active{% endif %}">
+                    <a href="{{ path('app_home') }}" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item {% if app.request.attributes.get('_route') == 'app_exploration' %}active{% endif %}">
+                    <a href="{{ path('app_exploration') }}" class="nav-link">Exploration</a>
+                </li>
+                <li class="nav-item dropdown {% if app.request.attributes.get('_route') starts with 'app_clubs' %}active{% endif %}">
+                    <a class="nav-link dropdown-toggle" href="#" id="clubsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Clubs
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="clubsDropdown">
+                    <a class="dropdown-item" href="{{ path('app_clubs') }}">Clubs</a>
+                    <a class="dropdown-item" href="{{path('app_activites')}}">Activités</a>
+                    </div>
+                </li>
+                <li class="nav-item {% if app.request.attributes.get('_route') == 'app_assistance' %}active{% endif %}">
+                    <a href="#" class="nav-link">Assistance</a>
+                </li>
+                <li class="nav-item {% if app.request.attributes.get('_route') == 'app_social' %}active{% endif %}">
+                    <a href="{{ path('app_post_index') }}" class="nav-link">Fil Social</a>
+                </li>
 
           {% if user %}
           <li class="nav-item dropdown user-dropdown">
