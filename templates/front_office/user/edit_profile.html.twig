@@ -607,48 +607,62 @@
                                 </div>
                             </div>
 
-                            {# --- Basic Information --- #}
-                            {# Username #}
-                            <div class="form-group">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" id="username" name="username" class="form-control form-control-animated {% if usernameError is defined and usernameError %}is-invalid{% endif %}" value="{{ user.username }}" required>
-                                {% if usernameError is defined and usernameError %} <div class="invalid-feedback">{{ usernameError }}</div> {% endif %}
-                            </div>
+                           {# --- Basic Information --- #}
+{# Username #}
+<div class="form-group" style="display: block !important;">
+    <label for="username" class="form-label">Username</label>
+    <input type="text" id="username" name="username" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if usernameError is defined and usernameError %}is-invalid{% endif %}" value="{{ user.username }}" required>
+    {% if usernameError is defined and usernameError %} <div class="invalid-feedback">{{ usernameError }}</div> {% endif %}
+</div>
 
-                            {# Email #}
-                            <div class="form-group">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" id="email" name="email" class="form-control form-control-animated" value="{{ user.email }}" required>
-                            </div>
+{# Email #}
+<div class="form-group" style="display: block !important;">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" id="email" name="email" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated" value="{{ user.email }}" required>
+</div>
 
-                            {# Last Name #}
-                            <div class="form-group">
-                                <label for="nom" class="form-label">Last Name</label>
-                                <input type="text" id="nom" name="nom" class="form-control form-control-animated" value="{{ user.nom }}">
-                            </div>
+{# Last Name #}
+<div class="form-group" style="display: block !important;">
+    <label for="nom" class="form-label">Last Name</label>
+    <input type="text" id="nom" name="nom" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated" value="{{ user.nom }}">
+</div>
 
-                            {# First Name #}
-                            <div class="form-group">
-                                <label for="prenom" class="form-label">First Name</label>
-                                <input type="text" id="prenom" name="prenom" class="form-control form-control-animated" value="{{ user.prenom }}">
-                            </div>
-
+{# First Name #}
+<div class="form-group" style="display: block !important;">
+    <label for="prenom" class="form-label">First Name</label>
+    <input type="text" id="prenom" name="prenom" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated" value="{{ user.prenom }}">
+</div>
                             {# --- Form Divider --- #}
                             <div class="form-divider"></div>
 
-                            {# --- Change Password Section --- #}
-                            <h5 class="form-section-title">Change Password (Optional)</h5>
-                            <div class="form-group">
-                                <label for="password" class="form-label">New Password</label>
-                                <input type="password" id="password" name="password" class="form-control form-control-animated {% if passwordError is defined and passwordError %}is-invalid{% endif %}" placeholder="Leave blank to keep current password">
-                                {% if passwordError is defined and passwordError %} <div class="invalid-feedback">{{ passwordError }}</div> {% endif %}
-                            </div>
-                            <div class="form-group">
-                                <label for="confirm_password" class="form-label">Confirm New Password</label>
-                                <input type="password" id="confirm_password" name="confirm_password" class="form-control form-control-animated" placeholder="Confirm new password">
-                            </div>
+  {# Current Password field - Required #}
+  <h5 class="form-section-title">Current Password field - Required</h5>
+<div class="form-group" style="display: block !important;">
+    <label for="current_password" class="form-label">Current Password <span class="text-danger">*</span></label>
+    <input type="password" id="current_password" name="current_password" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if currentPasswordError is defined and currentPasswordError %}is-invalid{% endif %}" placeholder="Enter your current password" >
+    {% if currentPasswordError is defined and currentPasswordError %}
+        <div class="invalid-feedback">{{ currentPasswordError }}</div>
+    {% endif %}
+    <div class="form-text">Please enter your current password to confirm your identity</div>
+</div>
 
-                  
+{# --- Change Password Section --- #}
+<h5 class="form-section-title">Change Password (Optional)</h5>
+
+{# Password field with !important styles to ensure visibility #}
+<div class="form-group" style="display: block !important;">
+    <label for="password" class="form-label">New Password</label>
+    <input type="password" id="password" name="password" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if passwordError is defined and passwordError %}is-invalid{% endif %}" placeholder="Leave blank to keep current password">
+    {% if passwordError is defined and passwordError %}
+        <div class="invalid-feedback">{{ passwordError }}</div>
+    {% endif %}
+</div>
+
+{# Confirm Password field with !important styles to ensure visibility #}
+<div class="form-group" style="display: block !important;">
+    <label for="confirm_password" class="form-label">Confirm New Password</label>
+    <input type="password" id="confirm_password" name="confirm_password" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if passwordError is defined and passwordError %}is-invalid{% endif %}" placeholder="Confirm new password">
+</div>
 
                             {# --- Action Buttons --- #}
                             <div class="btn-group">
