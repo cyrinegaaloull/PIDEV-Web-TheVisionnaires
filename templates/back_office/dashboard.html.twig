@@ -1,0 +1,113 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<div class="row gy-4">
+  <!-- Welcome Card -->
+  <div class="col-xl-12">
+    <div class="card">
+      <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+        <div>
+          <h4 class="mb-2">Bienvenue, {{ app.user.username|default('John Doe') }} </h4>
+          <p class="mb-0 text-muted">Voici un aperçu de l'activité de la plateforme aujourd’hui.</p>
+        </div>
+        <a href="#" class="btn btn-primary mt-3 mt-md-0">Voir les statistiques</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="col-md-6 col-xl-3">
+    <div class="card">
+      <div class="card-body d-flex align-items-center">
+        <div class="avatar bg-primary text-white rounded-circle me-3">
+        </div>
+        <div>
+          <h5 class="mb-0">128</h5>
+          <small class="text-muted">Utilisateurs inscrits</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card">
+      <div class="card-body d-flex align-items-center">
+        <div class="avatar bg-success text-white rounded-circle me-3">
+        </div>
+        <div>
+          <h5 class="mb-0">36</h5>
+          <small class="text-muted">Lieux ajoutés</small>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="col-md-6 col-xl-3">
+    <div class="card">
+      <div class="card-body d-flex align-items-center">
+        <div class="avatar bg-info text-white rounded-circle me-3">
+        </div>
+        <div>
+          <h5 class="mb-0">17</h5>
+          <small class="text-muted">Événements à venir</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card">
+      <div class="card-body d-flex align-items-center">
+        <div class="avatar bg-warning text-white rounded-circle me-3">
+        </div>
+        <div>
+          <h5 class="mb-0">5</h5>
+          <small class="text-muted">Clubs actifs</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Placeholder -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Activité récente</h5>
+        <div class="dropdown">
+          <button type="button" class="btn p-0" data-bs-toggle="dropdown">
+            <i class="ri-more-2-line"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end">
+            <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+            <a class="dropdown-item" href="javascript:void(0);">Télécharger</a>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="activityChart" style="height: 250px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Optional chart setup #}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const chart = new ApexCharts(document.querySelector("#activityChart"), {
+      chart: {
+        height: 250,
+        type: 'line',
+        toolbar: { show: false }
+      },
+      series: [{
+        name: 'Connexions',
+        data: [10, 41, 35, 51, 49, 62, 69]
+      }],
+      xaxis: {
+        categories: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+      }
+    });
+    chart.render();
+  });
+</script>
+{% endblock %}
+
+

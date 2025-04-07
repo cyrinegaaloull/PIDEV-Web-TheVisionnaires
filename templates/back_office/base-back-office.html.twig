@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en"
+      class="light-style layout-menu-fixed layout-compact"
+      dir="ltr"
+      data-theme="theme-default"
+      data-template="vertical-menu-template-free"
+      data-style="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Back Office{% endblock %}</title>
+
+  <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.ico') }}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="{{ asset('assets/back_office/vendor/fonts/remixicon/remixicon.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/back_office/vendor/libs/node-waves/node-waves.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/back_office/vendor/css/core.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/back_office/vendor/css/theme-default.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/back_office/css/demo.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/back_office/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/back_office/vendor/libs/apex-charts/apex-charts.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assests/back-office/css/clubs.css')}}"/>
+
+
+  <script src="{{ asset('assets/back_office/vendor/js/helpers.js') }}"></script>
+  <script src="{{ asset('assets/back_office/js/config.js') }}"></script>
+</head>
+
+<body>
+<div class="layout-wrapper layout-content-navbar">
+  <div class="layout-container">
+
+    {# Sidebar - BEGIN #}
+    <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+      <div class="app-brand demo">
+        <a href="#" class="app-brand-link">
+          <span class="app-brand-logo demo me-1">
+            <!-- Your logo SVG or image -->
+          </span>
+          <a href="#" class="app-brand-link">
+            <span class="app-brand-logo demo me-1">
+              <img src="{{ asset('assets/logo/logo1.png') }}" alt="Logo"/>
+            </span>
+          </a>
+        </a>
+        <a href="#" class="layout-menu-toggle menu-link text-large ms-auto">
+          <i class="menu-toggle-icon d-xl-block align-middle"></i>
+        </a>
+      </div>
+
+      <div class="menu-inner-shadow"></div>
+
+      <ul class="menu-inner py-1">
+        <!-- Dashboard -->
+        <li class="menu-item active open">
+          <a href="{{ path('admin_dashboard') }}" class="menu-link">
+            <i class="menu-icon tf-icons ri-home-smile-line"></i>
+            <div>Dashboard</div>
+          </a>
+        </li>
+      
+        <!-- Layouts -->
+        
+        <!-- Apps & Pages -->
+        <li class="menu-header mt-7">
+          <span class="menu-header-text">Gestion</span>
+        </li>
+      
+        <!-- Exploration -->
+        <li class="menu-item">
+          <a href="#" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons ri-earth-line"></i>
+            <div>Exploration</div>
+          </a>
+          <ul class="menu-sub">
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 1</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 2</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 3</a>
+            </li>
+          </ul>
+        </li>
+      
+        <!-- Clubs -->
+        <li class="menu-item">
+          <a href="#" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons ri-group-line"></i>
+            <div>Clubs Sociaux</div>
+          </a>
+          <ul class="menu-sub">
+            <li class="menu-item">
+              <a href="{{ path('admin_club_list') }}" class="menu-link">Clubs</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Activités</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Demandes</a>
+            </li>
+          </ul>
+        </li>
+        <!-- Assistance -->
+        <li class="menu-item">
+          <a href="#" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons ri-government-line"></i>
+            <div>Assistance</div>
+          </a>
+          <ul class="menu-sub">
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 1</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 2</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 3</a>
+            </li>
+          </ul>
+        </li>
+        <!-- Navigation -->
+        <li class="menu-item">
+          <a href="#" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons ri-bus-line"></i>
+            <div>Navigation</div>
+          </a>
+          <ul class="menu-sub">
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 1</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 2</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 3</a>
+            </li>
+          </ul>
+        </li>
+        <!-- Flux Social -->
+        <li class="menu-item">
+          <a href="#" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons ri-message-3-line"></i>
+            <div>Flux Social</div>
+          </a>
+          <ul class="menu-sub">
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 1</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 2</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 3</a>
+            </li>
+          </ul>
+        </li>
+        <!-- Utilisateur -->
+        <li class="menu-item">
+          <a href="#" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons ri-user-3-line"></i>
+            <div>Utilisateur</div>
+          </a>
+          <ul class="menu-sub">
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 1</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 2</a>
+            </li>
+            <li class="menu-item">
+              <a href="#" class="menu-link">Option 3</a>
+            </li>
+          </ul>
+        </li>
+      
+        <!-- Components -->
+        <li class="menu-header mt-7"><span class="menu-header-text">Mon Compte</span></li>
+      
+        <li class="menu-item">
+          <a href="#" class="menu-link">
+            <i class="menu-icon tf-icons ri-profile-line"></i>
+            <div>Profile</div>
+          </a>
+        </li>
+      
+        <li class="menu-item">
+          <a href="javascript:void(0);" class="menu-link">
+            <i class="menu-icon tf-icons ri-settings-3-line"></i>
+            <div>Paramètres</div>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="javascript:void(0);" class="menu-link">
+            <i class="menu-icon tf-icons ri-logout-box-line"></i>
+            <div>Se déconnecter</div>
+          </a>
+        </li>
+      
+    </aside>
+    {# Sidebar - END #}
+
+    <div class="layout-page">
+
+      {# Navbar - BEGIN #}
+      <nav
+            class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+            id="layout-navbar">
+            <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
+              <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
+                <i class="ri-menu-fill ri-24px"></i>
+              </a>
+            </div>
+
+            <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+              <!-- Search -->
+              <div class="navbar-nav align-items-center">
+                <div class="nav-item d-flex align-items-center">
+                  <i class="ri-search-line ri-22px me-2"></i>
+                  <input
+                    type="text"
+                    class="form-control border-0 shadow-none"
+                    placeholder="Search..."
+                    aria-label="Search..." />
+                </div>
+              </div>
+              <!-- /Search -->
+
+              <ul class="navbar-nav flex-row align-items-center ms-auto">
+                <!-- Place this tag where you want the button to render. -->
+                <li class="nav-item lh-1 me-4">
+                  <a
+                    class="github-button"
+                    href="#"
+                    data-icon="octicon-star"
+                    data-size="large"
+                    data-show-count="true"
+                    >John Doe</a
+                  >
+                </li>
+
+                <!-- User -->
+                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                  <a
+                    class="nav-link dropdown-toggle hide-arrow p-0"
+                    href="javascript:void(0);"
+                    data-bs-toggle="dropdown">
+                    <div class="avatar avatar-online">
+                      <img src="{{ asset('assets/back_office/img/avatars/1.png') }}" alt class="w-px-40 h-auto rounded-circle" />
+                    </div>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end mt-3 py-2">
+                    <li>
+                      <a class="dropdown-item" href="#">
+                        <div class="d-flex align-items-center">
+                          <div class="flex-shrink-0 me-2">
+                            <div class="avatar avatar-online">
+                              <img src="{{ asset('assets/back_office/img/avatars/1.png') }}"alt class="w-px-40 h-auto rounded-circle" />
+                            </div>
+                          </div>
+                          <div class="flex-grow-1">
+                            <h6 class="mb-0 small">John Doe</h6>
+                            <ig class="text-muted">Admin</small>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+                    <li>
+                      <div class="dropdown-divider"></div>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#">
+                        <i class="ri-user-3-line ri-22px me-2"></i>
+                        <span class="align-middle">Profile</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#">
+                        <i class="ri-settings-4-line ri-22px me-2"></i>
+                        <span class="align-middle">Paramètres</span>
+                      </a>
+                    </li>
+                    
+                    <li>
+                      <div class="dropdown-divider"></div>
+                    </li>
+                    <li>
+                      <div class="d-grid px-4 pt-2 pb-1">
+                        <a class="btn btn-danger d-flex" href="javascript:void(0);">
+                          <small class="align-middle">Se déconnecter</small>
+                          <i class="ri-logout-box-r-line ms-2 ri-16px"></i>
+                        </a>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+                <!--/ User -->
+              </ul>
+            </div>
+          </nav>
+      {# Navbar - END #}
+
+      <div class="content-wrapper">
+        <div class="container-xxl flex-grow-1 container-p-y">
+          {% block body %}{% endblock %}
+        </div>
+
+        {# Footer - BEGIN #}
+        <footer class="content-footer footer bg-footer-theme">
+          <div class="container-xxl d-flex justify-content-between py-2">
+            <div class="mb-2 mb-md-0 text-muted">
+              © {{ "now"|date("Y") }}, powered by <a href="#" target="_blank" class="footer-link">Local Lens</a>
+            </div>
+          </div>
+        </footer>
+        {# Footer - END #}
+      </div>
+    </div>
+  </div>
+
+  <div class="layout-overlay layout-menu-toggle"></div>
+</div>
+
+{# Scripts #}
+<script src="{{ asset('assets/back_office/vendor/libs/jquery/jquery.js') }}"></script>
+<script src="{{ asset('assets/back_office/vendor/libs/popper/popper.js') }}"></script>
+<script src="{{ asset('assets/back_office/vendor/js/bootstrap.js') }}"></script>
+<script src="{{ asset('assets/back_office/vendor/libs/node-waves/node-waves.js') }}"></script>
+<script src="{{ asset('assets/back_office/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
+<script src="{{ asset('assets/back_office/vendor/js/menu.js') }}"></script>
+<script src="{{ asset('assets/back_office/vendor/libs/apex-charts/apexcharts.js') }}"></script>
+<script src="{{ asset('assets/back_office/js/main.js') }}"></script>
+</body>
+</html>
