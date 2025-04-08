@@ -62,11 +62,11 @@
       {% for club in clubs %}
         <div class="col-md-4 ftco-animate">
           <div class="project-wrap hotel">
-            <a href="#" class="img" style="background-image: url('{{ asset('uploads/clubs/' ~ club.bannerImage) }}');">
+            <a href="#" class="img" style="background-image: url('{{ asset('uploads/' ~ club.bannerImage) }}');">
               <span class="club-category">{{ club.clubCategory }}</span>
             </a>
             <div class="text p-4">
-              <h3><a href="#">{{ club.clubName }}</a></h3>
+            <h3><a href="{{ path('app_club_details', { id: club.clubid }) }}">{{ club.clubName }}</a></h3>
               <p class="location"><span class="fa fa-map-marker"></span> {{ club.clubLocation }}</p>
             </div>
           </div>

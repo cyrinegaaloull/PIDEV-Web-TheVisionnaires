@@ -3,12 +3,14 @@
 namespace App\Controller\back_office\clubs;
 
 use App\Entity\Club;
+use App\Repository\ClubRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ClubAdminController extends AbstractController
 {
@@ -69,20 +71,43 @@ class ClubAdminController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/clubs/delete/{id}', name: 'admin_club_delete')]
-    public function delete(int $id, EntityManagerInterface $em): Response
-    {
-        $club = $em->getRepository(Club::class)->find($id);
 
-        if (!$club) {
-            $this->addFlash('danger', 'Club introuvable.');
-            return $this->redirectToRoute('admin_club_list');
+
+    
+    #[Route('/admin/clubs/export', name: 'admin_club_export')]
+    public function exportClubs(ClubRepository $clubRepository): Response
+    {
+        $clubs = $clubRepository->findAll();
+        
+        // CSV header
+        $csvData = "ID,Nom,Description,Catégorie,Logo,Contact,Localisation,Date de création,Nombre de membres,Horaires,Image de bannière\n";
+        
+        foreach ($clubs as $club) {
+            $csvData .= sprintf(
+                '"%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s"'."\n",
+                $club->getClubid(),
+                $this->escapeCsvValue($club->getClubname()),
+                $this->escapeCsvValue($club->getClubdescription()),
+                $this->escapeCsvValue($club->getClubcategory() ?? ''),
+                $this->escapeCsvValue($club->getClublogo()),
+                $this->escapeCsvValue($club->getClubcontact()),
+                $this->escapeCsvValue($club->getClublocation()),
+                $club->getCreationdate()->format('d/m/Y'),
+                $club->getMemberscount(),
+                $this->escapeCsvValue($club->getScheduleinfo()),
+                $this->escapeCsvValue($club->getBannerimage())
+            );
         }
 
-        $em->remove($club);
-        $em->flush();
+        $response = new Response($csvData);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="clubs_export_'.date('Y-m-d').'.csv"');
+        
+        return $response;
+    }
 
-        $this->addFlash('success', 'Club supprimé avec succès.');
-        return $this->redirectToRoute('admin_club_list');
+    private function escapeCsvValue($value): string
+    {
+        return str_replace('"', '""', $value);
     }
 }

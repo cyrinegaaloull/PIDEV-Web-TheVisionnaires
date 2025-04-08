@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+
 #[ORM\Entity]
 #[ORM\Table(name: "club")]
 #[ORM\UniqueConstraint(name: "unique_club_name", columns: ["clubName"])]
@@ -337,6 +338,5 @@ class Club
 
         return $this;
     }
-
 
 }

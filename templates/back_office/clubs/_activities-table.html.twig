@@ -1,0 +1,101 @@
+<table class="table table-hover">
+  <thead class="table-light">
+    <tr>
+      <th>Nom</th>
+      <th>Club</th>
+      <th>Date</th>
+      <th>Statut</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for activite in activites %}
+  <tr>
+    <td>{{ activite.activitename }}</td>
+    <td>
+      <img src="{{ asset('uploads/' ~ activite.clubid.clublogo) }}" class="rounded-circle" width="30" height="30" alt="logo">
+      <span class="ms-2">{{ activite.clubid.clubname }}</span>
+    </td>
+    <td>{{ activite.activitedate|date('d/m/Y') }}</td>
+    <td>
+      {% set badgeClass = {
+        'A_venir': 'info',
+        'En_Cours': 'primary',
+        'Termine': 'success',
+        'Reporte': 'warning',
+        'Annule': 'danger'
+      }[activite.activitestatus] %}
+      <span class="badge rounded-pill bg-label-{{ badgeClass }} me-1">
+        {{ activite.activitestatus|replace({'_': ' '}) }}
+      </span>
+    </td>
+    <td>
+      <a href="{{ path('admin_activite_edit', { id: activite.activiteid }) }}" class="btn btn-sm btn-warning btn-circle">
+        <i class="ri-pencil-line"></i>
+      </a>
+
+      <!-- Trigger delete modal -->
+      <button class="btn btn-sm btn-danger btn-circle" data-bs-toggle="modal" data-bs-target="#deleteModal{{ activite.activiteid }}">
+        <i class="ri-delete-bin-line"></i>
+      </button>
+    </td>
+  </tr>
+
+  <!-- Delete Modal per activity -->
+  <div class="modal fade" id="deleteModal{{ activite.activiteid }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ activite.activiteid }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="deleteModalLabel{{ activite.activiteid }}">Confirmer la suppression</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          Êtes-vous sûr de vouloir supprimer l’activité <strong>{{ activite.activitename }}</strong> ?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+
+          <form method="post" action="{{ path('admin_activite_delete', { id: activite.activiteid }) }}" class="d-inline-block">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ activite.activiteid) }}">
+            <button type="submit" class="btn btn-danger"><i class="ri-check-line me-1"></i> Confirmer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <tr>
+    <td colspan="5" class="text-center">Aucune activité trouvée.</td>
+  </tr>
+{% endfor %}
+  </tbody>
+</table>
+
+
+{% if activites.pageCount > 1 %}
+  <nav>
+    <ul class="pagination pagination-rounded justify-content-center mt-3">
+      {% if activites.currentPageNumber > 1 %}
+        <li class="page-item">
+          <a href="#" class="page-link page-link-ajax" data-page="{{ activites.currentPageNumber - 1 }}">
+            <i class="ri-arrow-left-s-line"></i>
+          </a>
+        </li>
+      {% endif %}
+      
+      {% for page in 1..activites.pageCount %}
+        <li class="page-item {% if page == activites.currentPageNumber %}active{% endif %}">
+          <a href="#" class="page-link page-link-ajax" data-page="{{ page }}">{{ page }}</a>
+        </li>
+      {% endfor %}
+      
+      {% if activites.currentPageNumber < activites.pageCount %}
+        <li class="page-item">
+          <a href="#" class="page-link page-link-ajax" data-page="{{ activites.currentPageNumber + 1 }}">
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

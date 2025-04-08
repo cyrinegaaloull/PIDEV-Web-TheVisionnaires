@@ -1,0 +1,79 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Calendrier des Activités{% endblock %}
+
+{% block body %}
+<div class="card p-4">
+  <h5><i class="ri-calendar-line me-2"></i> Calendrier des Activités</h5>
+  <div id="calendar" style="margin-top: 20px;"></div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+  const calendarEl = document.getElementById('calendar');
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'fr',
+    headerToolbar: {
+      left: 'prev,today,next',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,listWeek'
+    },
+    events: {{ events|json_encode|raw }},
+    eventDidMount: function (info) {
+      const tooltip = new bootstrap.Tooltip(info.el, {
+        title: `
+          <strong>${info.event.title}</strong><br>
+          Club: ${info.event.extendedProps.club}<br>
+          ${info.event.extendedProps.description || ''}
+        `,
+        html: true,
+        placement: 'top',
+        trigger: 'hover',
+        container: 'body'
+      });
+    },
+    eventClick: function (info) {
+      window.location.href = '/admin/activite/' + info.event.id + '/details';
+    }
+  });
+
+  calendar.render();
+});
+</script>
+<style>
+  .fc-toolbar-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #5f5f5f;
+  }
+
+  .fc-button {
+    background-color: #7367F0 !important;
+    border: none;
+    border-radius: 8px !important;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .fc-button:hover {
+    background-color: #5b50cc !important;
+  }
+
+  .fc-button-primary:not(:disabled):active {
+    background-color: #4b3dbc !important;
+  }
+
+  .fc-button-primary:disabled {
+    opacity: 0.6;
+  }
+
+  .fc .fc-button-group > .fc-button {
+    margin: 0 2px;
+  }
+
+  .fc-daygrid-day-number {
+    font-weight: 500;
+  }
+</style>
+{% endblock %}
