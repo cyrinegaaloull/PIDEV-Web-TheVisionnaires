@@ -57,9 +57,16 @@
         <li class="nav-item {% if app.request.attributes.get('_route') == 'app_exploration' %}active{% endif %}">
           <a href="#" class="nav-link">Exploration</a>
         </li>
-        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_clubs' %}active{% endif %}">
-          <a href="{{ path('app_clubs') }}" class="nav-link">Clubs</a>
-        </li>
+        <li class="nav-item dropdown {% if app.request.attributes.get('_route') starts with 'app_clubs' %}active{% endif %}">
+        <a class="nav-link dropdown-toggle" href="#" id="clubsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Clubs
+        </a>
+        <div class="dropdown-menu" aria-labelledby="clubsDropdown">
+          <a class="dropdown-item" href="{{ path('app_clubs') }}">Clubs</a>
+          <a class="dropdown-item" href="{{path('app_activites')}}">Activités</a>
+        </div>
+      </li>
+
         <li class="nav-item {% if app.request.attributes.get('_route') == 'app_assistance' %}active{% endif %}">
           <a href="#" class="nav-link">Assistance</a>
         </li>
@@ -174,6 +181,8 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY"></script>
   <script src="{{ asset('assets/front_office/js/google-map.js') }}"></script>
   <script src="{{ asset('assets/front_office/js/main.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-Vw4oCPIzHo6Tu1vslQo7a7RuBgBlQ1MaLFXPAekx1wWb5mja8jRloX9UpWWmYwDQ" crossorigin="anonymous"></script>
+
 
 </body>
 </html>

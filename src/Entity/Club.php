@@ -4,6 +4,9 @@
 namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Activite;
 
 
 /**
@@ -91,6 +94,17 @@ class Club
      * @ORM\Column(name="bannerImage", type="string", length=255, nullable=false)
      */
     private $bannerimage;
+
+    /**
+    * @ORM\OneToMany(targetEntity=Activite::class, mappedBy="clubid", orphanRemoval=true)
+    */
+    private $activities;
+
+    public function __construct()
+    {
+        $this->activities = new ArrayCollection();
+    }
+
 
 
     /**
@@ -342,4 +356,36 @@ class Club
     {
         return $this->bannerimage;
     }
+
+
+    /**
+    * @return Collection<int, Activite>
+    */
+    public function getActivities(): Collection
+    {
+        return $this->activities;
+    }
+
+    public function addActivity(Activite $activity): self
+    {
+        if (!$this->activities->contains($activity)) {
+            $this->activities[] = $activity;
+            $activity->setClubid($this);
+        }
+
+    return $this;
+    }
+
+    public function removeActivity(Activite $activity): self
+    {
+        if ($this->activities->removeElement($activity)) {
+            // set the owning side to null (unless already changed)
+            if ($activity->getClubid() === $this) {
+                $activity->setClubid(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

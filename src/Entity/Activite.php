@@ -88,12 +88,11 @@ class Activite
     /**
      * @var Club
      *
-     * @ORM\ManyToOne(targetEntity="Club")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="clubID", referencedColumnName="clubID")
-     * })
+     * @ORM\ManyToOne(targetEntity="App\Entity\Club", inversedBy="activities")
+     * @ORM\JoinColumn(name="clubID", referencedColumnName="clubID", onDelete="CASCADE")
      */
     private $clubid;
+
 
 
     /**

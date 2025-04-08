@@ -1,0 +1,175 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Activités - Admin{% endblock %}
+
+{% block body %}
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">Liste des activités</h5>
+  <div class="d-flex align-items-center gap-2">
+  <a href="{{ path('admin_activite_export') }}" class="btn btn-outline-success" title="Exporter en CSV">
+    <i class="ri-file-excel-2-line me-1"></i> Exporter
+  </a>
+  <a href="{{ path('admin_activite_new') }}" class="btn btn-primary">
+    <i class="ri-add-line me-1"></i> Nouvelle Activité
+  </a>
+   <a href="{{ path('admin_activite_calendar') }}" class="btn btn-outline-secondary btn-circle" title="Vue Calendrier">
+    <i class="ri-calendar-line"></i>
+  </a>
+</div>
+
+</div>
+
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <input type="text" id="search-input" class="form-control" placeholder="Rechercher une activité...">
+    </div>
+    <div class="col-md-3">
+      <select id="filter-select" class="form-select">
+        <option value="">Filtrer par</option>
+        <option value="alpha_asc">Nom A-Z</option>
+        <option value="alpha_desc">Nom Z-A</option>
+        <option value="date_asc">Plus ancien</option>
+        <option value="date_desc">Plus récent</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select id="status-select" class="form-select">
+        <option value="">Tous les statuts</option>
+        <option value="A_venir">À venir</option>
+        <option value="En_Cours">En Cours</option>
+        <option value="Termine">Terminé</option>
+        <option value="Reporte">Reporté</option>
+        <option value="Annule">Annulé</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="activities-table-container">
+    {% include 'back_office/clubs/_activities-table.html.twig' %}
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-3">
+  <div>Total : {{ total_activites }} activités</div>
+</div>
+</div>
+
+
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Êtes-vous sûr de vouloir supprimer cette activité ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete-btn">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pagination-rounded .page-link {
+    border-radius: 1.5rem !important;
+  }
+  .btn-circle {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50% !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
+<script>
+  function fetchActivities(page = 1) {
+  const search = document.getElementById('search-input').value;
+  const filter = document.getElementById('filter-select').value;
+  const status = document.getElementById('status-select').value;
+
+  const url = new URL("{{ path('admin_activite_list') }}", window.location.origin);
+  url.searchParams.append('page', page);
+  if (search) url.searchParams.append('search', search);
+  if (filter) url.searchParams.append('filter', filter);
+  if (status) url.searchParams.append('status', status);
+
+  fetch(url, {
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById('activities-table-container').innerHTML = html;
+    rebindEventListeners(); // rebind events after AJAX
+  });
+}
+
+// Bind search & filter
+document.getElementById('search-input').addEventListener('input', () => fetchActivities(1));
+document.getElementById('filter-select').addEventListener('change', () => fetchActivities(1));
+document.getElementById('status-select').addEventListener('change', () => fetchActivities(1));
+
+// Centralized rebind function
+function rebindEventListeners() {
+  // AJAX pagination
+  document.querySelectorAll('.page-link-ajax').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const page = e.target.dataset.page;
+      fetchActivities(page);
+    });
+  });
+
+  // Delete button handling
+  document.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const deleteUrl = btn.dataset.url;
+      const csrfToken = btn.dataset.token;
+
+      const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+      document.getElementById('confirm-delete-btn').onclick = function () {
+        fetch(deleteUrl, {
+          method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            '_token': csrfToken
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            modal.hide();
+            fetchActivities(1);
+          } else {
+            alert(data.message || 'Erreur inconnue');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          alert('Erreur lors de la suppression');
+        });
+      };
+
+      modal.show();
+    });
+  });
+}
+
+// Initial bind
+rebindEventListeners();
+
+</script>
+{% endblock %}

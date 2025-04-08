@@ -1,0 +1,419 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}{{ club.clubName }}{% endblock %}
+
+{% block body %}
+<!-- Hero Banner Section -->
+<section class="hero-wrap hero-wrap-2 js-fullheight" style="background-image: url('{{ asset('uploads/' ~ club.bannerImage) }}'); height: 500px; position: relative;">
+  <div class="overlay" style="opacity: 0.6;"></div>
+  <div class="container">
+    <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
+      <div class="col-md-9 ftco-animate pb-5 text-center">
+        <p class="breadcrumbs">
+          <span><a href="{{ path('app_home') }}">Accueil <i class="fa fa-chevron-right"></i></a></span>
+          <span><a href="{{ path('app_clubs') }}">Clubs Sociaux <i class="fa fa-chevron-right"></i></a></span>
+          <span>{{ club.clubName }}</span>
+        </p>
+        <h1 class="mb-3 text-white">{{ club.clubName }}</h1>
+        <span class="badge badge-pill bg-info px-3 py-2 text-white">{{ club.clubCategory }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Club Info Section -->
+<section class="ftco-section ftco-no-pt">
+  <div class="container">
+    <div class="row club-profile-section">
+      <!-- Club Logo and Quick Info -->
+      <div class="col-md-3 text-center club-profile-sidebar">
+        <div class="mb-4" style="margin-top: -80px;">
+          <img src="{{ asset('uploads/' ~ club.clubLogo) }}" alt="{{ club.clubName }}" class="rounded-circle club-logo shadow" style="width: 180px; height: 180px; border: 5px solid white; object-fit: cover;">
+        </div>
+        
+        <div class="club-quick-info">
+          <div class="info-item">
+            <i class="fa fa-users"></i>
+            <span>{{ club.membersCount }} membres</span>
+          </div>
+          
+          <div class="info-item">
+            <i class="fa fa-calendar"></i>
+            <span>Créé le {{ club.creationDate|date('d/m/Y') }}</span>
+          </div>
+          
+          <div class="info-item">
+            <i class="fa fa-map-marker"></i>
+            <span>{{ club.clubLocation }}</span>
+          </div>
+          
+          <div class="mt-4">
+            <a href="#" class="btn btn-secondary btn-block"><i class="fa fa-plus-circle"></i> Rejoindre le club</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Club Details Content -->
+      <div class="col-md-9 club-profile-content">
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs club-tabs" id="clubTabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="about-tab" data-toggle="tab" href="#about" role="tab">À propos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="activities-tab" data-toggle="tab" href="#activities" role="tab">Activités</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab">Contact</a>
+          </li>
+        </ul>
+        
+        <!-- Tab Contents -->
+        <div class="tab-content p-4 bg-white club-tab-content">
+          <!-- About Tab -->
+          <div class="tab-pane fade show active" id="about" role="tabpanel">
+            <h3 class="mb-4">Description</h3>
+            <p>{{ club.clubDescription }}</p>
+            
+            <div class="row mt-5">
+              <div class="col-md-6">
+                <div class="info-box">
+                  <h4><i class="fa fa-clock-o"></i> Horaires</h4>
+                  <p>{{ club.scheduleInfo }}</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-box">
+                  <h4><i class="fa fa-trophy"></i> Accomplissements</h4>
+                  <p>Ce club a organisé {{ activitiesCount }} événements depuis sa création.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+                <!-- Activities Tab -->
+        <div class="tab-pane fade" id="activities" role="tabpanel">
+        <h3 class="mb-4">Activités à venir</h3>
+        <div class="activities-timeline">
+            {% if upcomingActivities is defined and upcomingActivities|length > 0 %}
+            {% for activity in upcomingActivities %}
+                <div class="activity-item">
+                <div class="activity-date">
+                    <span class="day">{{ activity.activitedate|date('d') }}</span>
+                    <span class="month">{{ activity.activitedate|date('M') }}</span>
+                </div>
+                <div class="activity-content">
+                    <h4>{{ activity.activitename }}</h4>
+                    <p>{{ activity.activitedescription }}</p>
+                    <div class="activity-meta">
+                    <span><i class="fa fa-map-marker"></i> {{ activity.activitelocation }}</span>
+                    <span><i class="fa fa-clock-o"></i> {{ activity.starttime|date('H:i') }} - {{ activity.endtime|date('H:i') }}</span>
+                    </div>
+                </div>
+                </div>
+            {% endfor %}
+            {% else %}
+            <div class="alert alert-info">
+                <p>Aucune activité planifiée pour le moment. Revenez bientôt !</p>
+            </div>
+            {% endif %}
+        </div>
+        </div>
+
+          
+          <!-- Contact Tab -->
+          <div class="tab-pane fade" id="contact" role="tabpanel">
+            <h3 class="mb-4">Nous Contacter</h3>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="contact-info">
+                  <div class="info-item">
+                    <i class="fa fa-envelope"></i>
+                    <div>
+                        <h5>Contact</h5>
+                        <p>{{ club.clubContact }}</p>
+                    </div>
+                </div> 
+
+                  
+                  <div class="info-item">
+                    <i class="fa fa-map-marker"></i>
+                    <div>
+                      <h5>Adresse</h5>
+                      <p>{{ club.clubLocation }}</p>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <form class="contact-form">
+                  <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Votre nom">
+                  </div>
+                  <div class="form-group">
+                    <input type="email" class="form-control" placeholder="Votre email">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Sujet">
+                  </div>
+                  <div class="form-group">
+                    <textarea class="form-control" rows="4" placeholder="Votre message"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-secondary btn-block">Envoyer</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Related Clubs Section -->
+<section class="ftco-section bg-light">
+  <div class="container">
+    <div class="row justify-content-center mb-5">
+      <div class="col-md-7 heading-section text-center ftco-animate">
+        <h2>Clubs similaires</h2>
+      </div>
+    </div>
+    <div class="row">
+      {% if relatedClubs is defined and relatedClubs|length > 0 %}
+        {% for relatedClub in relatedClubs %}
+          <div class="col-md-4 ftco-animate">
+            <div class="project-wrap hotel">
+              <a href="{{ path('app_club_details', { id: relatedClub.clubid }) }}" class="img" style="background-image: url('{{ asset('uploads/' ~ relatedClub.bannerImage) }}');">
+                <span class="club-category">{{ relatedClub.clubCategory }}</span>
+              </a>
+              <div class="text p-4">
+                <h3><a href="{{ path('app_club_details', { id: relatedClub.clubid }) }}">{{ relatedClub.clubName }}</a></h3>
+                <p class="location"><span class="fa fa-map-marker"></span> {{ relatedClub.clubLocation }}</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12 text-center">
+          <p>Aucun club similaire trouvé.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+  /* Club Details Page Specific Styles */
+  .club-logo {
+    background-color: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  
+  .club-profile-section {
+    margin-top: -50px;
+  }
+  
+  .club-profile-sidebar {
+    margin-bottom: 30px;
+  }
+  
+  .club-quick-info {
+    background: white;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.05);
+  }
+  
+  .club-quick-info .info-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .club-quick-info .info-item i {
+    margin-right: 10px;
+    color: #1089ff;
+    width: 20px;
+    text-align: center;
+  }
+  
+  .club-tabs {
+    border-bottom: 0;
+  }
+  
+  .club-tabs .nav-link {
+    border: none;
+    border-radius: 0;
+    font-weight: 500;
+    color: #555;
+    padding: 15px 20px;
+  }
+  
+  .club-tabs .nav-link.active {
+    background-color: white;
+    color: #1089ff;
+    border-top: 2px solid #1089ff;
+  }
+  
+  .club-tab-content {
+    border-radius: 0 0 5px 5px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    min-height: 400px;
+  }
+  
+  .info-box {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 20px;
+    height: 100%;
+  }
+  
+  .info-box h4 {
+    color: #1089ff;
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  
+  /* Activities timeline */
+  .activities-timeline {
+    position: relative;
+  }
+  
+  .activity-item {
+  display: flex;
+  margin-bottom: 30px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); /* subtle shadow */
+  padding: 20px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.activity-item:hover {
+  transform: translateY(-4px);
+}
+
+  
+  .activity-date {
+    background: #1089ff;
+    color: white;
+    min-width: 80px;
+    height: 80px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+  }
+  
+  .activity-date .day {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .activity-content {
+    background: #f8f9fa;
+    border-radius: 5px;
+    padding: 20px;
+    flex-grow: 1;
+  }
+  
+  .activity-content h4 {
+    margin-bottom: 10px;
+    color: #444;
+  }
+  
+  .activity-meta {
+    margin-top: 15px;
+    color: #777;
+  }
+  
+  .activity-meta span {
+    margin-right: 20px;
+  }
+  
+  /* Contact styles */
+  .contact-info .info-item {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .contact-info .info-item i {
+    width: 40px;
+    height: 40px;
+    background: #1089ff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+  }
+  
+  .social-links {
+    display: flex;
+  }
+  
+  .social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #444;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .social-icon:hover {
+    background: #1089ff;
+    color: white;
+  }
+  
+  .contact-form .form-control {
+    border-radius: 0;
+    border: 1px solid #eee;
+    padding: 12px 15px;
+  }
+  
+  /* Related clubs */
+  .project-wrap {
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+  }
+  
+  .project-wrap:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+
+  
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    
+    // Handle tab navigation via URL hash
+    if (window.location.hash) {
+      $('#clubTabs a[href="' + window.location.hash + '"]').tab('show');
+    }
+    
+    // Update URL hash when tab changes
+    $('#clubTabs a').on('click', function (e) {
+      history.pushState(null, null, $(this).attr('href'));
+    });
+</script>
+{% endblock %}
