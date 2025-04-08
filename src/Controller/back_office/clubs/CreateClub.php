@@ -126,6 +126,26 @@ class CreateClub extends AbstractController
         ]);
     }
 
+    #[Route('/admin/clubs/delete/{id}', name: 'admin_club_delete', methods: ['POST'])]
+public function delete(Request $request, Club $club, EntityManagerInterface $em): JsonResponse
+{
+    if (!$this->isCsrfTokenValid('delete'.$club->getClubid(), $request->request->get('_token'))) {
+        return new JsonResponse(['success' => false, 'message' => 'Jeton CSRF invalide.'], 400);
+    }
+
+    try {
+        $em->remove($club);
+        $em->flush();
+        return new JsonResponse(['success' => true]);
+    } catch (\Exception $e) {
+        return new JsonResponse([
+            'success' => false,
+            'message' => 'La suppression a échoué : ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+
     /**
      * Handles AJAX form submission for creating clubs
      */
@@ -253,4 +273,6 @@ class CreateClub extends AbstractController
 
         return $newFilename;
     }
+
+
 }
