@@ -135,6 +135,4 @@ class ActiviteAdminController extends AbstractController
             'events' => $events,
         ]);
     }
-    
-
 }
