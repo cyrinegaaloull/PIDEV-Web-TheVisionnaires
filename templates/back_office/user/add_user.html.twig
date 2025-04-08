@@ -1,68 +1,159 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Add New User{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
-    </head>
-    <body>
-        {% block body %}
-            <h1>Add a New User</h1>
-            <form action="{{ path('add_user') }}" method="post" enctype="multipart/form-data">
-                <div>
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" value="{{ username|default('') }}" required>
-                    {% if usernameError is defined and usernameError %}
-                        <span style="color: red;">{{ usernameError }}</span>
-                    {% endif %}
-                </div>
-                <div>
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="{{ email|default('') }}" required>
-                </div>
-                <div>
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <!-- Confirm Password Input -->
-                <div>
-                    <label for="confirm_password">Confirm Password:</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required>
-                    {% if passwordError is defined and passwordError %}
-                        <span style="color: red;">{{ passwordError }}</span>
-                    {% endif %}
-                </div>
-                <div>
-                    <label for="nom">Nom:</label>
-                    <input type="text" id="nom" name="nom" value="{{ nom|default('') }}" required>
-                </div>
-                <div>
-                    <label for="prenom">Prenom:</label>
-                    <input type="text" id="prenom" name="prenom" value="{{ prenom|default('') }}" required>
-                </div>
-                <div>
-                    <label for="avatar">Avatar:</label>
-                    <input type="file" id="avatar" name="avatar" accept="image/*" required>
-                </div>
-                <div>
-                    <label for="role_id">Role:</label>
-                    <select id="role_id" name="role_id" required>
-                        <option value="">-- Select a Role --</option>
-                        {% for role in roles %}
-                            <option value="{{ role.id }}" {% if role_id is defined and role.id == role_id %}selected{% endif %}>
-                                {{ role.role }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <input type="hidden" name="_token" value="{{ csrf_token('user_item') }}">
-                <button type="submit">Add User</button>
-            </form>
-            <br>
-            <a href="{{ path('list_users') }}">
-                <button type="button">View All Users</button>
-            </a>
-        {% endblock %}
-        {% block javascripts %}{% endblock %}
-    </body>
-</html>
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Add New User{% endblock %}
+
+{% block body %}
+<div class="row">
+    <!-- Flash Messages -->
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible mb-3" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="col-xl-8 mx-auto">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Add a New User</h5>
+                <a href="{{ path('list_users') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ri-list-check ri-16px me-1"></i> View All Users
+                </a>
+            </div>
+            <div class="card-body">
+                <form action="{{ path('add_user') }}" method="post" enctype="multipart/form-data">
+                    <div class="row g-3">
+                        <!-- Username -->
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline mb-3">
+                                <input type="text" class="form-control {% if usernameError is defined and usernameError %}is-invalid{% endif %}" 
+                                    id="username" name="username" value="{{ username|default('') }}" required>
+                                <label for="username">Username</label>
+                                {% if usernameError is defined and usernameError %}
+                                    <div class="invalid-feedback">{{ usernameError }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline mb-3">
+                                <input type="email" class="form-control" id="email" name="email" value="{{ email|default('') }}" required>
+                                <label for="email">Email</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Password -->
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline mb-3">
+                                <input type="password" class="form-control {% if passwordError is defined and passwordError %}is-invalid{% endif %}" 
+                                    id="password" name="password" required>
+                                <label for="password">Password</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Confirm Password -->
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline mb-3">
+                                <input type="password" class="form-control {% if passwordError is defined and passwordError %}is-invalid{% endif %}" 
+                                    id="confirm_password" name="confirm_password" required>
+                                <label for="confirm_password">Confirm Password</label>
+                                {% if passwordError is defined and passwordError %}
+                                    <div class="invalid-feedback">{{ passwordError }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Nom -->
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline mb-3">
+                                <input type="text" class="form-control" id="nom" name="nom" value="{{ nom|default('') }}" required>
+                                <label for="nom">Nom</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Prenom -->
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline mb-3">
+                                <input type="text" class="form-control" id="prenom" name="prenom" value="{{ prenom|default('') }}" required>
+                                <label for="prenom">Prenom</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Avatar -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="avatar" class="form-label">Avatar</label>
+                                <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Role -->
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline mb-3">
+                                <select class="form-select" id="role_id" name="role_id" required>
+                                    <option value="">-- Select a Role --</option>
+                                    {% for role in roles %}
+                                        <option value="{{ role.id }}" {% if role_id is defined and role.id == role_id %}selected{% endif %}>
+                                            {{ role.role }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <label for="role_id">Role</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="_token" value="{{ csrf_token('user_item') }}">
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="ri-user-add-line ri-16px me-1"></i> Add User
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Password validation
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+        
+        const validatePassword = () => {
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity("Passwords don't match");
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
+        };
+        
+        password.addEventListener('change', validatePassword);
+        confirmPassword.addEventListener('keyup', validatePassword);
+        
+        // Preview avatar image (optional enhancement)
+        const avatarInput = document.getElementById('avatar');
+        avatarInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // If you want to show a preview, you could add an img element and set its src
+                    // For now, we'll just log that a file was selected
+                    console.log('File selected:', file.name);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
+{% endblock %}

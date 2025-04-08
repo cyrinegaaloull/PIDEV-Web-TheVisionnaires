@@ -1,26 +1,72 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Add New Role{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
-    </head>
-    <body>
-        {% block body %}
-            <h1>Add a New Role</h1>
-            <form action="{{ path('add_role') }}" method="post">
-                <div>
-                    <label for="role">Role Name:</label>
-                    <input type="text" id="role" name="role" required>
-                </div>
-                <input type="hidden" name="_token" value="{{ csrf_token('role_item') }}">
-                <button type="submit">Add Role</button>
-            </form>
-            <br>
-            <a href="{{ path('list_roles') }}">
-                <button type="button">View All Roles</button>
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Role Management{% endblock %}
+
+{% block body %}
+<div class="row">
+  <!-- Flash Messages -->
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label }} alert-dismissible mb-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <!-- Add Role Form -->
+  <div class="col-xl-6">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Add a New Role</h5>
+        <small class="text-body float-end">Role Management</small>
+      </div>
+      <div class="card-body">
+        <form action="{{ path('add_role') }}" method="post">
+          <div class="form-floating form-floating-outline mb-4">
+            <input type="text" class="form-control" id="role" name="role" placeholder="Admin" required />
+            <label for="role">Role Name</label>
+          </div>
+          
+          <input type="hidden" name="_token" value="{{ csrf_token('role_item') }}">
+          
+          <div class="d-flex">
+            <button type="submit" class="btn btn-primary me-3">Add Role</button>
+            <a href="{{ path('list_roles') }}" class="btn btn-outline-secondary">
+              View All Roles
             </a>
-        {% endblock %}
-        {% block javascripts %}{% endblock %}
-    </body>
-</html>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Role Information Card -->
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Role Information</h5>
+      </div>
+      <div class="card-body">
+        <p>Roles define the permissions and access levels for users within the system. Each role can have specific capabilities assigned to it.</p>
+        
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  // Role management specific JavaScript can go here
+  document.addEventListener('DOMContentLoaded', function() {
+    // Example: Validation for role name
+    const roleInput = document.getElementById('role');
+    if (roleInput) {
+      roleInput.addEventListener('input', function() {
+        // Custom validation logic could go here
+      });
+    }
+  });
+</script>
+{% endblock %}
