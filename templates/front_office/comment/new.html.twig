@@ -1,11 +1,13 @@
-{% extends 'base.html.twig' %}
+{% extends 'front_office/base-front-office.html.twig' %}
 
-{% block title %}New Comment{% endblock %}
+{% block title %}Ajouter un commentaire{% endblock %}
 
 {% block body %}
-    <h1>Create new Comment</h1>
+    <h1>Ajouter un commentaire</h1>
 
     {{ include('front_office/comment/_form.html.twig') }}
 
-    <a href="{{ path('app_comment_index') }}">back to list</a>
+    <div class="mt-3">
+        <a href="{{ path('app_post_show', {'postId': post.postId}) }}" class="btn btn-secondary">← Retour à la publication</a>
+    </div>
 {% endblock %}

@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -26,16 +27,36 @@ class Post
 
     /**
      * @ORM\Column(name="title", type="string", length=255)
+     *
+     * @Assert\NotBlank(message="Le titre ne doit pas être vide.")
+     * @Assert\Length(
+     *      min=3,
+     *      max=255,
+     *      minMessage="Le titre doit comporter au moins {{ limit }} caractères.",
+     *      maxMessage="Le titre ne doit pas dépasser {{ limit }} caractères."
+     * )
      */
     private string $title;
 
     /**
      * @ORM\Column(name="content", type="text")
+     *
+     * @Assert\NotBlank(message="Le contenu ne doit pas être vide.")
+     * @Assert\Length(
+     *      min=10,
+     *      minMessage="Le contenu doit comporter au moins {{ limit }} caractères."
+     * )
      */
     private string $content;
 
     /**
      * @ORM\Column(name="category", type="string", length=255)
+     *
+     * @Assert\NotBlank(message="La catégorie est obligatoire.")
+     * @Assert\Length(
+     *      max=255,
+     *      maxMessage="La catégorie ne doit pas dépasser {{ limit }} caractères."
+     * )
      */
     private string $category;
 
