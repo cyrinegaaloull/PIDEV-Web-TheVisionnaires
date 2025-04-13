@@ -1,64 +1,33 @@
 <?php
 
-
 namespace App\Entity;
+
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Roles
- *
- * @ORM\Table(name="Roles")
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: "Roles")]
 class Roles
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    private int $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="role", type="string", length=50, nullable=false)
-     */
-    private $role;
+    #[ORM\Column(name: "role", type: "string", length: 50, nullable: false)]
+    private string $role;
 
-
-    /**
-     * Get id.
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * Set role.
-     *
-     * @param string $role
-     *
-     * @return Roles
-     */
-    public function setRole($role)
+    public function setRole(string $role): self
     {
         $this->role = $role;
-
         return $this;
     }
 
-    /**
-     * Get role.
-     *
-     * @return string
-     */
-    public function getRole()
+    public function getRole(): string
     {
         return $this->role;
     }
