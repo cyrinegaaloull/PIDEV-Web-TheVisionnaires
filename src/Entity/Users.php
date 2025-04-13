@@ -2,254 +2,121 @@
 
 namespace App\Entity;
 
-use App\Entity\Roles; 
- 
+use App\Entity\Roles;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Users
- *
- * @ORM\Table(name="users", indexes={@ORM\Index(name="role_id", columns={"role_id"})})
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: "users")]
+#[ORM\Index(name: "role_id", columns: ["role_id"])]
 class Users
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="user_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $userId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(name: "user_id", type: "integer", nullable: false)]
+    private int $userId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="username", type="string", length=255, nullable=false)
-     */
-    private $username;
+    #[ORM\Column(name: "username", type: "string", length: 255, nullable: false)]
+    private string $username;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="email", type="string", length=255, nullable=false)
-     */
-    private $email;
+    #[ORM\Column(name: "email", type: "string", length: 255, nullable: false)]
+    private string $email;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="password", type="string", length=255, nullable=false)
-     */
-    private $password;
+    #[ORM\Column(name: "password", type: "string", length: 255, nullable: false)]
+    private string $password;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="nom", type="string", length=255, nullable=false)
-     */
-    private $nom;
+    #[ORM\Column(name: "nom", type: "string", length: 255, nullable: false)]
+    private string $nom;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="prenom", type="string", length=255, nullable=false)
-     */
-    private $prenom;
+    #[ORM\Column(name: "prenom", type: "string", length: 255, nullable: false)]
+    private string $prenom;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="avatar", type="string", length=255, nullable=false)
-     */
-    private $avatar;
+    #[ORM\Column(name: "avatar", type: "string", length: 255, nullable: false)]
+    private string $avatar;
 
-    /**
-     * @var Roles
-     *
-     * @ORM\ManyToOne(targetEntity="Roles")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="role_id", referencedColumnName="id")
-     * })
-     */
-    private $role;
+    #[ORM\ManyToOne(targetEntity: Roles::class)]
+    #[ORM\JoinColumn(name: "role_id", referencedColumnName: "id")]
+    private ?Roles $role = null;
 
+    // Getters and Setters (unchanged, you can keep them as-is)
 
-    /**
-     * Get userId.
-     *
-     * @return int
-     */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    /**
-     * Set username.
-     *
-     * @param string $username
-     *
-     * @return Users
-     */
-    public function setUsername($username)
+    public function setUsername(string $username): self
     {
         $this->username = $username;
-
         return $this;
     }
 
-    /**
-     * Get username.
-     *
-     * @return string
-     */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
 
-    /**
-     * Set email.
-     *
-     * @param string $email
-     *
-     * @return Users
-     */
-    public function setEmail($email)
+    public function setEmail(string $email): self
     {
         $this->email = $email;
-
         return $this;
     }
 
-    /**
-     * Get email.
-     *
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    /**
-     * Set password.
-     *
-     * @param string $password
-     *
-     * @return Users
-     */
-    public function setPassword($password)
+    public function setPassword(string $password): self
     {
         $this->password = $password;
-
         return $this;
     }
 
-    /**
-     * Get password.
-     *
-     * @return string
-     */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    /**
-     * Set nom.
-     *
-     * @param string $nom
-     *
-     * @return Users
-     */
-    public function setNom($nom)
+    public function setNom(string $nom): self
     {
         $this->nom = $nom;
-
         return $this;
     }
 
-    /**
-     * Get nom.
-     *
-     * @return string
-     */
-    public function getNom()
+    public function getNom(): string
     {
         return $this->nom;
     }
 
-    /**
-     * Set prenom.
-     *
-     * @param string $prenom
-     *
-     * @return Users
-     */
-    public function setPrenom($prenom)
+    public function setPrenom(string $prenom): self
     {
         $this->prenom = $prenom;
-
         return $this;
     }
 
-    /**
-     * Get prenom.
-     *
-     * @return string
-     */
-    public function getPrenom()
+    public function getPrenom(): string
     {
         return $this->prenom;
     }
 
-    /**
-     * Set avatar.
-     *
-     * @param string $avatar
-     *
-     * @return Users
-     */
-    public function setAvatar($avatar)
+    public function setAvatar(string $avatar): self
     {
         $this->avatar = $avatar;
-
         return $this;
     }
 
-    /**
-     * Get avatar.
-     *
-     * @return string
-     */
-    public function getAvatar()
+    public function getAvatar(): string
     {
         return $this->avatar;
     }
 
-    /**
-     * Set role.
-     *
-     * @param Roles|null $role
-     *
-     * @return Users
-     */
-    public function setRole(Roles $role = null)
+    public function setRole(?Roles $role): self
     {
         $this->role = $role;
-
         return $this;
     }
 
-    /**
-     * Get role.
-     *
-     * @return Roles|null
-     */
-    public function getRole()
+    public function getRole(): ?Roles
     {
         return $this->role;
     }

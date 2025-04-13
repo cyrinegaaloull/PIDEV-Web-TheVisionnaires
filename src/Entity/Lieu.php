@@ -1,375 +1,208 @@
 <?php
 
-
 namespace App\Entity;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Lieu
- *
- * @ORM\Table(name="lieu")
- * @ORM\Entity
- */
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+
+#[ORM\Entity(repositoryClass: "App\Repository\LieuRepository")]
+#[ORM\Table(name: "lieu")]
 class Lieu
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="lieuID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $lieuid;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(name: "lieuID", type: "integer")]
+    private ?int $lieuid = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="lieuName", type="string", length=100, nullable=false)
-     */
-    private $lieuname;
+    #[ORM\Column(name: "lieuName", type: "string", length: 100)]
+    #[Assert\NotBlank(message: "Le nom du lieu est requis.")]
+    #[Assert\Length(min: 3, max: 100)]
+    private ?string $lieuname = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="lieuAddress", type="string", length=100, nullable=false)
-     */
-    private $lieuaddress;
+    #[ORM\Column(name: "lieuAddress", type: "string", length: 100)]
+    #[Assert\NotBlank(message: "L'adresse est obligatoire.")]
+    #[Assert\Length(
+        min: 10,
+        max: 255,
+        minMessage: "L'adresse doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "L'adresse ne peut pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $lieuaddress = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="lieuDescription", type="string", length=100, nullable=false)
-     */
-    private $lieudescription;
+    #[ORM\Column(name: "lieuDescription", type: "string", length: 255)]
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
+    #[Assert\Length(
+        min: 10,
+        max: 255,
+        minMessage: "La description doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $lieudescription = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="lieuCategory", type="string", length=30, nullable=false)
-     */
-    private $lieucategory;
+    #[ORM\Column(name: "lieuCategory", type: "string", length: 30)]
+    #[Assert\NotBlank(message: "La catégorie est requise.")]
+    private ?string $lieucategory = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="lieuOpeningHours", type="text", length=65535, nullable=false)
-     */
-    private $lieuopeninghours;
+    #[ORM\Column(name: "lieuOpeningHours", type: "text")]
+    #[Assert\NotBlank(message: "L'heure d'ouverture est requise.")]
+    private ?string $lieuopeninghours = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="lieuClosingHours", type="text", length=65535, nullable=false)
-     */
-    private $lieuclosinghours;
+    #[ORM\Column(name: "lieuClosingHours", type: "text")]
+    #[Assert\NotBlank(message: "L'heure de fermeture est requise.")]
+    private ?string $lieuclosinghours = null;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="lieuNumber", type="integer", nullable=true)
-     */
-    private $lieunumber;
+    #[ORM\Column(name: "lieuNumber", type: "integer", nullable: true)]
+    private ?int $lieunumber = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="lieuImage", type="string", length=20, nullable=true)
-     */
-    private $lieuimage;
+    #[ORM\Column(name: "lieuImage", type: "string", length: 20, nullable: true)]
+    private ?string $lieuimage = null;
 
-    /**
-     * @var float|null
-     *
-     * @ORM\Column(name="latitude", type="float", precision=10, scale=0, nullable=true)
-     */
-    private $latitude;
+    #[ORM\Column(type: "float", nullable: true)]
+    private ?float $latitude = null;
 
-    /**
-     * @var float|null
-     *
-     * @ORM\Column(name="longitude", type="float", precision=10, scale=0, nullable=true)
-     */
-    private $longitude;
+    #[ORM\Column(type: "float", nullable: true)]
+    private ?float $longitude = null;
 
-    /**
-     * @var bool|null
-     *
-     * @ORM\Column(name="isFavorite", type="boolean", nullable=true)
-     */
-    private $isfavorite = '0';
+    #[ORM\Column(type: "boolean", nullable: true)]
+    private ?bool $isfavorite = false;
 
+    #[Assert\Callback]
+    public static function validate(self $object, ExecutionContextInterface $context, $payload = null): void
+    {
+        if ($object->lieunumber !== null) {
+            $len = strlen((string)$object->lieunumber);
+            if ($len !== 8) {
+                $context->buildViolation('Le numéro du lieu doit contenir exactement 8 chiffres.')
+                    ->atPath('lieunumber')
+                    ->addViolation();
+            }
+        }
+    }
 
-    /**
-     * Get lieuid.
-     *
-     * @return int
-     */
-    public function getLieuid()
+    public function getLieuid(): ?int
     {
         return $this->lieuid;
     }
 
-    /**
-     * Set lieuname.
-     *
-     * @param string $lieuname
-     *
-     * @return Lieu
-     */
-    public function setLieuname($lieuname)
-    {
-        $this->lieuname = $lieuname;
-
-        return $this;
-    }
-
-    /**
-     * Get lieuname.
-     *
-     * @return string
-     */
-    public function getLieuname()
+    public function getLieuname(): ?string
     {
         return $this->lieuname;
     }
 
-    /**
-     * Set lieuaddress.
-     *
-     * @param string $lieuaddress
-     *
-     * @return Lieu
-     */
-    public function setLieuaddress($lieuaddress)
+    public function setLieuname(?string $lieuname): self
     {
-        $this->lieuaddress = $lieuaddress;
-
+        $this->lieuname = $lieuname;
         return $this;
     }
 
-    /**
-     * Get lieuaddress.
-     *
-     * @return string
-     */
-    public function getLieuaddress()
+    public function getLieuaddress(): ?string
     {
         return $this->lieuaddress;
     }
 
-    /**
-     * Set lieudescription.
-     *
-     * @param string $lieudescription
-     *
-     * @return Lieu
-     */
-    public function setLieudescription($lieudescription)
+    public function setLieuaddress(?string $lieuaddress): self
     {
-        $this->lieudescription = $lieudescription;
-
+        $this->lieuaddress = $lieuaddress;
         return $this;
     }
 
-    /**
-     * Get lieudescription.
-     *
-     * @return string
-     */
-    public function getLieudescription()
+    public function getLieudescription(): ?string
     {
         return $this->lieudescription;
     }
 
-    /**
-     * Set lieucategory.
-     *
-     * @param string $lieucategory
-     *
-     * @return Lieu
-     */
-    public function setLieucategory($lieucategory)
+    public function setLieudescription(?string $lieudescription): self
     {
-        $this->lieucategory = $lieucategory;
-
+        $this->lieudescription = $lieudescription;
         return $this;
     }
 
-    /**
-     * Get lieucategory.
-     *
-     * @return string
-     */
-    public function getLieucategory()
+    public function getLieucategory(): ?string
     {
         return $this->lieucategory;
     }
 
-    /**
-     * Set lieuopeninghours.
-     *
-     * @param string $lieuopeninghours
-     *
-     * @return Lieu
-     */
-    public function setLieuopeninghours($lieuopeninghours)
+    public function setLieucategory(?string $lieucategory): self
     {
-        $this->lieuopeninghours = $lieuopeninghours;
-
+        $this->lieucategory = $lieucategory;
         return $this;
     }
 
-    /**
-     * Get lieuopeninghours.
-     *
-     * @return string
-     */
-    public function getLieuopeninghours()
+    public function getLieuopeninghours(): ?string
     {
         return $this->lieuopeninghours;
     }
 
-    /**
-     * Set lieuclosinghours.
-     *
-     * @param string $lieuclosinghours
-     *
-     * @return Lieu
-     */
-    public function setLieuclosinghours($lieuclosinghours)
+    public function setLieuopeninghours(?string $lieuopeninghours): self
     {
-        $this->lieuclosinghours = $lieuclosinghours;
-
+        $this->lieuopeninghours = $lieuopeninghours;
         return $this;
     }
 
-    /**
-     * Get lieuclosinghours.
-     *
-     * @return string
-     */
-    public function getLieuclosinghours()
+    public function getLieuclosinghours(): ?string
     {
         return $this->lieuclosinghours;
     }
 
-    /**
-     * Set lieunumber.
-     *
-     * @param int|null $lieunumber
-     *
-     * @return Lieu
-     */
-    public function setLieunumber($lieunumber = null)
+    public function setLieuclosinghours(?string $lieuclosinghours): self
     {
-        $this->lieunumber = $lieunumber;
-
+        $this->lieuclosinghours = $lieuclosinghours;
         return $this;
     }
 
-    /**
-     * Get lieunumber.
-     *
-     * @return int|null
-     */
-    public function getLieunumber()
+    public function getLieunumber(): ?int
     {
         return $this->lieunumber;
     }
 
-    /**
-     * Set lieuimage.
-     *
-     * @param string|null $lieuimage
-     *
-     * @return Lieu
-     */
-    public function setLieuimage($lieuimage = null)
+    public function setLieunumber(?int $lieunumber): self
     {
-        $this->lieuimage = $lieuimage;
-
+        $this->lieunumber = $lieunumber;
         return $this;
     }
 
-    /**
-     * Get lieuimage.
-     *
-     * @return string|null
-     */
-    public function getLieuimage()
+    public function getLieuimage(): ?string
     {
         return $this->lieuimage;
     }
 
-    /**
-     * Set latitude.
-     *
-     * @param float|null $latitude
-     *
-     * @return Lieu
-     */
-    public function setLatitude($latitude = null)
+    public function setLieuimage(?string $lieuimage): self
     {
-        $this->latitude = $latitude;
-
+        $this->lieuimage = $lieuimage;
         return $this;
     }
 
-    /**
-     * Get latitude.
-     *
-     * @return float|null
-     */
-    public function getLatitude()
+    public function getLatitude(): ?float
     {
         return $this->latitude;
     }
 
-    /**
-     * Set longitude.
-     *
-     * @param float|null $longitude
-     *
-     * @return Lieu
-     */
-    public function setLongitude($longitude = null)
+    public function setLatitude(?float $latitude): self
     {
-        $this->longitude = $longitude;
-
+        $this->latitude = $latitude;
         return $this;
     }
 
-    /**
-     * Get longitude.
-     *
-     * @return float|null
-     */
-    public function getLongitude()
+    public function getLongitude(): ?float
     {
         return $this->longitude;
     }
 
-    /**
-     * Set isfavorite.
-     *
-     * @param bool|null $isfavorite
-     *
-     * @return Lieu
-     */
-    public function setIsfavorite($isfavorite = null)
+    public function setLongitude(?float $longitude): self
     {
-        $this->isfavorite = $isfavorite;
-
+        $this->longitude = $longitude;
         return $this;
     }
 
-    /**
-     * Get isfavorite.
-     *
-     * @return bool|null
-     */
-    public function getIsfavorite()
+    public function getIsfavorite(): ?bool
     {
         return $this->isfavorite;
+    }
+
+    public function setIsfavorite(?bool $isfavorite): self
+    {
+        $this->isfavorite = $isfavorite;
+        return $this;
     }
 }
