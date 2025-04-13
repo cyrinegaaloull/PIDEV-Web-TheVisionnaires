@@ -1,54 +1,30 @@
 <?php
 
-
 namespace App\Entity; 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Avis
- *
- * @ORM\Table(name="avis", indexes={@ORM\Index(name="etabID", columns={"etabID"}), @ORM\Index(name="userID", columns={"userID"})})
- * @ORM\Entity
- */
+#[ORM\Table(name: 'avis')]
+#[ORM\Index(name: 'etabID', columns: ['etabID'])]
+#[ORM\Index(name: 'userID', columns: ['userID'])]
+#[ORM\Entity]
 class Avis
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="avisID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'avisID', type: 'integer', nullable: false)]
     private $avisid;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="etabID", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: 'etabID', type: 'integer', nullable: false)]
     private $etabid;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="userID", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: 'userID', type: 'integer', nullable: false)]
     private $userid;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="rating", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: 'rating', type: 'integer', nullable: false)]
     private $rating;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="dateAvis", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
-     */
+    #[ORM\Column(name: 'dateAvis', type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $dateavis = 'CURRENT_TIMESTAMP';
-
 
     /**
      * Get avisid.

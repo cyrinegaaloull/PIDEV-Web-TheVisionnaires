@@ -1,158 +1,133 @@
 <?php
 
-
 namespace App\Entity;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Post
- *
- * @ORM\Table(name="post")
- * @ORM\Entity
- */
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'post')]
 class Post
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="post_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $postId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'post_id', type: 'integer')]
+    private ?int $postId = null;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="user_id", type="integer", nullable=true)
-     */
-    private $userId;
+    #[ORM\Column(name: 'user_id', type: 'integer', nullable: true)]
+    private ?int $userId = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="title", type="string", length=255, nullable=false)
-     */
-    private $title;
+    #[ORM\Column(name: 'title', type: 'string', length: 255)]
+    #[Assert\NotBlank(message: 'Le titre ne doit pas être vide.')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Le titre doit comporter au moins {{ limit }} caractères.',
+        maxMessage: 'Le titre ne doit pas dépasser {{ limit }} caractères.'
+    )]
+    private string $title;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="content", type="text", length=65535, nullable=false)
-     */
-    private $content;
+    #[ORM\Column(name: 'content', type: 'text')]
+    #[Assert\NotBlank(message: 'Le contenu ne doit pas être vide.')]
+    #[Assert\Length(
+        min: 10,
+        minMessage: 'Le contenu doit comporter au moins {{ limit }} caractères.'
+    )]
+    private string $content;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="category", type="string", length=255, nullable=false)
-     */
-    private $category;
+    #[ORM\Column(name: 'category', type: 'string', length: 255)]
+    #[Assert\NotBlank(message: 'La catégorie est obligatoire.')]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'La catégorie ne doit pas dépasser {{ limit }} caractères.'
+    )]
+    private string $category;
 
+    #[ORM\OneToMany(targetEntity: 'App\\Entity\\Comment', mappedBy: 'post', cascade: ['remove'])]
+    private Collection $comments;
 
-    /**
-     * Get postId.
-     *
-     * @return int
-     */
-    public function getPostId()
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+    }
+
+    public function getPostId(): ?int
     {
         return $this->postId;
     }
 
-    /**
-     * Set userId.
-     *
-     * @param int|null $userId
-     *
-     * @return Post
-     */
-    public function setUserId($userId = null)
-    {
-        $this->userId = $userId;
-
-        return $this;
-    }
-
-    /**
-     * Get userId.
-     *
-     * @return int|null
-     */
-    public function getUserId()
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
 
-    /**
-     * Set title.
-     *
-     * @param string $title
-     *
-     * @return Post
-     */
-    public function setTitle($title)
+    public function setUserId(?int $userId): self
     {
-        $this->title = $title;
-
+        $this->userId = $userId;
         return $this;
     }
 
-    /**
-     * Get title.
-     *
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * Set content.
-     *
-     * @param string $content
-     *
-     * @return Post
-     */
-    public function setContent($content)
+    public function setTitle(string $title): self
     {
-        $this->content = $content;
-
+        $this->title = $title;
         return $this;
     }
 
-    /**
-     * Get content.
-     *
-     * @return string
-     */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
 
-    /**
-     * Set category.
-     *
-     * @param string $category
-     *
-     * @return Post
-     */
-    public function setCategory($category)
+    public function setContent(string $content): self
+    {
+        $this->content = $content;
+        return $this;
+    }
+
+    public function getCategory(): string
+    {
+        return $this->category;
+    }
+
+    public function setCategory(string $category): self
     {
         $this->category = $category;
-
         return $this;
     }
 
     /**
-     * Get category.
-     *
-     * @return string
+     * @return Collection<int, Comment>
      */
-    public function getCategory()
+    public function getComments(): Collection
     {
-        return $this->category;
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            if ($comment->getPost() === $this) {
+                $comment->setPost(null);
+            }
+        }
+
+        return $this;
     }
 }
