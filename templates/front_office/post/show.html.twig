@@ -12,11 +12,7 @@
                     <h1 class="hero-title">{{ post.title }}</h1>
                     <p class="hero-subtitle">Publié dans la catégorie: {{ post.category }}</p>
 
-                    <!-- Delete Post Button -->
-                    <form method="post" action="{{ path('app_post_delete', {'postId': post.postId}) }}" style="display: inline-block;" onsubmit="return confirm('Voulez-vous vraiment supprimer cette publication ?');">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.postId) }}">
-                        <button type="submit" class="btn btn-danger btn-sm">Supprimer la publication</button>
-                    </form>
+                   
                 </div>
             </div>
         </div>
