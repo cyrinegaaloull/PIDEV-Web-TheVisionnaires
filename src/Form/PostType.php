@@ -8,49 +8,54 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class PostType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            // Title Field
             ->add('title', TextType::class, [
-                'label' => 'Title',
-                'attr' => [
-                    'placeholder' => 'Enter a title',
-                    'minlength' => 3, // HTML5 validation hint
-                    'maxlength' => 255,
+                'label' => 'Titre',
+                'attr' => ['placeholder' => 'Entrez un titre...'],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Le titre ne peut pas être vide.']),
+                    new Assert\Length([
+                        'min' => 3,
+                        'max' => 255,
+                        'minMessage' => 'Le titre doit contenir au moins {{ limit }} caractères.',
+                        'maxMessage' => 'Le titre ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
                 ],
-                'required' => true, // Ensures the field is not empty
             ])
-
-            // Content Field
             ->add('content', TextareaType::class, [
-                'label' => 'Content',
-                'attr' => [
-                    'placeholder' => 'Enter your content here...',
-                    'minlength' => 10, // HTML5 validation hint
-                    'rows' => 6, // Adjust textarea height
+                'label' => 'Contenu',
+                'attr' => ['placeholder' => 'Entrez votre contenu ici...', 'rows' => 6],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Le contenu ne peut pas être vide.']),
+                    new Assert\Length([
+                        'min' => 10,
+                        'minMessage' => 'Le contenu doit contenir au moins {{ limit }} caractères.',
+                    ]),
                 ],
-                'required' => true,
             ])
-
-            // Category Field
             ->add('category', TextType::class, [
-                'label' => 'Category',
-                'attr' => [
-                    'placeholder' => 'Enter a category',
-                    'maxlength' => 255,
+                'label' => 'Catégorie',
+                'attr' => ['placeholder' => 'Entrez une catégorie...'],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'La catégorie ne peut pas être vide.']),
+                    new Assert\Length([
+                        'max' => 255,
+                        'maxMessage' => 'La catégorie ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
                 ],
-                'required' => true,
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Post::class, // Links the form to the Post entity
+            'data_class' => Post::class,
         ]);
     }
 }

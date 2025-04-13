@@ -1,0 +1,18 @@
+/* Invalid Field Styling */
+.form-control.is-invalid {
+    border: 2px solid red !important; /* Red border */
+    background-color: #ffebee; /* Light red background */
+}
+
+.invalid-feedback {
+    color: red; /* Red text for error messages */
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.is-invalid::after {
+    content: "❌"; /* Red X icon */
+    color: red;
+    margin-left: 10px;
+    font-size: 1.2em;
+}
