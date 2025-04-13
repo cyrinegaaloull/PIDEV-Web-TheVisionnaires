@@ -1,0 +1,59 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+    <div class="row gy-4">
+        <!-- Page Header -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-0">Détails de la publication</h5>
+                    <p class="text-muted">Voici les détails de la publication sélectionnée.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post Details -->
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-2">{{ post.title }}</h6>
+                    <p class="text-muted small">{{ post.content }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Publié dans: {{ post.category }}</small>
+                        <form action="{{ path('admin_post_delete', {'postId': post.postId}) }}" method="post" style="display: inline-block;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete-post-' ~ post.postId) }}">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Voulez-vous vraiment supprimer cette publication ?')">Supprimer la publication</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-3">Commentaires</h6>
+                    {% if comments|length > 0 %}
+                        {% for comment in comments %}
+                            <div class="comment mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Utilisateur ID: {{ comment.userId }}</strong>
+                                        <p class="text-muted small">{{ comment.content }}</p>
+                                    </div>
+                                    <form action="{{ path('admin_comment_delete', {'commentId': comment.commentId}) }}" method="post" style="display: inline-block;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete-comment-' ~ comment.commentId) }}">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Voulez-vous vraiment supprimer ce commentaire ?')">Supprimer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Aucun commentaire pour cette publication.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

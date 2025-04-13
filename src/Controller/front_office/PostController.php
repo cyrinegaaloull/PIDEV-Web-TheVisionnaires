@@ -4,7 +4,6 @@ namespace App\Controller\front_office;
 
 use App\Entity\Comment;
 use App\Entity\Post;
-use App\Form\PostType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +39,7 @@ final class PostController extends AbstractController
         $user = $this->getSimulatedUser($simulateUser);
 
         $post = new Post();
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createForm(\App\Form\PostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -115,7 +114,7 @@ final class PostController extends AbstractController
         $simulateUser = false;
         $user = $this->getSimulatedUser($simulateUser);
 
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createForm(\App\Form\PostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -144,6 +143,29 @@ final class PostController extends AbstractController
         }
 
         return $this->redirectToRoute('app_post_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/comment/{commentId}/edit', name: 'app_comment_edit', methods: ['POST'])]
+    public function editComment(Request $request, Comment $comment, EntityManagerInterface $entityManager): Response
+    {
+        // Validate CSRF token
+        if (!$this->isCsrfTokenValid('edit-comment' . $comment->getCommentId(), $request->headers->get('X-CSRF-TOKEN'))) {
+            return $this->json(['error' => 'Invalid CSRF token.'], Response::HTTP_FORBIDDEN);
+        }
+
+        // Get the new content from the request body
+        $data = json_decode($request->getContent(), true);
+        $newContent = trim($data['content'] ?? '');
+
+        if (empty($newContent)) {
+            return $this->json(['error' => 'Le contenu du commentaire ne peut pas être vide.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Update the comment content
+        $comment->setContent($newContent);
+        $entityManager->flush();
+
+        return $this->json(['success' => true]);
     }
 
     /**
