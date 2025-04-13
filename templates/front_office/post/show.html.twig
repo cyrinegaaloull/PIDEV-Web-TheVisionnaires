@@ -147,7 +147,6 @@
                     <h2>{{ post.title }}</h2>
                     <p><strong>Contenu:</strong> {{ post.content }}</p>
                     <p><strong>Catégorie:</strong> {{ post.category }}</p>
-
                     <p><strong>ID de l'utilisateur:</strong> {{ post.userId }}</p>
                 </div>
 
@@ -171,7 +170,12 @@
                                 <div class="comment-content" id="content-{{ comment.commentId }}">{{ comment.content }}</div>
                                 <div class="comment-actions mt-2">
                                     <!-- Edit Button -->
-                                    <a href="#" class="btn btn-sm btn-primary me-2 edit-btn" data-comment-id="{{ comment.commentId }}">Modifier</a>
+                                    <a href="#" class="btn btn-sm btn-primary me-2 edit-btn"
+                                       data-comment-id="{{ comment.commentId }}"
+                                       data-original-content="{{ comment.content|e('js') }}"
+                                       data-csrf-token="{{ csrf_token('edit-comment' ~ comment.commentId) }}">
+                                        Modifier
+                                    </a>
 
                                     <!-- Delete Button -->
                                     <form action="{{ path('app_comment_delete', {'commentId': comment.commentId}) }}" method="post" style="display: inline-block;">
@@ -197,19 +201,16 @@
                 button.addEventListener('click', function (event) {
                     event.preventDefault();
 
-                    const commentId = button.dataset.commentId;
+                    const commentId = this.dataset.commentId;
                     const commentContentDiv = document.getElementById(`content-${commentId}`);
-                    const commentDiv = document.getElementById(`comment-${commentId}`);
+                    const actionsDiv = this.parentElement;
+                    const csrfToken = this.dataset.csrfToken;
+                    const originalContent = this.dataset.originalContent;
 
-                    // Check if the comment is already in edit mode
-                    if (commentContentDiv.querySelector('textarea')) {
-                        return; // Do nothing if already in edit mode
-                    }
+                    // Prevent double editing
+                    if (commentContentDiv.querySelector('textarea')) return;
 
-                    // Save the original content
-                    const originalContent = commentContentDiv.textContent;
-
-                    // Replace the content with a textarea
+                    // Create textarea
                     const textarea = document.createElement('textarea');
                     textarea.value = originalContent;
                     textarea.style.width = '100%';
@@ -222,7 +223,7 @@
                     commentContentDiv.innerHTML = '';
                     commentContentDiv.appendChild(textarea);
 
-                    // Replace the "Modifier" button with "Confirmer" and "Annuler" buttons
+                    // Create confirm and cancel buttons
                     const confirmButton = document.createElement('button');
                     confirmButton.textContent = 'Confirmer';
                     confirmButton.className = 'btn btn-sm btn-success me-2';
@@ -231,12 +232,10 @@
                     cancelButton.textContent = 'Annuler';
                     cancelButton.className = 'btn btn-sm btn-secondary';
 
-                    const actionsDiv = button.parentElement;
-                    actionsDiv.removeChild(button);
+                    actionsDiv.removeChild(this);
                     actionsDiv.prepend(confirmButton);
                     actionsDiv.appendChild(cancelButton);
 
-                    // Handle the confirmation
                     confirmButton.addEventListener('click', function () {
                         const newContent = textarea.value.trim();
                         if (newContent === '') {
@@ -244,9 +243,7 @@
                             return;
                         }
 
-                        // Send the updated content to the server via AJAX
-                        const csrfToken = '{{ csrf_token('edit-comment' ~ 'COMMENT_ID_PLACEHOLDER') }}'.replace('COMMENT_ID_PLACEHOLDER', commentId);
-                        fetch('{{ path('app_comment_edit', {'commentId': 'COMMENT_ID_PLACEHOLDER'}) }}'.replace('COMMENT_ID_PLACEHOLDER', commentId), {
+                        fetch(`/post/comment/${commentId}/edit`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -255,19 +252,19 @@
                             body: JSON.stringify({ content: newContent }),
                         })
                             .then(response => {
-                                if (response.ok) {
-                                    return response.json();
-                                } else {
-                                    throw new Error('Une erreur est survenue lors de la mise à jour du commentaire.');
+                                if (!response.ok) {
+                                    throw new Error("Erreur serveur.");
                                 }
+                                return response.json();
                             })
                             .then(data => {
                                 if (data.success) {
-                                    // Update the comment content and reset the UI
                                     commentContentDiv.innerHTML = newContent;
                                     actionsDiv.removeChild(confirmButton);
                                     actionsDiv.removeChild(cancelButton);
                                     actionsDiv.prepend(button);
+                                } else {
+                                    alert(data.error || 'Une erreur est survenue.');
                                 }
                             })
                             .catch(error => {
@@ -275,7 +272,6 @@
                             });
                     });
 
-                    // Handle the cancellation
                     cancelButton.addEventListener('click', function () {
                         commentContentDiv.innerHTML = originalContent;
                         actionsDiv.removeChild(confirmButton);

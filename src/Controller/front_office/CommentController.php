@@ -63,7 +63,7 @@ final class CommentController extends AbstractController
         ]);
     }
 
-    #[Route('/{commentId}/edit', name: 'app_comment_edit', methods: ['POST'])]
+    #[Route('/{commentId}/edit-form', name: 'app_comment_edit_form', methods: ['POST'])]
     public function edit(Request $request, Comment $comment, EntityManagerInterface $entityManager): Response
     {
         // Simulate a logged-in user (for testing purposes)
