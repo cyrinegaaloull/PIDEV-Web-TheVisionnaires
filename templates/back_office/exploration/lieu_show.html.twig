@@ -1,0 +1,42 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="fw-bold mb-3 text-primary">
+    <i class="ri-map-pin-line me-1"></i> Détails du lieu
+  </h4>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title text-dark">{{ lieu.lieuname }}</h5>
+      <p class="mb-2"><i class="ri-map-pin-2-line me-1 text-muted"></i> <strong>Adresse:</strong> {{ lieu.lieuaddress }}</p>
+      <p class="mb-2"><i class="ri-information-line me-1 text-muted"></i> <strong>Description:</strong> {{ lieu.lieudescription }}</p>
+      <p class="mb-2"><i class="ri-price-tag-3-line me-1 text-muted"></i> <strong>Catégorie:</strong> {{ lieu.lieucategory }}</p>
+      <p class="mb-2"><i class="ri-map-pin-user-line me-1 text-muted"></i> <strong>Coordonnées:</strong> {{ lieu.latitude }}, {{ lieu.longitude }}</p>
+
+      <a href="{{ path('admin_event_add', { id: lieu.lieuid }) }}" class="btn btn-success mt-3">
+        <i class="ri-calendar-event-line me-1"></i> Ajouter un événement
+      </a>
+    </div>
+  </div>
+
+  <h5 class="fw-bold mb-3"><i class="ri-calendar-line me-1"></i> Événements associés</h5>
+  {% if events %}
+    <div class="row">
+      {% for event in events %}
+        <div class="col-md-6 col-lg-4 mb-3">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h6 class="card-title">{{ event.eventname }}</h6>
+              <p class="mb-1 text-muted"><i class="ri-time-line me-1"></i> {{ event.eventdate ? event.eventdate|date('d/m/Y') : 'Pas de date' }}</p>
+              <span class="badge bg-label-primary"><i class="ri-bookmark-line me-1"></i> {{ event.eventcategory }}</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">Aucun événement lié à ce lieu.</div>
+  {% endif %}
+</div>
+{% endblock %}

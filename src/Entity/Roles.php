@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
+<<<<<<< HEAD
 #[ORM\Table(name: "Roles")]
 class Roles
 {
@@ -17,6 +18,20 @@ class Roles
     private string $role;
 
     public function getId(): int
+=======
+#[ORM\Table(name: 'Roles')]
+class Roles
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    private ?int $id = null;
+
+    #[ORM\Column(name: 'role', type: 'string', length: 50, nullable: false)]
+    private string $role;
+
+    public function getId(): ?int
+>>>>>>> 1eea093 (committing)
     {
         return $this->id;
     }

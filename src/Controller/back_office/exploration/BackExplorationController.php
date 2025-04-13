@@ -4,10 +4,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Lieu;
-
+use App\Entity\Event;
+use App\Repository\EventRepository;
 use App\Form\LieuType;
+use App\Form\EventType;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 class BackExplorationController extends AbstractController
 {
     #[Route('/admin/dashboard', name: 'admin_dashboard')]
@@ -21,18 +25,20 @@ public function initLieu(): Response
 {
     return $this->render('back_office/exploration/ajout_lieu_map.html.twig');
 }
+
 #[Route('/admin/lieu/complete/{lat}/{lon}/{name}', name: 'admin_lieu_finalize')]
 public function finalizeLieu(Request $request, EntityManagerInterface $em, float $lat, float $lon, string $name): Response
 {
     $lieu = new Lieu();
-$lieu->setLatitude($lat);
-$lieu->setLongitude($lon);
-$lieu->setLieuname($name); // 👈 this will prefill the form field correctly
+    $lieu->setLatitude($lat);
+    $lieu->setLongitude($lon);
+    $lieu->setLieuname($name);
 
+    $form = $this->createForm(LieuType::class, $lieu, [
+        'disabled_name' => true,
+    ]);
 
-$form = $this->createForm(LieuType::class, $lieu, ['disabled_name' => true]);
     $form->handleRequest($request);
-
 
     if ($form->isSubmitted() && $form->isValid()) {
         $file = $form->get('lieuimage')->getData();
@@ -45,25 +51,16 @@ $form = $this->createForm(LieuType::class, $lieu, ['disabled_name' => true]);
         $em->persist($lieu);
         $em->flush();
 
-        $this->addFlash('success', 'Lieu enregistré avec succès !');
-        return $this->redirectToRoute('admin_lieux');
-    }
-
-    // If submitted and invalid, show errors
-    if ($form->isSubmitted()) {
-        foreach ($form->getErrors(true) as $error) {
-            $field = $error->getOrigin()->getName();
-            $message = $error->getMessage();
-            dump("Erreur sur champ: $field => $message");
-        }
-        
-        $this->addFlash('error', 'Formulaire invalide. Veuillez corriger les erreurs.');
+        $this->addFlash('success', 'Lieu ajouté avec succès.');
+        return $this->redirectToRoute('admin_lieux'); // ✅ Redirect here
     }
 
     return $this->render('back_office/exploration/ajout_lieu_finalize.html.twig', [
         'form' => $form->createView(),
     ]);
 }
+
+
 #[Route('/admin/lieux', name: 'admin_lieux')]
 public function listLieux(EntityManagerInterface $em): Response
 {
@@ -109,6 +106,36 @@ public function deleteLieu(Lieu $lieu, EntityManagerInterface $em): Response
     return $this->redirectToRoute('admin_lieux');
 }
 
+#[Route('/admin/lieu/{id}', name: 'admin_lieu_show')]
+public function showLieu(Lieu $lieu, EventRepository $eventRepo): Response
+{
+    $events = $eventRepo->findBy(['lieuid' => $lieu->getLieuid()]);
+    return $this->render('back_office/exploration/lieu_show.html.twig', [
+        'lieu' => $lieu,
+        'events' => $events,
+    ]);
+}
+#[Route('/admin/event/add/{id}', name: 'admin_event_add')]
+public function addEvent(Request $request, Lieu $lieu, EntityManagerInterface $em): Response
+{
+    $event = new Event();
+    $event->setLieuid($lieu->getLieuid());
+
+    $form = $this->createForm(EventType::class, $event);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em->persist($event);
+        $em->flush();
+        $this->addFlash('success', 'Événement ajouté avec succès !');
+        return $this->redirectToRoute('admin_lieu_show', ['id' => $lieu->getLieuid()]);
+    }
+
+    return $this->render('back_office/exploration/event_add.html.twig', [
+        'form' => $form->createView(),
+        'lieu' => $lieu,
+    ]);
+}
 
 
 }

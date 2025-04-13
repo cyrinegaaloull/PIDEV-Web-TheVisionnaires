@@ -5,7 +5,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.1",
-        "doctrine/annotations": "*",
+        "doctrine/annotations": "^2.0",
         "doctrine/dbal": "^3.9",
         "doctrine/deprecations": "^1.1",
         "doctrine/doctrine-bundle": "^2.14",
@@ -16,6 +16,7 @@
         "sendinblue/api-v3-sdk": "^8.4",
         "symfony/asset": "6.4.*",
         "symfony/asset-mapper": "6.4.*",
+        "symfony/brevo-mailer": "6.4.*",
         "symfony/console": "6.4.*",
         "symfony/doctrine-bridge": "6.4.*",
         "symfony/doctrine-messenger": "6.4.*",

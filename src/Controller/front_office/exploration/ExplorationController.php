@@ -155,14 +155,13 @@ public function notifyUser(
     int $id,
     EventRepository $eventRepo,
     NotificationService $notifier,
-    UsersRepository $userRepo // 👈 add this!
+    UsersRepository $userRepo 
 ): Response {
     $event = $eventRepo->find($id);
     if (!$event) {
         throw $this->createNotFoundException('Event not found');
     }
 
-    // 🔐 Simulated user (you can later use getUser() if auth is added)
     $user = $userRepo->findOneBy(['username' => 'cyrine']);
     if (!$user) {
         throw $this->createNotFoundException('Utilisateur introuvable');
@@ -173,7 +172,14 @@ public function notifyUser(
     $notifier->sendWhatsApp($userPhone, "🎉 Rappel: L’événement '{$event->getEventname()}' aura lieu le " . $event->getEventdate()->format('d/m/Y'));
     $notifier->sendEmail($userEmail, 'Rappel événement', "🎫 Ne manquez pas '{$event->getEventname()}' le " . $event->getEventdate()->format('d/m/Y'));
 
-    $this->addFlash('success', 'Notification envoyée avec succès.');
+    try {
+        $notifier->sendWhatsApp($userPhone, "🎉 Rappel: L’événement '{$event->getEventname()}' aura lieu le " . $event->getEventdate()->format('d/m/Y'));
+        $notifier->sendEmail($userEmail, 'Rappel événement', "🎫 Ne manquez pas '{$event->getEventname()}' le " . $event->getEventdate()->format('d/m/Y'));
+        $this->addFlash('success', 'Notification envoyée avec succès.');
+    } catch (\Throwable $e) {
+        $this->addFlash('danger', '❌ Échec de l’envoi de la notification: ' . $e->getMessage());
+    }    
+    
     return $this->redirectToRoute('lieu_details', ['id' => $event->getLieuid()]);
 }
 #[Route('/recommendations', name: 'weather_recommendations')]
@@ -226,13 +232,40 @@ public function recommendByWeather(
     return $this->render('front_office/exploration/_weather_recommendations.html.twig', [
         'recommended' => $recommended,
         'ratings' => $ratings,
-        'weather' => $weather,           // ✅ add this
-        'categories' => $categories,     // ✅ and this
+        'weather' => $weather,           
+        'categories' => $categories,     
     ]);
     
 }
+#[Route('/event/{id}/reserve', name: 'event_reserve', methods: ['POST'])]
+public function reserveTicket(int $id, EventRepository $eventRepo, EntityManagerInterface $em): Response
+{
+    $event = $eventRepo->find($id);
+    if (!$event) {
+        throw $this->createNotFoundException('Événement introuvable');
+    }
 
+    if ($event->getReservedtickets() >= $event->getMaxtickets()) {
+        $this->addFlash('danger', 'Plus de billets disponibles.');
+        return $this->redirectToRoute('event_details', ['id' => $id]);
+    }
 
+    $event->incrementReservedTickets();
+    $em->flush();
+
+    $this->addFlash('success', '🎫 Réservation réussie !');
+    return $this->redirectToRoute('event_details', ['id' => $id]);
+}
+#[Route('/mail', name: 'test_mail')]
+public function testMail(NotificationService $notifier): Response
+{
+    try {
+        $notifier->sendEmail('cyrinegaaloul29@gmail.com', 'Test Subject', 'Body message here');
+        return new Response('✅ Email sent!');
+    } catch (\Throwable $e) {
+        return new Response('❌ Failed: ' . $e->getMessage());
+    }
+}
 
 }
 

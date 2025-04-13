@@ -168,11 +168,15 @@ public function incrementReservedTickets(): self {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1eea093 (committing)
     public function setEventimage(?string $eventimage): self
     {
         $this->eventimage = $eventimage;
         return $this;
     }
+<<<<<<< HEAD
 
     public function getNotificationmethod(): ?string
     {
@@ -202,35 +206,32 @@ public function incrementReservedTickets(): self {
  * @ORM\Column(name="notificationMethod", type="string", length=20, nullable=true)
  */
 private $notificationmethod;
+=======
+>>>>>>> 1eea093 (committing)
 
-/**
- * @var \DateTime|null
- *
- * @ORM\Column(name="notificationScheduledAt", type="datetime", nullable=true)
- */
-private $notificationscheduledat;
+    public function getNotificationmethod(): ?string
+    {
+        return $this->notificationmethod;
+    }
 
-public function getNotificationmethod(): ?string
-{
-    return $this->notificationmethod;
-}
-
-public function setNotificationmethod(?string $method): self
-{
-    $this->notificationmethod = $method;
-    return $this;
-}
-
-public function getNotificationscheduledat(): ?\DateTime
-{
-    return $this->notificationscheduledat;
-}
-
-public function setNotificationscheduledat(?\DateTime $time): self
-{
-    $this->notificationscheduledat = $time;
-    return $this;
-}
-
+<<<<<<< HEAD
 >>>>>>> ed8b8e6 (removed secrets from .env)
+=======
+    public function setNotificationmethod(?string $method): self
+    {
+        $this->notificationmethod = $method;
+        return $this;
+    }
+
+    public function getNotificationscheduledat(): ?\DateTimeInterface
+    {
+        return $this->notificationscheduledat;
+    }
+
+    public function setNotificationscheduledat(?\DateTimeInterface $time): self
+    {
+        $this->notificationscheduledat = $time;
+        return $this;
+    }
+>>>>>>> 1eea093 (committing)
 }

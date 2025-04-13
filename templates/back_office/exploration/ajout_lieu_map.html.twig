@@ -9,30 +9,38 @@
 </div>
 
 <div id="map" style="height: 500px; border-radius: 12px;"></div>
-
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+
 <script>
   const map = L.map('map').setView([36.8065, 10.1815], 6); // Tunisia center
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+  // ✅ High-performance CartoDB tiles (no proxy needed)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
   let marker;
 
-  document.getElementById('map').addEventListener('click', function (e) {
-    map.on('click', function (ev) {
-      const { lat, lng } = ev.latlng;
-      if (marker) map.removeLayer(marker);
-      marker = L.marker([lat, lng]).addTo(map);
+  map.on('click', function (ev) {
+    const { lat, lng } = ev.latlng;
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng]).addTo(map);
 
-      alert("Lieu sélectionné !");
-      window.location.href = `/admin/lieu/complete/${lat}/${lng}/Inconnu`;
-    });
+    alert("Lieu sélectionné !");
+    window.location.href = `/admin/lieu/complete/${lat}/${lng}/Inconnu`;
   });
 
   // Photon Search
   const input = document.getElementById('searchInput');
   const suggestions = document.getElementById('suggestions');
+
   input.addEventListener('input', function () {
     const query = input.value.trim();
     if (!query) return;
+
     fetch(`https://photon.komoot.io/api/?q=${query}&limit=5`)
       .then(res => res.json())
       .then(data => {
@@ -41,20 +49,27 @@
           const li = document.createElement('li');
           li.className = 'list-group-item list-group-item-action';
           li.textContent = feature.properties.name + ' - ' + (feature.properties.city || '');
-          li.onclick = () => {
-            const [lon, lat] = feature.geometry.coordinates;
-            map.setView([lat, lon], 14);
-            if (marker) map.removeLayer(marker);
-            marker = L.marker([lat, lon]).addTo(map);
-            const name = feature.properties.name + 
-             (feature.properties.city ? `, ${feature.properties.city}` : '') + 
-             (feature.properties.country ? `, ${feature.properties.country}` : '');
-window.location.href = `/admin/lieu/complete/${lat}/${lon}/${encodeURIComponent(name)}`;
 
-          };
+          li.onclick = () => {
+  const [lon, lat] = feature.geometry.coordinates;
+  const name = feature.properties.name +
+    (feature.properties.city ? `, ${feature.properties.city}` : '') +
+    (feature.properties.country ? `, ${feature.properties.country}` : '');
+
+  // ✅ Confirmation dialog
+  if (confirm(`Voulez-vous ajouter "${name}" comme lieu ?`)) {
+    map.setView([lat, lon], 14);
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lon]).addTo(map);
+    
+    window.location.href = `/admin/lieu/complete/${lat}/${lon}/${encodeURIComponent(name)}`;
+  }
+};
+
           suggestions.appendChild(li);
         });
       });
   });
 </script>
+
 {% endblock %}

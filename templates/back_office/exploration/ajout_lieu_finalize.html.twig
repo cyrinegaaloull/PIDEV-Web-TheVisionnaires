@@ -3,88 +3,89 @@
 {% block body %}
 <h4 class="fw-bold mb-4 text-primary">Étape 2 : Complétez les détails du lieu</h4>
 
-<div class="card shadow border rounded-3 p-4">
-    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+<div class="card shadow border rounded-3 p-4 bg-white">
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'demo-vertical-spacing'}}) }}
+    {% if not form.vars.valid and form.vars.submitted %}
+    <div class="alert alert-danger">
+        <strong>Veuillez corriger les erreurs dans le formulaire.</strong>
+    </div>
+{% endif %}
+
+
     {% for label, messages in app.flashes %}
-  {% for message in messages %}
-    <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }}">
-      {{ message }}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            {{ form_row(form.lieuname, {'attr': {'class': 'form-control form-control-lg'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.lieuaddress, {'attr': {'class': 'form-control form-control-lg'}}) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(form.lieudescription, {'attr': {'rows': '3', 'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.lieucategory, {'attr': {'class': 'form-select'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.lieunumber, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.lieuopeninghours, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.lieuclosinghours, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6 mb-3">
+    {{ form_row(form.lieuimage, {'attr': {'class': 'form-control', 'onchange': 'previewImage(event)'}}) }}
+    <div class="mt-2">
+        <img id="lieu-image-preview" src="#" alt="Aperçu de l'image" class="img-thumbnail" style="display: none; max-width: 250px;" />
     </div>
-  {% endfor %}
-{% endfor %}
+</div>
 
-
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            {{ form_label(form.lieuname, null, {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.lieuname, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.lieuname) }}
-        </div>
-        
-        
-        
-        <div class="col-md-6 mb-3">
-            {{ form_label(form.lieuaddress, null, {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.lieuaddress, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.lieuaddress) }}
-        </div>
-
-        <div class="col-md-6 mb-3">
-            {{ form_label(form.lieunumber, null, {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.lieunumber, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.lieunumber) }}
-        </div>
-
-        <div class="col-12 mb-3">
-            {{ form_label(form.lieudescription, null, {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.lieudescription, {'attr': {'class': 'form-control', 'rows': 3}}) }}
-            {{ form_errors(form.lieudescription) }}
-        </div>
-
-        <div class="col-md-6 mb-3">
-            {{ form_label(form.lieucategory, null, {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.lieucategory, {'attr': {'class': 'form-select'}}) }}
-            {{ form_errors(form.lieucategory) }}
-        </div>
-
-        <div class="col-md-6 mb-3">
-            {{ form_label(form.lieuimage, 'Image du lieu', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.lieuimage, {'attr': {'onchange': 'previewImage(event)', 'class': 'form-control'}}) }}
-            {{ form_errors(form.lieuimage) }}
-            <img id="preview" src="#" alt="Preview" class="mt-2 rounded shadow-sm border" style="max-width: 200px; display: none;" />
-        </div>
-
-        <div class="col-md-6 mb-3">
-            {{ form_label(form.lieuopeninghours, null, {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.lieuopeninghours, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.lieuopeninghours) }}
-        </div>
-
-        <div class="col-md-6 mb-3">
-            {{ form_label(form.lieuclosinghours, null, {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.lieuclosinghours, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.lieuclosinghours) }}
-        </div>
     </div>
 
-    <div class="mt-4 d-flex justify-content-end">
-        <button type="submit" class="btn btn-primary btn-lg shadow">
+    <div class="d-flex justify-content-end mt-4">
+        <button class="btn btn-primary btn-lg px-4 shadow-sm">
             <i class="fas fa-save me-2"></i> Enregistrer le lieu
         </button>
     </div>
 
     {{ form_end(form) }}
 </div>
-
+<style>
+#lieu-image-preview {
+    border-radius: 10px;
+    max-height: 200px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+</style>
 <script>
-    function previewImage(event) {
+function previewImage(event) {
+    const input = event.target;
+    const preview = document.getElementById('lieu-image-preview');
+
+    if (input.files && input.files[0]) {
         const reader = new FileReader();
-        reader.onload = function(){
-            const output = document.getElementById('preview');
-            output.src = reader.result;
-            output.style.display = 'block';
-        };
-        reader.readAsDataURL(event.target.files[0]);
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.src = '#';
+        preview.style.display = 'none';
     }
+}
 </script>
+
 {% endblock %}

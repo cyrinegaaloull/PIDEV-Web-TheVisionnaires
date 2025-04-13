@@ -40,5 +40,5 @@ services:
             $twilioSid: '%env(TWILIO_ACCOUNT_SID)%'
             $twilioToken: '%env(TWILIO_AUTH_TOKEN)%'
             $whatsappNumber: '%env(TWILIO_WHATSAPP_NUMBER)%'
-            $senderEmail: 'locallens.contact@gmail.com'
+            $senderEmail: 'cyrinegaaloul6@gmail.com'
 

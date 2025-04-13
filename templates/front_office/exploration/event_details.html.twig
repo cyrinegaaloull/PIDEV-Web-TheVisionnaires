@@ -18,6 +18,19 @@
         <p><strong>Catégorie:</strong> {{ event.eventcategory }}</p>
         <p><strong>Description:</strong> {{ event.eventdescription }}</p>
         <p><strong>Prix:</strong> {{ event.ticketprice }} TND</p>
+        {% set available = event.maxtickets - event.reservedtickets %}
+
+{% if available > 0 %}
+  <form method="POST" action="{{ path('event_reserve', {'id': event.eventid}) }}">
+    <button type="submit" class="btn btn-primary">
+      <i class="ri-ticket-line"></i> Réserver
+    </button>
+  </form>
+  <p class="mt-2 text-muted">🎟️ Places restantes : {{ available }}</p>
+{% else %}
+  <p class="text-danger fw-bold mt-2">Événement complet ❌</p>
+{% endif %}
+
 
         <form action="{{ path('event_notify', { id: event.eventid }) }}" method="post">
   <button class="btn btn-success">🔔 Me notifier</button>
