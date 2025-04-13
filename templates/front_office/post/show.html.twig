@@ -11,6 +11,12 @@
                 <div class="col-md-8">
                     <h1 class="hero-title">{{ post.title }}</h1>
                     <p class="hero-subtitle">Publié dans la catégorie: {{ post.category }}</p>
+
+                    <!-- Delete Post Button -->
+                    <form method="post" action="{{ path('app_post_delete', {'postId': post.postId}) }}" style="display: inline-block;" onsubmit="return confirm('Voulez-vous vraiment supprimer cette publication ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.postId) }}">
+                        <button type="submit" class="btn btn-danger btn-sm">Supprimer la publication</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -131,6 +137,39 @@
         .comment-form button:hover {
             background: #0056b3;
         }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 50%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
     </style>
 
     <!-- Post Details Section -->
@@ -148,7 +187,7 @@
                 <!-- Add New Comment -->
                 <div class="comment-form mt-4">
                     <h3>Ajouter un commentaire</h3>
-                    <form method="post" action="{{ path('app_post_show', {'postId': post.postId}) }}">
+                    <form method="post">
                         {{ form_widget(form) }}
                         <button type="submit" class="btn btn-primary">Publier</button>
                     </form>
@@ -164,11 +203,12 @@
                                 <div class="comment-author">Utilisateur ID: {{ comment.userId }}</div>
                                 <div class="comment-content">{{ comment.content }}</div>
                                 <div class="comment-actions mt-2">
-                                    <a href="#" class="btn btn-sm btn-primary me-2">Modifier</a>
-                                    <form action="{{ path('app_post_show', {'postId': post.postId}) }}" method="post" style="display: inline-block;">
-                                        <input type="hidden" name="action" value="delete_comment">
-                                        <input type="hidden" name="commentId" value="{{ comment.commentId }}">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.commentId) }}">
+                                    <!-- Edit Button -->
+                                    <a href="#" class="btn btn-sm btn-primary me-2" onclick="openEditModal({{ comment.commentId }}, '{{ comment.content|e('js') }}')">Modifier</a>
+
+                                    <!-- Delete Button -->
+                                    <form action="{{ path('app_comment_delete', {'commentId': comment.commentId}) }}" method="post" style="display: inline-block;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete-comment' ~ comment.commentId) }}">
                                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Voulez-vous vraiment supprimer ce commentaire ?')">Supprimer</button>
                                     </form>
                                 </div>
@@ -181,4 +221,51 @@
             </div>
         </div>
     </div>
+
+    <!-- Edit Comment Modal -->
+    <div id="editCommentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h3>Modifier le commentaire</h3>
+            <form id="editCommentForm" method="post">
+                <textarea id="editCommentContent" name="content" rows="3" placeholder="Écrivez votre commentaire ici..." required></textarea>
+                <input type="hidden" id="editCommentId" name="commentId">
+                <input type="hidden" id="editCsrfToken" name="_token">
+                <button type="submit" class="btn btn-primary mt-2">Confirmer</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Open the modal and populate the form fields
+        function openEditModal(commentId, content) {
+            const modal = document.getElementById('editCommentModal');
+            const form = document.getElementById('editCommentForm');
+            const contentField = document.getElementById('editCommentContent');
+            const commentIdField = document.getElementById('editCommentId');
+            const csrfTokenField = document.getElementById('editCsrfToken');
+
+            contentField.value = content;
+            commentIdField.value = commentId;
+            csrfTokenField.value = '{{ csrf_token('edit-comment' ~ 'COMMENT_ID_PLACEHOLDER') }}'.replace('COMMENT_ID_PLACEHOLDER', commentId);
+
+            form.action = '{{ path('app_comment_edit', {'commentId': 'COMMENT_ID_PLACEHOLDER'}) }}'.replace('COMMENT_ID_PLACEHOLDER', commentId);
+
+            modal.style.display = 'block';
+        }
+
+        // Close the modal
+        function closeEditModal() {
+            const modal = document.getElementById('editCommentModal');
+            modal.style.display = 'none';
+        }
+
+        // Close the modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('editCommentModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    </script>
 {% endblock %}

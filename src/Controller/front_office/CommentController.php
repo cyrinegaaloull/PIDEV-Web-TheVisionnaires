@@ -3,13 +3,11 @@
 namespace App\Controller\front_office;
 
 use App\Entity\Comment;
-use App\Entity\Post;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 #[Route('/comment')]
 final class CommentController extends AbstractController
@@ -18,30 +16,34 @@ final class CommentController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, int $postId): Response
     {
         // Fetch the Post entity based on postId
-        $post = $entityManager->getRepository(Post::class)->find($postId);
+        $post = $entityManager->getRepository(\App\Entity\Post::class)->find($postId);
 
         if (!$post) {
             throw $this->createNotFoundException('Publication non trouvée.');
         }
 
+        // Simulate a logged-in user (replace with actual user retrieval logic)
+        $simulateUser = false;
+        $user = $this->getSimulatedUser($simulateUser);
+
         // Create a new Comment and associate it with the Post
         $comment = new Comment();
         $comment->setPost($post); // Link the comment to the post
 
-        // Simulate a logged-in user (replace with actual user retrieval logic)
-        $simulateUser = false;
-        if ($simulateUser) {
-            $comment->setUserId(1); // Example user ID
+        if ($user) {
+            $comment->setUserId($user['id']); // Example user ID
         } else {
-            // Replace with actual user retrieval logic
-            // $comment->setUserId($this->getUser()->getId());
+            $comment->setUserId(1); // Default user ID for simulation
         }
 
-        // Create the form
+        // Handle form submission
         $form = $this->createFormBuilder($comment)
-            ->add('content', TextareaType::class, [
-                'label' => 'Contenu',
-                'attr' => ['rows' => 3],
+            ->add('content', \Symfony\Component\Form\Extension\Core\Type\TextareaType::class, [
+                'label' => false,
+                'attr' => [
+                    'rows' => 3,
+                    'placeholder' => 'Écrivez votre commentaire ici...',
+                ],
             ])
             ->getForm();
 
@@ -51,56 +53,75 @@ final class CommentController extends AbstractController
             $entityManager->persist($comment);
             $entityManager->flush();
 
-            // Redirect to the post's show page
             return $this->redirectToRoute('app_post_show', ['postId' => $post->getPostId()]);
         }
 
         return $this->render('front_office/comment/new.html.twig', [
             'form' => $form->createView(),
             'post' => $post,
+            'user' => $user, // Pass the user to the template
         ]);
     }
 
-    #[Route('/{commentId}/edit', name: 'app_comment_edit', methods: ['GET', 'POST'])]
+    #[Route('/{commentId}/edit', name: 'app_comment_edit', methods: ['POST'])]
     public function edit(Request $request, Comment $comment, EntityManagerInterface $entityManager): Response
     {
-        // Get the postId from the comment's associated post
-        $postId = $comment->getPost()->getPostId();
+        // Simulate a logged-in user (for testing purposes)
+        $simulateUser = true; // Enable simulation
+        $user = $this->getSimulatedUser($simulateUser);
 
-        $form = $this->createFormBuilder($comment)
-            ->add('content', TextareaType::class, [
-                'label' => 'Contenu',
-                'attr' => ['rows' => 3],
-            ])
-            ->getForm();
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            // Redirect to the post's show page
-            return $this->redirectToRoute('app_post_show', ['postId' => $postId]);
+        // Validate CSRF token
+        if (!$this->isCsrfTokenValid('edit-comment' . $comment->getCommentId(), $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
-        return $this->render('front_office/comment/edit.html.twig', [
-            'comment' => $comment,
-            'form' => $form->createView(),
-        ]);
+        // Update the comment content
+        $newContent = trim($request->get('content'));
+        if (empty($newContent)) {
+            $this->addFlash('error', 'Le contenu du commentaire ne peut pas être vide.');
+        } else {
+            $comment->setContent($newContent);
+            $entityManager->flush();
+            $this->addFlash('success', 'Le commentaire a été mis à jour avec succès.');
+        }
+
+        // Redirect back to the post's show page
+        return $this->redirectToRoute('app_post_show', ['postId' => $comment->getPost()->getPostId()]);
     }
 
     #[Route('/{commentId}', name: 'app_comment_delete', methods: ['POST'])]
     public function delete(Request $request, Comment $comment, EntityManagerInterface $entityManager): Response
     {
-        // Get the postId from the comment's associated post
-        $postId = $comment->getPost()->getPostId();
-
-        if ($this->isCsrfTokenValid('delete' . $comment->getCommentId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($comment);
-            $entityManager->flush();
+        // Validate CSRF token
+        if (!$this->isCsrfTokenValid('delete-comment' . $comment->getCommentId(), $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
-        // Redirect to the post's show page
+        // Delete the comment
+        $postId = $comment->getPost()->getPostId();
+        $entityManager->remove($comment);
+        $entityManager->flush();
+
+        // Redirect back to the post's show page
         return $this->redirectToRoute('app_post_show', ['postId' => $postId]);
+    }
+
+    /**
+     * Helper method to simulate a logged-in user.
+     *
+     * @param bool $simulateUser Whether to simulate a user or not
+     * @return array|null Simulated user data or null
+     */
+    private function getSimulatedUser(bool $simulateUser): ?array
+    {
+        if ($simulateUser) {
+            return [
+                'id' => 1, // Simulated user ID
+                'username' => 'John Doe',
+                'profile_picture' => 'default_profile_pic.jpg',
+            ];
+        }
+
+        return null; // No user logged in
     }
 }

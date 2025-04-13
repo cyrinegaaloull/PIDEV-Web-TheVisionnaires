@@ -60,7 +60,7 @@ final class PostController extends AbstractController
     #[Route('/{postId}', name: 'app_post_show', methods: ['GET', 'POST'])]
     public function show(Request $request, EntityManagerInterface $entityManager, int $postId): Response
     {
-        // Fetch the Post entity
+        // Fetch the Post entity based on postId
         $post = $entityManager->getRepository(Post::class)->find($postId);
 
         if (!$post) {
@@ -74,12 +74,20 @@ final class PostController extends AbstractController
         // Handle Comment Creation
         $newComment = new Comment();
         $newComment->setPost($post); // Link the comment to the post
-        $newComment->setUserId(1); // Set default userId to 1
+
+        if ($user) {
+            $newComment->setUserId($user['id']); // Example user ID
+        } else {
+            $newComment->setUserId(1); // Default user ID for simulation
+        }
 
         $form = $this->createFormBuilder($newComment)
             ->add('content', TextareaType::class, [
-                'label' => 'Ajouter un commentaire',
-                'attr' => ['rows' => 3],
+                'label' => false, // No label for the textarea
+                'attr' => [
+                    'rows' => 3,
+                    'placeholder' => 'Écrivez votre commentaire ici...',
+                ],
             ])
             ->getForm();
 
@@ -90,22 +98,6 @@ final class PostController extends AbstractController
             $entityManager->flush();
 
             // Redirect back to the same page to avoid resubmission issues
-            return $this->redirectToRoute('app_post_show', ['postId' => $postId]);
-        }
-
-        // Handle Comment Deletion
-        if ($request->isMethod('POST') && $request->get('action') === 'delete_comment') {
-            $commentId = $request->get('commentId');
-            $comment = $entityManager->getRepository(Comment::class)->find($commentId);
-
-            if ($comment && $comment->getPost()->getPostId() === $post->getPostId()) {
-                if ($this->isCsrfTokenValid('delete' . $commentId, $request->get('_token'))) {
-                    $entityManager->remove($comment);
-                    $entityManager->flush();
-                }
-            }
-
-            // Redirect back to the same page
             return $this->redirectToRoute('app_post_show', ['postId' => $postId]);
         }
 
@@ -139,7 +131,7 @@ final class PostController extends AbstractController
         ]);
     }
 
-    #[Route('/{postId}', name: 'app_post_delete', methods: ['POST'])]
+    #[Route('/{postId}/delete', name: 'app_post_delete', methods: ['POST'])]
     public function delete(Request $request, Post $post, EntityManagerInterface $entityManager): Response
     {
         // Simulate a logged-in user (optional)
@@ -164,6 +156,7 @@ final class PostController extends AbstractController
     {
         if ($simulateUser) {
             return [
+                'id' => 1, // Simulated user ID
                 'username' => 'John Doe',
                 'profile_picture' => 'default_profile_pic.jpg',
             ];
