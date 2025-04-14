@@ -591,99 +591,118 @@
                         {% endfor %}
 
                         <form method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="_token" value="{{ csrf_token('edit_profile' ~ user.getUserId()) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('edit_profile' ~ user.getUserId()) }}">
 
-                            {# --- Avatar File Input (Visually Hidden, Triggered by JS) --- #}
-<div class="form-group" style="height: 0; overflow: hidden; margin: 0; padding: 0; border: 0;">
-    {# Label is optional for screen readers if another element provides context #}
-    <label for="avatar" class="visually-hidden">Choose a new profile picture</label> 
-    <input type="file" 
-           id="avatar" 
-           name="avatar" 
-           class="form-control" 
-           accept="image/png, image/jpeg, image/gif" 
-           style="position: absolute; left: -9999px;"> 
-    {# 'accept' attribute restricts file types in the browser dialog #}
-    {# Inline style or a CSS class hides it effectively #}
-</div>
+    {# --- Avatar File Input & Display (Keep as is, add error display) --- #}
+    <div class="form-group" style="height: 0; overflow: hidden; margin: 0; padding: 0; border: 0;">
+        <label for="avatar" class="visually-hidden">Choose a new profile picture</label>
+        <input type="file"
+               id="avatar"
+               name="avatar"
+               class="form-control {% if errors.avatar is defined %}is-invalid{% endif %}" {# Add is-invalid check #}
+               accept="image/png, image/jpeg, image/gif"
+               style="position: absolute; left: -9999px;">
+    </div>
 
-                            {# --- Display Current Avatar (Top) --- #}
-                            <div class="profile-avatar-top">
-                                <div class="profile-avatar-container">
-                                    {% if user.avatar %}
-                                        <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="Current Profile Picture" class="img-display">
-                                    {% else %}
-                                        <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Default Profile Picture" class="img-display">
-                                    {% endif %}
-                                    <div class="avatar-edit-overlay">
-                                        <span>Click to edit</span>
-                                    </div>
-                                </div>
-                            </div>
+    <div class="profile-avatar-top">
+        <div class="profile-avatar-container">
+            {# Display existing or default avatar logic remains the same #}
+            {% if user.avatar %}
+                <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="Current Profile Picture" class="img-display">
+            {% else %}
+                <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Default Profile Picture" class="img-display">
+            {% endif %}
+            <div class="avatar-edit-overlay"><span>Click to edit</span></div>
+        </div>
+         {# Display Avatar Error Message #}
+         {% if errors.avatar is defined %}
+            <div class="text-danger mt-2" style="text-align: center;">{{ errors.avatar }}</div>
+         {% endif %}
+    </div>
 
-                           {# --- Basic Information --- #}
-{# Username #}
-<div class="form-group" style="display: block !important;">
-    <label for="username" class="form-label">Username</label>
-    <input type="text" id="username" name="username" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if usernameError is defined and usernameError %}is-invalid{% endif %}" value="{{ user.username }}" required>
-    {% if usernameError is defined and usernameError %} <div class="invalid-feedback">{{ usernameError }}</div> {% endif %}
-</div>
 
-{# Email #}
-<div class="form-group" style="display: block !important;">
-    <label for="email" class="form-label">Email</label>
-    <input type="email" id="email" name="email" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated" value="{{ user.email }}" required>
-</div>
+    {# --- Basic Information --- #}
+    {# Username #}
+    <div class="form-group" style="display: block !important;">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" id="username" name="username" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if errors.username is defined %}is-invalid{% endif %}" value="{{ request is defined and request.method == 'POST' ? request.request.get('username') : user.username }}" >
+        {% if errors.username is defined %}
+            <div class="invalid-feedback">{{ errors.username }}</div>
+        {% endif %}
+    </div>
 
-{# Last Name #}
-<div class="form-group" style="display: block !important;">
-    <label for="nom" class="form-label">Last Name</label>
-    <input type="text" id="nom" name="nom" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated" value="{{ user.nom }}">
-</div>
+    {# Email #}
+    <div class="form-group" style="display: block !important;">
+        <label for="email" class="form-label">Email</label>
+        <input type="text" id="email" name="email" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if errors.email is defined %}is-invalid{% endif %}" value="{{ request is defined and request.method == 'POST' ? request.request.get('email') : user.email }}" >
+         {% if errors.email is defined %}
+            <div class="invalid-feedback">{{ errors.email }}</div>
+        {% endif %}
+    </div>
 
-{# First Name #}
-<div class="form-group" style="display: block !important;">
-    <label for="prenom" class="form-label">First Name</label>
-    <input type="text" id="prenom" name="prenom" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated" value="{{ user.prenom }}">
-</div>
-                            {# --- Form Divider --- #}
-                            <div class="form-divider"></div>
+    {# Last Name #}
+    <div class="form-group" style="display: block !important;">
+        <label for="nom" class="form-label">Last Name</label>
+        <input type="text" id="nom" name="nom" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if errors.nom is defined %}is-invalid{% endif %}" value="{{ request is defined and request.method == 'POST' ? request.request.get('nom') : user.nom }}">
+         {% if errors.nom is defined %}
+            <div class="invalid-feedback">{{ errors.nom }}</div>
+        {% endif %}
+    </div>
 
-  {# Current Password field - Required #}
-  <h5 class="form-section-title">Current Password field - Required</h5>
-<div class="form-group" style="display: block !important;">
-    <label for="current_password" class="form-label">Current Password <span class="text-danger">*</span></label>
-    <input type="password" id="current_password" name="current_password" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if currentPasswordError is defined and currentPasswordError %}is-invalid{% endif %}" placeholder="Enter your current password" >
-    {% if currentPasswordError is defined and currentPasswordError %}
-        <div class="invalid-feedback">{{ currentPasswordError }}</div>
-    {% endif %}
-    <div class="form-text">Please enter your current password to confirm your identity</div>
-</div>
+    {# First Name #}
+    <div class="form-group" style="display: block !important;">
+        <label for="prenom" class="form-label">First Name</label>
+        <input type="text" id="prenom" name="prenom" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if errors.prenom is defined %}is-invalid{% endif %}" value="{{ request is defined and request.method == 'POST' ? request.request.get('prenom') : user.prenom }}">
+         {% if errors.prenom is defined %}
+            <div class="invalid-feedback">{{ errors.prenom }}</div>
+        {% endif %}
+    </div>
 
-{# --- Change Password Section --- #}
-<h5 class="form-section-title">Change Password (Optional)</h5>
+    {# --- Form Divider --- #}
+    <div class="form-divider"></div>
 
-{# Password field with !important styles to ensure visibility #}
-<div class="form-group" style="display: block !important;">
-    <label for="password" class="form-label">New Password</label>
-    <input type="password" id="password" name="password" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if passwordError is defined and passwordError %}is-invalid{% endif %}" placeholder="Leave blank to keep current password">
-    {% if passwordError is defined and passwordError %}
-        <div class="invalid-feedback">{{ passwordError }}</div>
-    {% endif %}
-</div>
+    {# Current Password field - Required #}
+    <h5 class="form-section-title">Verify Identity</h5>
+    <div class="form-group" style="display: block !important;">
+        <label for="current_password" class="form-label">Current Password <span class="text-danger">*</span></label>
+        <input type="password" id="current_password" name="current_password" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if errors.current_password is defined %}is-invalid{% endif %}" placeholder="Enter your current password to save changes" >
+        {% if errors.current_password is defined %}
+            <div class="invalid-feedback">{{ errors.current_password }}</div>
+        {% endif %}
+         <div class="form-text">Required to save any changes.</div>
+    </div>
 
-{# Confirm Password field with !important styles to ensure visibility #}
-<div class="form-group" style="display: block !important;">
-    <label for="confirm_password" class="form-label">Confirm New Password</label>
-    <input type="password" id="confirm_password" name="confirm_password" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if passwordError is defined and passwordError %}is-invalid{% endif %}" placeholder="Confirm new password">
-</div>
+    {# --- Change Password Section --- #}
+    <h5 class="form-section-title">Change Password (Optional)</h5>
 
-                            {# --- Action Buttons --- #}
-                            <div class="btn-group">
-                                <a href="{{ path('app_home') }}" class="btn btn-secondary">Cancel</a>
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
-                            </div>
-                        </form>
+    {# New Password field #}
+    <div class="form-group" style="display: block !important;">
+        <label for="password" class="form-label">New Password</label>
+        <input type="password" id="password" name="password" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if errors.password is defined %}is-invalid{% endif %}" placeholder="Leave blank to keep current password">
+        {% if errors.password is defined %}
+            <div class="invalid-feedback">{{ errors.password }}</div>
+        {% endif %}
+    </div>
+
+    {# Confirm New Password field #}
+    <div class="form-group" style="display: block !important;">
+        <label for="confirm_password" class="form-label">Confirm New Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" style="display: block !important; visibility: visible !important; opacity: 1 !important;" class="form-control form-control-animated {% if errors.confirm_password is defined %}is-invalid{% endif %}" placeholder="Confirm new password">
+         {% if errors.confirm_password is defined %}
+            <div class="invalid-feedback">{{ errors.confirm_password }}</div>
+        {% endif %}
+    </div>
+
+    {# --- Action Buttons --- #}
+    <div class="btn-group">
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+</form>
+
+{# ... rest of the HTML ... #}
+
+{# Add JavaScript for Avatar click (if not already present) #}
                     </div> {# End card-body #}
                 </div> {# End modern-card #}
             </div> {# End col #}
