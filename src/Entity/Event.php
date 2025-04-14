@@ -1,251 +1,197 @@
 <?php
 
-
 namespace App\Entity;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Event
- *
- * @ORM\Table(name="event", indexes={@ORM\Index(name="fk_event_lieu", columns={"lieuID"})})
- * @ORM\Entity
- */
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ORM\Entity]
+#[ORM\Table(name: "event")]
+#[ORM\Index(name: "fk_event_lieu", columns: ["lieuID"])]
 class Event
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="eventID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $eventid;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(name: "eventID", type: "integer")]
+    private ?int $eventid = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="eventName", type="string", length=100, nullable=false)
-     */
-    private $eventname;
+    #[ORM\Column(name: "eventName", type: "string", length: 100)]
+    #[Assert\NotBlank(message: "Le nom de l'événement est requis.")]
+    #[Assert\Length(
+        min: 3,
+        max: 100,
+        minMessage: "Le nom doit faire au moins {{ limit }} caractères.",
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $eventname = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="eventDescription", type="string", length=100, nullable=false)
-     */
-    private $eventdescription;
+    #[ORM\Column(name: "eventDescription", type: "string", length: 100)]
+    #[Assert\NotBlank(message: "La description est requise.")]
+    #[Assert\Length(
+        min: 10,
+        max: 255,
+        minMessage: "La description doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $eventdescription = null;
 
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="eventDate", type="date", nullable=true)
-     */
-    private $eventdate;
+    #[ORM\Column(name: "eventDate", type: "date", nullable: true)]
+    #[Assert\NotNull(message: "La date est requise.")]
+    #[Assert\GreaterThan("today", message: "La date doit être dans le futur.")]
+    private ?\DateTimeInterface $eventdate = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="eventCategory", type="string", length=30, nullable=false)
-     */
-    private $eventcategory;
+    #[ORM\Column(name: "eventCategory", type: "string", length: 30)]
+    #[Assert\NotBlank(message: "La catégorie est requise.")]
+    private ?string $eventcategory = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="lieuID", type="integer", nullable=false)
-     */
-    private $lieuid;
+    #[ORM\Column(name: "lieuID", type: "integer")]
+    #[Assert\NotNull(message: "Le lieu associé est requis.")]
+    private ?int $lieuid = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="ticketPrice", type="integer", nullable=false)
-     */
-    private $ticketprice;
+    #[ORM\Column(name: "ticketPrice", type: "integer")]
+    #[Assert\NotNull(message: "Le prix du ticket est requis.")]
+    #[Assert\PositiveOrZero(message: "Le prix doit être un nombre positif.")]
+    private ?int $ticketprice = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="eventImage", type="string", length=100, nullable=true)
-     */
-    private $eventimage;
+    #[ORM\Column(name: "eventImage", type: "string", length: 100, nullable: true)]
+    private ?string $eventimage = null;
+
+    #[ORM\Column(name: "notificationMethod", type: "string", length: 20, nullable: true)]
+    private ?string $notificationmethod = null;
+
+    #[ORM\Column(name: "notificationScheduledAt", type: "datetime", nullable: true)]
+    private ?\DateTimeInterface $notificationscheduledat = null;
+
+#[ORM\Column(name: "maxTickets", type: "integer", nullable: false)]
+#[Assert\NotNull(message: "Le nombre de tickets est requis.")]
+    #[Assert\PositiveOrZero(message: "Le prix doit être un nombre positif.")]
+private $maxtickets;
+#[ORM\Column(name: "reservedTickets", type: "integer", nullable: false)]
+private $reservedtickets = 0;
+
+public function getMaxtickets(): ?int {
+    return $this->maxtickets;
+}
+public function setMaxtickets(?int $maxtickets): self {
+    $this->maxtickets = $maxtickets;
+    return $this;
+}
+
+public function getReservedtickets(): ?int {
+    return $this->reservedtickets;
+}
+public function setReservedtickets(?int $reserved): self {
+    $this->reservedtickets = $reserved;
+    return $this;
+}
+
+public function incrementReservedTickets(): self {
+    $this->reservedtickets = ($this->reservedtickets ?? 0) + 1;
+    return $this;
+}
 
 
-    /**
-     * Get eventid.
-     *
-     * @return int
-     */
-    public function getEventid()
+    public function getEventid(): ?int
     {
         return $this->eventid;
     }
 
-    /**
-     * Set eventname.
-     *
-     * @param string $eventname
-     *
-     * @return Event
-     */
-    public function setEventname($eventname)
-    {
-        $this->eventname = $eventname;
-
-        return $this;
-    }
-
-    /**
-     * Get eventname.
-     *
-     * @return string
-     */
-    public function getEventname()
+    public function getEventname(): ?string
     {
         return $this->eventname;
     }
 
-    /**
-     * Set eventdescription.
-     *
-     * @param string $eventdescription
-     *
-     * @return Event
-     */
-    public function setEventdescription($eventdescription)
+    public function setEventname(?string $eventname): self
     {
-        $this->eventdescription = $eventdescription;
-
+        $this->eventname = $eventname;
         return $this;
     }
 
-    /**
-     * Get eventdescription.
-     *
-     * @return string
-     */
-    public function getEventdescription()
+    public function getEventdescription(): ?string
     {
         return $this->eventdescription;
     }
 
-    /**
-     * Set eventdate.
-     *
-     * @param \DateTime|null $eventdate
-     *
-     * @return Event
-     */
-    public function setEventdate($eventdate = null)
+    public function setEventdescription(?string $eventdescription): self
     {
-        $this->eventdate = $eventdate;
-
+        $this->eventdescription = $eventdescription;
         return $this;
     }
 
-    /**
-     * Get eventdate.
-     *
-     * @return \DateTime|null
-     */
-    public function getEventdate()
+    public function getEventdate(): ?\DateTimeInterface
     {
         return $this->eventdate;
     }
 
-    /**
-     * Set eventcategory.
-     *
-     * @param string $eventcategory
-     *
-     * @return Event
-     */
-    public function setEventcategory($eventcategory)
+    public function setEventdate(?\DateTimeInterface $eventdate): self
     {
-        $this->eventcategory = $eventcategory;
-
+        $this->eventdate = $eventdate;
         return $this;
     }
 
-    /**
-     * Get eventcategory.
-     *
-     * @return string
-     */
-    public function getEventcategory()
+    public function getEventcategory(): ?string
     {
         return $this->eventcategory;
     }
 
-    /**
-     * Set lieuid.
-     *
-     * @param int $lieuid
-     *
-     * @return Event
-     */
-    public function setLieuid($lieuid)
+    public function setEventcategory(?string $eventcategory): self
     {
-        $this->lieuid = $lieuid;
-
+        $this->eventcategory = $eventcategory;
         return $this;
     }
 
-    /**
-     * Get lieuid.
-     *
-     * @return int
-     */
-    public function getLieuid()
+    public function getLieuid(): ?int
     {
         return $this->lieuid;
     }
 
-    /**
-     * Set ticketprice.
-     *
-     * @param int $ticketprice
-     *
-     * @return Event
-     */
-    public function setTicketprice($ticketprice)
+    public function setLieuid(?int $lieuid): self
     {
-        $this->ticketprice = $ticketprice;
-
+        $this->lieuid = $lieuid;
         return $this;
     }
 
-    /**
-     * Get ticketprice.
-     *
-     * @return int
-     */
-    public function getTicketprice()
+    public function getTicketprice(): ?int
     {
         return $this->ticketprice;
     }
 
-    /**
-     * Set eventimage.
-     *
-     * @param string|null $eventimage
-     *
-     * @return Event
-     */
-    public function setEventimage($eventimage = null)
+    public function setTicketprice(?int $ticketprice): self
     {
-        $this->eventimage = $eventimage;
-
+        $this->ticketprice = $ticketprice;
         return $this;
     }
 
-    /**
-     * Get eventimage.
-     *
-     * @return string|null
-     */
-    public function getEventimage()
+    public function getEventimage(): ?string
     {
         return $this->eventimage;
+    }
+
+    public function setEventimage(?string $eventimage): self
+    {
+        $this->eventimage = $eventimage;
+        return $this;
+    }
+
+    public function getNotificationmethod(): ?string
+    {
+        return $this->notificationmethod;
+    }
+
+    public function setNotificationmethod(?string $method): self
+    {
+        $this->notificationmethod = $method;
+        return $this;
+    }
+
+    public function getNotificationscheduledat(): ?\DateTimeInterface
+    {
+        return $this->notificationscheduledat;
+    }
+
+    public function setNotificationscheduledat(?\DateTimeInterface $time): self
+    {
+        $this->notificationscheduledat = $time;
+        return $this;
     }
 }

@@ -1,0 +1,290 @@
+{# templates/back_office/transport_modes/index.html.twig #}
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Gestion des modes de transport{% endblock %}
+
+{% block body %}
+<div class="row">
+  <div class="col-md-8">
+    <h4 class="fw-bold py-3 mb-4">
+      <span class="text-muted fw-light">Navigation /</span> Modes de transport
+    </h4>
+    
+    <div class="card">
+      <h5 class="card-header">Liste des modes de transport</h5>
+      <div class="card-body">
+        <div class="table-responsive text-nowrap">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="modesTableBody">
+              {% for mode in modes %}
+                <tr>
+                  <td>{{ mode.id }}</td>
+                  <td>{{ mode.name }}</td>
+                  <td>
+                    <div class="dropdown">
+                      <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                        <i class="ri-more-2-fill"></i>
+                      </button>
+                      <div class="dropdown-menu">
+                        <a class="dropdown-item edit-mode" href="javascript:void(0);"
+                           data-mode-id="{{ mode.id }}" 
+                           data-mode-name="{{ mode.name }}">
+                          <i class="ri-pencil-line me-2"></i> Modifier
+                        </a>
+                        <a class="dropdown-item delete-mode" href="javascript:void(0);"
+                           data-mode-id="{{ mode.id }}">
+                          <i class="ri-delete-bin-line me-2"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <h4 class="fw-bold py-3 mb-4">
+      <span class="text-muted fw-light">&nbsp;</span>
+    </h4>
+    
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0" id="formTitle">Ajouter un mode de transport</h5>
+      </div>
+      <div class="card-body">
+        <form id="transportModeForm">
+          <input type="hidden" id="modeId" value="">
+          <div class="mb-3">
+            <label for="modeName" class="form-label">Nom du mode de transport</label>
+            <input type="text" class="form-control" id="modeName" placeholder="Entrez le nom" required>
+          </div>
+          <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary" id="saveButton">Enregistrer</button>
+            <button type="button" class="btn btn-outline-secondary" id="cancelButton">Annuler</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmation de suppression</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col mb-3">
+            <p>Êtes-vous sûr de vouloir supprimer ce mode de transport ? Cette action est irréversible.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" id="confirmDelete">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center py-4">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+        <p class="mb-0">Traitement en cours...</p>
+      </div>
+    </div>
+  </div>
+</div>
+ <script >
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("script loaded!");
+      // Setup form elements
+      const transportModeForm = document.getElementById('transportModeForm');
+      const modeIdInput = document.getElementById('modeId');
+      const modeNameInput = document.getElementById('modeName');
+      const formTitle = document.getElementById('formTitle');
+      const saveButton = document.getElementById('saveButton');
+      const cancelButton = document.getElementById('cancelButton');
+      
+      // Setup modals
+      const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+      const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+      const confirmDeleteButton = document.getElementById('confirmDelete');
+      let modeToDelete = null;
+      
+      // Setup edit buttons
+      const editButtons = document.querySelectorAll('.edit-mode');
+      editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const modeId = this.getAttribute('data-mode-id');
+          const modeName = this.getAttribute('data-mode-name');
+          
+          // Set form for editing
+          modeIdInput.value = modeId;
+          modeNameInput.value = modeName;
+          formTitle.textContent = 'Modifier le mode de transport';
+          saveButton.textContent = 'Mettre à jour';
+        });
+      });
+      
+      // Setup delete buttons
+      const deleteButtons = document.querySelectorAll('.delete-mode');
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          modeToDelete = this.getAttribute('data-mode-id');
+          deleteModal.show();
+        });
+      });
+      
+      // Confirm delete handler
+      confirmDeleteButton.addEventListener('click', function() {
+        if (modeToDelete) {
+          deleteTransportMode(modeToDelete);
+          deleteModal.hide();
+        }
+      });
+      
+      // Cancel button handler
+      cancelButton.addEventListener('click', function() {
+        resetForm();
+      });
+      
+      // Form submission handler
+      transportModeForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const modeName = modeNameInput.value.trim();
+        if (!modeName) {
+          alert('Veuillez entrer un nom pour le mode de transport');
+          return;
+        }
+        
+        const modeId = modeIdInput.value;
+        if (modeId) {
+          // Update existing mode
+          updateTransportMode(modeId, modeName);
+        } else {
+          // Create new mode
+          createTransportMode(modeName);
+        }
+      });
+      
+      // Function to create a new transport mode
+      function createTransportMode(name) {
+        loadingModal.show();
+        console.log('Sending request to create transport mode:', { name: name });
+
+        fetch('/admin/transport-modes/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name: name })
+        })
+          .then(response => response.json())
+          .then(data => {
+            loadingModal.hide();
+            
+            if (data.success) {
+              // Reload the page to show updated list
+              window.location.reload();
+            } else {
+              alert('Erreur lors de la création: ' + (data.error || 'Erreur inconnue'));
+            }
+          })
+          .catch(error => {
+            loadingModal.hide();
+            console.error('Error creating transport mode:', error);
+            alert('Échec de la création du mode de transport');
+          });
+      }
+      
+      // Function to update a transport mode
+      function updateTransportMode(id, name) {
+        loadingModal.show();
+        
+        fetch(`/admin/transport-modes/update/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name: name })
+        })
+          .then(response => response.json())
+          .then(data => {
+            loadingModal.hide();
+            
+            if (data.success) {
+              // Reload the page to show updated list
+              window.location.reload();
+            } else {
+              alert('Erreur lors de la mise à jour: ' + (data.error || 'Erreur inconnue'));
+            }
+          })
+          .catch(error => {
+            loadingModal.hide();
+            console.error('Error updating transport mode:', error);
+            alert('Échec de la mise à jour du mode de transport');
+          });
+      }
+      
+      // Function to delete a transport mode
+      function deleteTransportMode(id) {
+        loadingModal.show();
+        
+        fetch(`/admin/transport-modes/delete/${id}`, {
+          method: 'DELETE'
+        })
+          .then(response => response.json())
+          .then(data => {
+            loadingModal.hide();
+            
+            if (data.success) {
+              // Reload the page to show updated list
+              window.location.reload();
+            } else {
+              alert('Erreur lors de la suppression: ' + (data.error || 'Erreur inconnue'));
+            }
+          })
+          .catch(error => {
+            loadingModal.hide();
+            console.error('Error deleting transport mode:', error);
+            alert('Échec de la suppression du mode de transport');
+          });
+      }
+      
+      // Function to reset the form
+      function resetForm() {
+        modeIdInput.value = '';
+        modeNameInput.value = '';
+        formTitle.textContent = 'Ajouter un mode de transport';
+        saveButton.textContent = 'Enregistrer';
+      }
+    });
+  </script>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+ 
+{% endblock %}

@@ -8,6 +8,11 @@ parameters:
     uploads_directory_web: '/uploads'
 
     
+
+parameters:
+    avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+
+
 services:
     # default configuration for services in *this* file
     _defaults:

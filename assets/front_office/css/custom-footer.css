@@ -1,0 +1,19 @@
+footer .ftco-footer .ftco-footer-social li a span.fa {
+    color: #56C9E4 !important;
+  }
+  
+  footer .ftco-footer .ftco-footer-social li a:hover span.fa {
+    color: #3792A7 !important;
+  }
+
+  footer .ftco-footer .ftco-footer-social li a span.fa::before {
+    color: #56C9E4 !important;
+  }
+  footer .ftco-footer .icon {
+    color: #56C9E4 !important;
+  }
+  
+  footer .ftco-footer .icon:hover {
+    color: #3792A7 !important;
+  }
+    

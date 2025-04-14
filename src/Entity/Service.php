@@ -1,47 +1,26 @@
 <?php
 
-
 namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Service
- *
- * @ORM\Table(name="service", indexes={@ORM\Index(name="etabID", columns={"etabID"})})
- * @ORM\Entity
- */
+#[ORM\Table(name: 'service')]
+#[ORM\Index(name: 'etabID', columns: ['etabID'])]
+#[ORM\Entity]
 class Service
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="serviceID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'serviceID', type: 'integer', nullable: false)]
     private $serviceid;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="serviceName", type="string", length=50, nullable=false)
-     */
+    #[ORM\Column(name: 'serviceName', type: 'string', length: 50, nullable: false)]
     private $servicename;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="servicePrix", type="float", precision=10, scale=0, nullable=false)
-     */
+    #[ORM\Column(name: 'servicePrix', type: 'float', precision: 10, scale: 0, nullable: false)]
     private $serviceprix;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="etabID", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: 'etabID', type: 'integer', nullable: false)]
     private $etabid;
-
 
     /**
      * Get serviceid.
