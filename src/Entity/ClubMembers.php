@@ -1,112 +1,59 @@
 <?php
 
-
 namespace App\Entity;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * ClubMembers
- *
- * @ORM\Table(name="club_members", indexes={@ORM\Index(name="userID", columns={"userID"})})
- * @ORM\Entity
- */
+use App\Entity\Club;
+use App\Entity\Users;
+use Doctrine\ORM\Mapping as ORM;
+use DateTime;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'club_members')]
 class ClubMembers
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="clubID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
-     */
-    private $clubid;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Club::class)]
+    #[ORM\JoinColumn(name: 'clubID', referencedColumnName: 'clubID', nullable: false, onDelete: 'CASCADE')]
+    private Club $clubid;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="userID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
-     */
-    private $userid;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Users::class)]
+    #[ORM\JoinColumn(name: 'userID', referencedColumnName: 'user_id', nullable: false, onDelete: 'CASCADE')]
+    private Users $userid;
 
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="joinDate", type="date", nullable=true, options={"default"="CURRENT_DATE"})
-     */
-    private $joindate = 'CURRENT_DATE';
+    #[ORM\Column(name: 'joinDate', type: 'date', nullable: true, options: ['default' => 'CURRENT_DATE'])]
+    private ?DateTime $joindate = null;
 
-
-    /**
-     * Set clubid.
-     *
-     * @param int $clubid
-     *
-     * @return ClubMembers
-     */
-    public function setClubid($clubid)
-    {
-        $this->clubid = $clubid;
-
-        return $this;
-    }
-
-    /**
-     * Get clubid.
-     *
-     * @return int
-     */
-    public function getClubid()
+    public function getClubid(): Club
     {
         return $this->clubid;
     }
 
-    /**
-     * Set userid.
-     *
-     * @param int $userid
-     *
-     * @return ClubMembers
-     */
-    public function setUserid($userid)
+    public function setClubid(Club $clubid): self
     {
-        $this->userid = $userid;
-
+        $this->clubid = $clubid;
         return $this;
     }
 
-    /**
-     * Get userid.
-     *
-     * @return int
-     */
-    public function getUserid()
+    public function getUserid(): Users
     {
         return $this->userid;
     }
 
-    /**
-     * Set joindate.
-     *
-     * @param \DateTime|null $joindate
-     *
-     * @return ClubMembers
-     */
-    public function setJoindate($joindate = null)
+    public function setUserid(Users $userid): self
     {
-        $this->joindate = $joindate;
-
+        $this->userid = $userid;
         return $this;
     }
 
-    /**
-     * Get joindate.
-     *
-     * @return \DateTime|null
-     */
-    public function getJoindate()
+    public function getJoindate(): ?DateTime
     {
         return $this->joindate;
+    }
+
+    public function setJoindate(?DateTime $joindate): self
+    {
+        $this->joindate = $joindate;
+        return $this;
     }
 }

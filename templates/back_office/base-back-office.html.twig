@@ -84,7 +84,9 @@
     </li>
 
     <!-- Clubs Sociaux -->
-    <li class="menu-item {% if currentRoute starts with 'admin_club' %}active open{% endif %}">
+    <li class="menu-item {% if currentRoute starts with 'admin_club' or currentRoute starts with 'admin_activite' or currentRoute starts with 'admin_membership' %}
+        active open
+        {% endif %}">
       <a href="#" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons ri-group-line"></i>
         <div>Clubs Sociaux</div>
@@ -100,8 +102,8 @@
             <i class="ri-calendar-event-line me-2"></i> Activités
           </a>
         </li>
-        <li class="menu-item {% if currentRoute == 'admin_club_requests' %}active{% endif %}">
-          <a href="#" class="menu-link">
+        <li class="menu-item {% if currentRoute == 'admin_membership_list' %}active{% endif %}">
+          <a href="{{path('admin_membership_list')}}" class="menu-link">
             <i class="ri-mail-send-line me-2"></i> Demandes
           </a>
         </li>

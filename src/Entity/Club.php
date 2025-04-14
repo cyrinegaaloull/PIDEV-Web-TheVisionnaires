@@ -1,111 +1,61 @@
 <?php
 
-
 namespace App\Entity;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+use App\Entity\Activite;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Activite;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-
-/**
- * @ORM\Entity
- * @ORM\Table(name="club", uniqueConstraints={@ORM\UniqueConstraint(name="unique_club_name", columns={"clubName"})})
- * @UniqueEntity(fields={"clubname"}, message="Ce nom de club existe déjà. Veuillez en choisir un autre.")
- */
+#[ORM\Entity]
+#[ORM\Table(name: "club")]
+#[ORM\UniqueConstraint(name: "unique_club_name", columns: ["clubName"])]
+#[UniqueEntity(fields: ["clubname"], message: "Ce nom de club existe déjà. Veuillez en choisir un autre.")]
 class Club
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="clubID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(name: "clubID", type: "integer", nullable: false)]
     private $clubid;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="clubName", type="string", length=50, nullable=false)
-     */
+    #[ORM\Column(name: "clubName", type: "string", length: 50, nullable: false)]
     private $clubname;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="clubDescription", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "clubDescription", type: "string", length: 255, nullable: false)]
     private $clubdescription;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="clubCategory", type="string", length=0, nullable=true)
-     */
+    #[ORM\Column(name: "clubCategory", type: "string", length: 0, nullable: true)]
     private $clubcategory;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="clubLogo", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "clubLogo", type: "string", length: 255, nullable: false)]
     private $clublogo;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="clubContact", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "clubContact", type: "string", length: 255, nullable: false)]
     private $clubcontact;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="clubLocation", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "clubLocation", type: "string", length: 255, nullable: false)]
     private $clublocation;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="creationDate", type="date", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
-     */
+    #[ORM\Column(name: "creationDate", type: "date", nullable: false, options: ["default" => "CURRENT_TIMESTAMP"])]
     private $creationdate;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="membersCount", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: "membersCount", type: "integer", nullable: false)]
     private $memberscount;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="scheduleInfo", type="text", length=65535, nullable=false)
-     */
+    #[ORM\Column(name: "scheduleInfo", type: "text", length: 65535, nullable: false)]
     private $scheduleinfo;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="bannerImage", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "bannerImage", type: "string", length: 255, nullable: false)]
     private $bannerimage;
 
-    /**
-    * @ORM\OneToMany(targetEntity=Activite::class, mappedBy="clubid", orphanRemoval=true)
-    */
+    #[ORM\OneToMany(targetEntity: Activite::class, mappedBy: "clubid", orphanRemoval: true)]
     private $activities;
 
     public function __construct()
     {
         $this->activities = new ArrayCollection();
     }
-
-
 
     /**
      * Get clubid.
@@ -387,5 +337,6 @@ class Club
 
         return $this;
     }
+
 
 }

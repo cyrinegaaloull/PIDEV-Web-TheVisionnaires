@@ -1,346 +1,163 @@
 <?php
 
-
 namespace App\Entity;
-use App\Entity\Club; 
+
+use App\Entity\Club;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Activite
- *
- * @ORM\Table(name="activite", indexes={@ORM\Index(name="clubID", columns={"clubID"})})
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'activite')]
 class Activite
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="activiteID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $activiteid;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'activiteID', type: 'integer')]
+    private int $activiteid;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="activiteName", type="string", length=255, nullable=false)
-     */
-    private $activitename;
+    #[ORM\Column(name: 'activiteName', type: 'string', length: 255)]
+    private string $activitename;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="activiteDescription", type="text", length=65535, nullable=false)
-     */
-    private $activitedescription;
+    #[ORM\Column(name: 'activiteDescription', type: 'text', length: 65535)]
+    private string $activitedescription;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="activiteDate", type="date", nullable=false)
-     */
-    private $activitedate;
+    #[ORM\Column(name: 'activiteDate', type: 'date')]
+    private \DateTimeInterface $activitedate;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="activiteLocation", type="string", length=255, nullable=false)
-     */
-    private $activitelocation;
+    #[ORM\Column(name: 'activiteLocation', type: 'string', length: 255)]
+    private string $activitelocation;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="activiteType", type="string", length=100, nullable=false)
-     */
-    private $activitetype;
+    #[ORM\Column(name: 'activiteType', type: 'string', length: 100)]
+    private string $activitetype;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="activiteImage", type="string", length=255, nullable=false)
-     */
-    private $activiteimage;
+    #[ORM\Column(name: 'activiteImage', type: 'string', length: 255)]
+    private string $activiteimage;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="startTime", type="time", nullable=false)
-     */
-    private $starttime;
+    #[ORM\Column(name: 'startTime', type: 'time')]
+    private \DateTimeInterface $starttime;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="endTime", type="time", nullable=false)
-     */
-    private $endtime;
+    #[ORM\Column(name: 'endTime', type: 'time')]
+    private \DateTimeInterface $endtime;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="activiteStatus", type="string", length=20, nullable=false, options={"default"="A_venir"})
-     */
-    private $activitestatus = 'A_venir';
+    #[ORM\Column(name: 'activiteStatus', type: 'string', length: 20, options: ['default' => 'A_venir'])]
+    private string $activitestatus = 'A_venir';
 
-    /**
-     * @var Club
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Club", inversedBy="activities")
-     * @ORM\JoinColumn(name="clubID", referencedColumnName="clubID", onDelete="CASCADE")
-     */
-    private $clubid;
+    #[ORM\ManyToOne(targetEntity: Club::class, inversedBy: 'activities')]
+    #[ORM\JoinColumn(name: 'clubID', referencedColumnName: 'clubID', onDelete: 'CASCADE')]
+    private ?Club $clubid = null;
 
+    // Getters & Setters
 
-
-    /**
-     * Get activiteid.
-     *
-     * @return int
-     */
-    public function getActiviteid()
+    public function getActiviteid(): int
     {
         return $this->activiteid;
     }
 
-    /**
-     * Set activitename.
-     *
-     * @param string $activitename
-     *
-     * @return Activite
-     */
-    public function setActivitename($activitename)
+    public function setActivitename(string $activitename): self
     {
         $this->activitename = $activitename;
-
         return $this;
     }
 
-    /**
-     * Get activitename.
-     *
-     * @return string
-     */
-    public function getActivitename()
+    public function getActivitename(): string
     {
         return $this->activitename;
     }
 
-    /**
-     * Set activitedescription.
-     *
-     * @param string $activitedescription
-     *
-     * @return Activite
-     */
-    public function setActivitedescription($activitedescription)
+    public function setActivitedescription(string $activitedescription): self
     {
         $this->activitedescription = $activitedescription;
-
         return $this;
     }
 
-    /**
-     * Get activitedescription.
-     *
-     * @return string
-     */
-    public function getActivitedescription()
+    public function getActivitedescription(): string
     {
         return $this->activitedescription;
     }
 
-    /**
-     * Set activitedate.
-     *
-     * @param \DateTime $activitedate
-     *
-     * @return Activite
-     */
-    public function setActivitedate($activitedate)
+    public function setActivitedate(\DateTimeInterface $activitedate): self
     {
         $this->activitedate = $activitedate;
-
         return $this;
     }
 
-    /**
-     * Get activitedate.
-     *
-     * @return \DateTime
-     */
-    public function getActivitedate()
+    public function getActivitedate(): \DateTimeInterface
     {
         return $this->activitedate;
     }
 
-    /**
-     * Set activitelocation.
-     *
-     * @param string $activitelocation
-     *
-     * @return Activite
-     */
-    public function setActivitelocation($activitelocation)
+    public function setActivitelocation(string $activitelocation): self
     {
         $this->activitelocation = $activitelocation;
-
         return $this;
     }
 
-    /**
-     * Get activitelocation.
-     *
-     * @return string
-     */
-    public function getActivitelocation()
+    public function getActivitelocation(): string
     {
         return $this->activitelocation;
     }
 
-    /**
-     * Set activitetype.
-     *
-     * @param string $activitetype
-     *
-     * @return Activite
-     */
-    public function setActivitetype($activitetype)
+    public function setActivitetype(string $activitetype): self
     {
         $this->activitetype = $activitetype;
-
         return $this;
     }
 
-    /**
-     * Get activitetype.
-     *
-     * @return string
-     */
-    public function getActivitetype()
+    public function getActivitetype(): string
     {
         return $this->activitetype;
     }
 
-    /**
-     * Set activiteimage.
-     *
-     * @param string $activiteimage
-     *
-     * @return Activite
-     */
-    public function setActiviteimage($activiteimage)
+    public function setActiviteimage(string $activiteimage): self
     {
         $this->activiteimage = $activiteimage;
-
         return $this;
     }
 
-    /**
-     * Get activiteimage.
-     *
-     * @return string
-     */
-    public function getActiviteimage()
+    public function getActiviteimage(): string
     {
         return $this->activiteimage;
     }
 
-    /**
-     * Set starttime.
-     *
-     * @param \DateTime $starttime
-     *
-     * @return Activite
-     */
-    public function setStarttime($starttime)
+    public function setStarttime(\DateTimeInterface $starttime): self
     {
         $this->starttime = $starttime;
-
         return $this;
     }
 
-    /**
-     * Get starttime.
-     *
-     * @return \DateTime
-     */
-    public function getStarttime()
+    public function getStarttime(): \DateTimeInterface
     {
         return $this->starttime;
     }
 
-    /**
-     * Set endtime.
-     *
-     * @param \DateTime $endtime
-     *
-     * @return Activite
-     */
-    public function setEndtime($endtime)
+    public function setEndtime(\DateTimeInterface $endtime): self
     {
         $this->endtime = $endtime;
-
         return $this;
     }
 
-    /**
-     * Get endtime.
-     *
-     * @return \DateTime
-     */
-    public function getEndtime()
+    public function getEndtime(): \DateTimeInterface
     {
         return $this->endtime;
     }
 
-    /**
-     * Set activitestatus.
-     *
-     * @param string $activitestatus
-     *
-     * @return Activite
-     */
-    public function setActivitestatus($activitestatus)
+    public function setActivitestatus(string $activitestatus): self
     {
         $this->activitestatus = $activitestatus;
-
         return $this;
     }
 
-    /**
-     * Get activitestatus.
-     *
-     * @return string
-     */
-    public function getActivitestatus()
+    public function getActivitestatus(): string
     {
         return $this->activitestatus;
     }
 
-    /**
-     * Set clubid.
-     *
-     * @param Club|null $clubid
-     *
-     * @return Activite
-     */
-    public function setClubid(Club $clubid = null)
+    public function setClubid(?Club $clubid): self
     {
         $this->clubid = $clubid;
-
         return $this;
     }
 
-    /**
-     * Get clubid.
-     *
-     * @return Club|null
-     */
-    public function getClubid()
+    public function getClubid(): ?Club
     {
         return $this->clubid;
     }
