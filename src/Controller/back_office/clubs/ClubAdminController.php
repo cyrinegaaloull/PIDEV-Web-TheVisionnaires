@@ -4,6 +4,7 @@ namespace App\Controller\back_office\clubs;
 
 use App\Entity\Club;
 use App\Repository\ClubRepository;
+use App\Entity\ClubMembers;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -110,4 +111,20 @@ class ClubAdminController extends AbstractController
     {
         return str_replace('"', '""', $value);
     }
+
+    #[Route('/admin/club/{id}/members', name: 'admin_club_members')]
+    public function getClubMembers(int $id, EntityManagerInterface $em): Response
+    {
+        $club = $em->getRepository(Club::class)->find($id);
+        if (!$club) {
+            throw $this->createNotFoundException("Club introuvable.");
+        }
+
+        $members = $em->getRepository(ClubMembers::class)->findBy(['clubid' => $club]);
+
+        return $this->render('back_office/clubs/_club_members_list.html.twig', [
+            'members' => $members
+        ]);
+    }
+
 }
