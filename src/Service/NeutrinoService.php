@@ -16,7 +16,12 @@ class NeutrinoService
     }
 
     public function isClean(string $text): bool
-    {
+{
+    if (trim($text) === '') {
+        return true;
+    }
+
+    try {
         $response = $this->client->request('POST', 'https://neutrinoapi.net/bad-word-filter', [
             'body' => [
                 'user-id' => $this->userId,
@@ -26,6 +31,12 @@ class NeutrinoService
         ]);
 
         $data = $response->toArray();
-        return !$data['is-bad']; // true if clean
+        return !$data['is-bad'];
+
+    } catch (\Throwable $e) {
+        // Optional: log $e->getMessage()
+        return true; // fail-safe: assume clean to avoid breaking the user flow
     }
+}
+
 }

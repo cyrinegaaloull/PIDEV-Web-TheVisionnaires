@@ -109,7 +109,7 @@ public function deleteLieu(Lieu $lieu, EntityManagerInterface $em): Response
 #[Route('/admin/lieu/{id}', name: 'admin_lieu_show')]
 public function showLieu(Lieu $lieu, EventRepository $eventRepo): Response
 {
-    $events = $eventRepo->findBy(['lieuid' => $lieu->getLieuid()]);
+    $events = $eventRepo->findBy(['lieu' => $lieu]);
     return $this->render('back_office/exploration/lieu_show.html.twig', [
         'lieu' => $lieu,
         'events' => $events,
@@ -119,7 +119,7 @@ public function showLieu(Lieu $lieu, EventRepository $eventRepo): Response
 public function addEvent(Request $request, Lieu $lieu, EntityManagerInterface $em): Response
 {
     $event = new Event();
-    $event->setLieuid($lieu->getLieuid());
+    $event->setLieu($lieu);
 
     $form = $this->createForm(EventType::class, $event);
     $form->handleRequest($request);
@@ -137,5 +137,36 @@ public function addEvent(Request $request, Lieu $lieu, EntityManagerInterface $e
     ]);
 }
 
+#[Route('/admin/event/edit/{id}', name: 'admin_event_edit')]
+public function editEvent(Request $request, Event $event, EntityManagerInterface $em): Response
+{
+    $form = $this->createForm(EventType::class, $event);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em->flush();
+        $this->addFlash('success', 'Événement modifié avec succès.');
+        return $this->redirectToRoute('admin_lieu_show', ['id' => $event->getLieu()->getLieuid()]);
+    }
+
+    return $this->render('back_office/exploration/event_edit.html.twig', [
+        'form' => $form->createView(),
+        'event' => $event,
+        'lieu' => $event->getLieu(),
+    ]);
+    
+}
+
+
+#[Route('/admin/event/delete/{id}', name: 'admin_event_delete', methods: ['POST'])]
+public function deleteEvent(Event $event, EntityManagerInterface $em): Response
+{
+    $lieuId = $event->getLieu()->getLieuid();
+    $em->remove($event);
+    $em->flush();
+
+    $this->addFlash('success', 'Événement supprimé avec succès.');
+    return $this->redirectToRoute('admin_lieu_show', ['id' => $lieuId]);
+}
 
 }

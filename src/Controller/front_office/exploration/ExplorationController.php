@@ -5,7 +5,6 @@ use App\Entity\Lieu;
 use App\Repository\EventRepository;
 use App\Repository\ReviewRepository;
 
-use App\Form\LieuType;
 use App\Entity\Review;
 use App\Repository\UsersRepository;
 use App\Service\NeutrinoService;
@@ -18,6 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 
 
 class ExplorationController extends AbstractController
@@ -36,6 +37,9 @@ class ExplorationController extends AbstractController
         if ($filter === 'nearest' && $lat && $lon) {
             $favorites = $lieuRepository->findFavorites();
             $lieux = $lieuRepository->findByNearest((float)$lat, (float)$lon);
+        } elseif ($filter === 'top-rated') {
+            $favorites = $lieuRepository->findFavorites();
+            $lieux = $lieuRepository->findTopRated(); // 🔥 You will create this
         } elseif ($search !== '') {
             $favorites = $lieuRepository->findFavorites();
             $lieux = $lieuRepository->findBySearch($search);
@@ -44,7 +48,7 @@ class ExplorationController extends AbstractController
             $lieux = $lieuRepository->findNonFavorites();
         }
         
-        // add this inside index() before rendering
+        
         $ratings = [];
         foreach ($lieux as $lieu) {
             $ratings[$lieu->getLieuid()] = $reviewRepo->calculateAverageRating($lieu->getLieuid());
@@ -55,6 +59,7 @@ class ExplorationController extends AbstractController
                 'lieux' => $lieux,
                 'favorites' => $favorites,
                 'ratings' => $ratings,
+                'search' => $search,
             ]);
             
         }
@@ -64,6 +69,7 @@ class ExplorationController extends AbstractController
             'favorites' => $favorites,
             'ratings' => $ratings,
             'user' => $user,
+            'search' => $search,
         ]);        
         
     }
@@ -103,7 +109,8 @@ public function addReview(
     EntityManagerInterface $em,
     LieuRepository $lieuRepository,
     UsersRepository $userRepo,
-    NeutrinoService $neutrino
+    NeutrinoService $neutrino,
+    ValidatorInterface $validator
 ): Response {
     $lieu = $lieuRepository->find($id);
     if (!$lieu) {
@@ -118,9 +125,7 @@ public function addReview(
         return $this->redirectToRoute('lieu_details', ['id' => $id]);
     }
 
-    // ⚠️ Simulate or manually fetch a user (temporary)
     $user = $userRepo->findOneBy(['username' => 'cyrine']);
-
     $review = new Review();
     $review->setComment($comment);
     $review->setRating($rating);
@@ -128,18 +133,25 @@ public function addReview(
     $review->setUserid($user->getUserId());
     $review->setLieuid($lieu->getLieuid());
 
+    $errors = $validator->validate($review);
+
+    if (count($errors) > 0) {
+        foreach ($errors as $error) {
+            $this->addFlash('danger', $error->getMessage());
+        }
+        return $this->redirectToRoute('lieu_details', ['id' => $id]);
+    }
+
     $em->persist($review);
     $em->flush();
 
     $this->addFlash('success', 'Merci pour votre avis !');
-
     return $this->redirectToRoute('lieu_details', ['id' => $id]);
 }
 
 #[Route('/event/{id}', name: 'event_details')]
 public function eventDetails(int $id, EventRepository $eventRepo, UsersRepository $userRepo): Response
 {
-    // ⚠️ Simulate or manually fetch a user (temporary)
     $user = $userRepo->findOneBy(['username' => 'cyrine']);
     $event = $eventRepo->find($id);
     if (!$event) {

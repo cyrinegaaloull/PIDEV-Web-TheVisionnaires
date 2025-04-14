@@ -1,4 +1,4 @@
-{% if favorites|length > 0 %}
+{% if favorites|length > 0 and search is empty %}
   <h3 class="mb-3 font-weight-bold">Vos favoris</h3>
   <div class="row">
     {% for lieu in favorites %}
@@ -6,6 +6,7 @@
     {% endfor %}
   </div>
 {% endif %}
+
 
 {% if lieux is not empty %}
   <h3 class="mb-3 mt-5 font-weight-bold">Autres lieux</h3>

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: "review")]
@@ -22,9 +23,12 @@ class Review
     private ?int $userid = null;
 
     #[ORM\Column(name: "rating", type: "float", precision: 10, scale: 0)]
+    #[Assert\NotBlank(message: 'Veuillez attribuer une note.')]
+    #[Assert\Range(min: 1, max: 5, notInRangeMessage: 'La note doit être entre {{ min }} et {{ max }}.')]
     private ?float $rating = null;
 
     #[ORM\Column(name: "comment", type: "string", length: 50, options: ["default" => "aucun commentaire"])]
+    #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide.')]
     private string $comment = 'aucun commentaire';
 
     #[ORM\Column(name: "reviewDate", type: "date", nullable: true)]

@@ -98,5 +98,14 @@ public function findRecommendedNearest(array $categories, float $lat, float $lon
         ->getResult();
 }
 
+public function findTopRated(): array
+{
+    return $this->createQueryBuilder('l')
+        ->leftJoin('App\Entity\Review', 'r', 'WITH', 'r.lieuid = l.lieuid')
+        ->groupBy('l.lieuid')
+        ->orderBy('AVG(r.rating)', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
 
 }

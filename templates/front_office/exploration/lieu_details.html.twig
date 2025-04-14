@@ -1,16 +1,52 @@
 {% extends 'front_office/base-front-office.html.twig' %}
 
-  
-
 {% block body %}
+<!-- External Stylesheets -->
 <link rel="stylesheet" href="{{ asset('assets/exploration/css/style.css') }}">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.css" rel="stylesheet" />
+
+<!-- Custom Styles -->
+<style>
+  .img {
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+  }
+  .star {
+    cursor: pointer;
+  }
+  .star.checked {
+    color: #ffc107;
+  }
+  .carousel-testimony .item {
+    padding: 15px;
+  }
+  .project-wrap {
+    transition: transform 0.3s;
+  }
+  .project-wrap:hover {
+    transform: scale(1.02);
+  }
+</style>
+
+<!-- Lieu Details Section -->
 <section class="ftco-section ftco-no-pb">
+  {% for label, messages in app.flashes %}
+  {% for message in messages %}
+    <div class="alert alert-{{ label }} alert-dismissible fade show container mt-3" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+{% endfor %}
   <div class="container">
     <div class="row">
       <div class="col-md-6 d-flex align-items-stretch">
-        <div class="img w-100" style="background-image: url('{{ asset('assets/exploration/images/' ~ (lieu.lieuImage ?: 'default.jpg')) }}'); background-size: cover; border-radius: 12px;"></div>
+        <div class="img w-100" style="background-image: url('{{ asset('assets/exploration/images/' ~ (lieu.lieuImage ?: 'default.jpg')) }}'); height: 100%;"></div>
       </div>
       <div class="col-md-6 pl-md-5 py-5">
         <div class="heading-section">
@@ -27,40 +63,50 @@
   </div>
 </section>
 
-<section class="ftco-section bg-light">
+<!-- Map Section -->
+<section class="ftco-section">
   <div class="container">
-    <h4 class="mb-4">Emplacement sur la carte</h4>
-    <div id="lieu-map" style="height: 300px; border-radius: 10px;"></div>
+    <h4 class="mb-4">Vue immersive (Google Street View)</h4>
+    <iframe
+      width="100%"
+      height="400"
+      style="border:0; border-radius: 10px;"
+      loading="lazy"
+      allowfullscreen
+      referrerpolicy="no-referrer-when-downgrade"
+      src="https://www.google.com/maps?q=&layer=c&cbll={{ lieu.latitude }},{{ lieu.longitude }}&cbp=11,0,0,0,0&z=18&output=svembed">
+    </iframe>
   </div>
 </section>
 
+
+<!-- Events Section -->
 {% if events is not empty %}
 <section class="ftco-section">
   <div class="container">
     <h3 class="mb-4">Événements à venir</h3>
     <div class="row">
       {% for event in events %}
-        <div class="col-md-4">
+        <div class="col-md-4 mb-4">
           <a href="{{ path('event_details', { id: event.eventid }) }}" class="project-wrap text-decoration-none text-dark">
-  <div class="img" style="background-image: url('{{ asset('assets/exploration/images/' ~ (event.eventImage ?: 'default.jpg')) }}'); height: 200px; background-size: cover;"></div>
-  <div class="text p-4">
-    <span class="days">{{ event.eventDate ? event.eventDate|date('d/m/Y') : 'Non précisée' }}</span>
-    <h3>{{ event.eventName }}</h3>
-    <p class="location"><span class="fa fa-map-marker"></span> {{ lieu.lieuAddress }}</p>
-    <p>{{ event.eventDescription }}</p>
-    <p><strong>Catégorie:</strong> {{ event.eventCategory }}</p>
-    <p><strong>Prix:</strong> {{ event.ticketPrice }} TND</p>
-  </div>
-</a>
-
+            <div class="img" style="background-image: url('{{ asset('assets/exploration/images/' ~ (event.eventImage ?: 'default.jpg')) }}'); height: 200px;"></div>
+            <div class="text p-4">
+              <span class="days">{{ event.eventDate ? event.eventDate|date('d/m/Y') : 'Non précisée' }}</span>
+              <h3>{{ event.eventName }}</h3>
+              <p class="location"><span class="fa fa-map-marker"></span> {{ lieu.lieuAddress }}</p>
+              <p>{{ event.eventDescription }}</p>
+              <p><strong>Catégorie:</strong> {{ event.eventCategory }}</p>
+              <p><strong>Prix:</strong> {{ event.ticketPrice }} TND</p>
+            </div>
+          </a>
         </div>
       {% endfor %}
     </div>
   </div>
 </section>
 {% endif %}
-
-<section class="ftco-section testimony-section" style="background-image: url('{{ asset('assets/front-office/images/bg_1.jpg') }}');">
+<!-- Testimonials Section -->
+<section class="ftco-section testimony-section">
   <div class="overlay"></div>
   <div class="container">
     <div class="row justify-content-center pb-4">
@@ -74,34 +120,66 @@
         {% if reviews is empty %}
           <p class="text-center text-white">Aucun avis pour l'instant.</p>
         {% else %}
-          <div class="carousel-testimony owl-carousel">
-            {% for review in reviews %}
-              <div class="item">
-                <div class="testimony-wrap py-4">
-                  <div class="text">
-                    <p class="star">
-                      {% for i in 1..5 %}
-                        <span class="fa {% if i <= review.rating %}fa-star{% else %}fa-star-o{% endif %}"></span>
-                      {% endfor %}
-                    </p>
-                    <p class="mb-4">{{ review.comment }}</p>
-                    <div class="d-flex align-items-center">
-                      <div class="pl-3">
-                        <p class="name">Anonymous</p>
-                        <span class="position">{{ review.reviewDate ? review.reviewDate|date('d/m/Y') : '' }}</span>
+          {% set reviewCount = reviews|length %}
+          
+          {% if reviewCount >= 3 %}
+            <div class="carousel-testimony owl-carousel" id="review-carousel">
+              {% for review in reviews %}
+                <div class="item">
+                  <div class="testimony-wrap py-4">
+                    <div class="text">
+                      <p class="star">
+                        {% for i in 1..5 %}
+                          <span class="fa {% if i <= review.rating %}fa-star{% else %}fa-star-o{% endif %}"></span>
+                        {% endfor %}
+                      </p>
+                      <p class="mb-4">{{ review.comment }}</p>
+                      <div class="d-flex align-items-center">
+                        <div class="pl-3">
+                          <p class="name">Anonymous</p>
+                          <span class="position">{{ review.reviewDate ? review.reviewDate|date('d/m/Y') : '' }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            {% endfor %}
-          </div>
+              {% endfor %}
+            </div>
+
+          {% else %}
+            <div class="row justify-content-center">
+              {% for review in reviews %}
+                <div class="col-md-{{ reviewCount == 2 ? '5' : '4' }} mx-2 mb-4">
+                  <div class="item">
+                    <div class="testimony-wrap py-4">
+                      <div class="text">
+                        <p class="star">
+                          {% for i in 1..5 %}
+                            <span class="fa {% if i <= review.rating %}fa-star{% else %}fa-star-o{% endif %}"></span>
+                          {% endfor %}
+                        </p>
+                        <p class="mb-4">{{ review.comment }}</p>
+                        <div class="d-flex align-items-center">
+                          <div class="pl-3">
+                            <p class="name">Anonymous</p>
+                            <span class="position">{{ review.reviewDate ? review.reviewDate|date('d/m/Y') : '' }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
         {% endif %}
       </div>
     </div>
   </div>
 </section>
 
+
+<!-- Add Review Section -->
 <section class="ftco-section">
   <div class="container">
     <h4>Ajouter un avis</h4>
@@ -113,20 +191,26 @@
             <i class="fa fa-star-o fa-2x text-warning star" data-value="{{ i }}"></i>
           {% endfor %}
         </div>
-        <input type="hidden" name="rating" id="rating" required>
+        <input type="hidden" name="rating" id="rating">
       </div>
       <div class="form-group">
         <label for="comment">Commentaire</label>
-        <textarea class="form-control" name="comment" rows="3" required></textarea>
+        <textarea class="form-control" name="comment" rows="3"></textarea>
       </div>
       <button type="submit" class="btn btn-primary">Envoyer</button>
     </form>
   </div>
 </section>
 
+<!-- External Scripts -->
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+<!-- Custom Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // ⭐ Star rating interaction
     const stars = document.querySelectorAll('#star-rating .star');
     const ratingInput = document.getElementById('rating');
     stars.forEach(star => {
@@ -144,19 +228,45 @@
       });
     });
 
-    const lat = {{ lieu.latitude ?: 0 }};
-    const lng = {{ lieu.longitude ?: 0 }};
+    // 🗺️ Leaflet Map
+    const lat = {{ lieu.latitude|default(0) }};
+    const lng = {{ lieu.longitude|default(0) }};
     const map = L.map('lieu-map').setView([lat, lng], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
-    const marker = L.marker([lat, lng]).addTo(map)
-      .bindPopup("{{ lieu.lieuName|e('js') }}").openPopup();
+    L.marker([lat, lng]).addTo(map).bindPopup("{{ lieu.lieuName|e('js') }}").openPopup();
 
     document.getElementById('lieu-map').addEventListener('click', function () {
       this.style.height = '500px';
       setTimeout(() => map.invalidateSize(), 200);
     });
+
+    
+    document.querySelectorAll('.carousel-testimony').forEach(carousel => {
+  const reviewCount = parseInt(carousel.dataset.reviewCount, 10);
+  const mode = carousel.dataset.carousel;
+
+  $(carousel).owlCarousel({
+    loop: mode === 'true',
+    margin: 30,
+    nav: false,
+    dots: mode === 'true',
+    autoplay: mode === 'true',
+    autoplayTimeout: 4000,
+    responsive: {
+      0: { items: 1 },
+      768: { items: reviewCount === 2 ? 2 : 2 },
+      992: { items: reviewCount === 2 ? 2 : 3 }
+    }
+  });
+});
+
   });
 </script>
+
+<!-- Owl Carousel Styles -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"/>
+
 {% endblock %}

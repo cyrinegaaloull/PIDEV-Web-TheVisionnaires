@@ -1,5 +1,22 @@
 {% if recommended is not empty %}
-  <h3 class="mb-4 font-weight-bold">Recommandé selon la météo</h3>
+  <div class="d-flex align-items-center mb-4">
+    {% set iconPath = {
+      'Clear': 'sun.png',
+      'Clouds': 'fog.png',
+      'Mist': 'fog.png',
+      'Fog': 'fog.png',
+      'Rain': 'rain.png',
+      'Drizzle': 'rain.png',
+      'Thunderstorm': 'storm.png',
+      'Snow': 'snow.png'
+    }[weather] ?? 'default.png' %}
+
+  <div class="text-center mr-3">
+    <img src="{{ asset('assets/exploration/images/' ~ iconPath) }}" alt="{{ weather }}" style="height: 40px;">
+    <small class="d-block text-muted">{{ weather }}</small>
+  </div>
+  <h3 class="font-weight-bold mb-0">Recommandé selon la météo</h3>
+</div>
   <div class="row">
     {% for lieu in recommended %}
       {% include 'front_office/exploration/_lieu_card.html.twig' with {
@@ -11,3 +28,12 @@
 {% else %}
 <p>Aucun lieu recommandé pour la météo actuelle (<strong>{{ weather }}</strong> - catégories: {{ categories|join(', ') }}).</p>
 {% endif %}
+
+<style>
+#weather-recommendations img {
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  padding: 5px;
+}
+</style>
+

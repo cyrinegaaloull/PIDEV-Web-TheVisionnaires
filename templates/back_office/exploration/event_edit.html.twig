@@ -10,7 +10,7 @@
     <div class="col-md-10 col-lg-8 mx-auto">
       <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h4 class="mb-0 text-primary">Ajouter un événement à {{ lieu.lieuname }}</h4>
+          <h4 class="mb-0 text-primary">Modifier un événement à {{ lieu.lieuname }}</h4>
         </div>
         <div class="card-body">
           {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'eventForm'}}) }}
@@ -46,11 +46,9 @@
   {{ form_widget(form.maxtickets, {'attr': {'class': 'form-control', 'min': '1'}}) }}
   {{ form_errors(form.maxtickets) }}
 </div>
-
-
           <div class="d-grid">
             <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#confirmModal">
-              <i class="ri-check-line me-1"></i> Enregistrer l'événement
+              <i class="ri-check-line me-1"></i> Enregistrer les modifications
             </button>
           </div>
 
@@ -66,7 +64,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-success">
       <div class="modal-header bg-success text-white">
-        <h5 class="modal-title" id="confirmModalLabel">Confirmer l'ajout</h5>
+        <h5 class="modal-title" id="confirmModalLabel">Confirmer la modification</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -74,7 +72,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-success" id="submitFormBtn">Oui, enregistrer</button>
+        <button type="button" class="btn btn-success" id="submitFormBtn">Enregistrer</button>
       </div>
     </div>
   </div>
@@ -84,7 +82,7 @@
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
   <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert">
     <div class="d-flex">
-      <div class="toast-body">Événement enregistré avec succès !</div>
+      <div class="toast-body">Événement modifié avec succès !</div>
       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
     </div>
   </div>
