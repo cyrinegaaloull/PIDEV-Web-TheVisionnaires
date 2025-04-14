@@ -64,15 +64,15 @@
         <li class="nav-item {% if app.request.attributes.get('_route') == 'app_social' %}active{% endif %}">
           <a href="#" class="nav-link">Fil Social</a>
         </li>
-        
-        <li class="nav-item {% if app.request.attributes.get('_route') starts with 'app_navigation' %}active{% endif %}">
-          <a href="{{ path('app_navigation') }}" class="nav-link">Navigation</a>
+        {% if user %}
+        <li class="nav-item">
+          <a href="#" class="nav-link">Navigation</a>
         </li>
-       
+        {% else %}
         <li class="nav-item {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">
           <a href="#" class="nav-link">Contactez-Nous</a>
         </li>
-        
+        {% endif %}
 
 
         {% if user %}
