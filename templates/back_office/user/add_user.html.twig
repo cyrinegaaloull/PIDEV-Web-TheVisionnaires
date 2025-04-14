@@ -4,7 +4,15 @@
 
 {% block body %}
 <div class="row">
-    <!-- Flash Messages -->
+    {# Display general form error if passed from controller #}
+    {% if errors.formError is defined and errors.formError %}
+        <div class="alert alert-danger alert-dismissible mb-3" role="alert">
+            {{ errors.formError }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
+    {# Display standard flash messages (e.g., after successful submission/redirect) #}
     {% for label, messages in app.flashes %}
         {% for message in messages %}
             <div class="alert alert-{{ label }} alert-dismissible mb-3" role="alert">
@@ -22,92 +30,135 @@
                     <i class="ri-list-check ri-16px me-1"></i> View All Users
                 </a>
             </div>
-            <div class="card-body">
-                <form action="{{ path('add_user') }}" method="post" enctype="multipart/form-data">
+           <div class="card-body">
+                <form action="{{ path('add_user') }}" method="post" enctype="multipart/form-data" novalidate> {# novalidate prevents browser validation #}
                     <div class="row g-3">
-                        <!-- Username -->
+
                         <div class="col-md-6">
                             <div class="form-floating form-floating-outline mb-3">
-                                <input type="text" class="form-control {% if usernameError is defined and usernameError %}is-invalid{% endif %}" 
-                                    id="username" name="username" value="{{ username|default('') }}" required>
+                                {# Add is-invalid class if usernameError exists #}
+                                {# Repopulate value with submitted username, default to empty string #}
+                                <input type="text" class="form-control {% if errors.usernameError is defined %}is-invalid{% endif %}"
+                                       id="username" name="username" value="{{ username|default('') }}">
                                 <label for="username">Username</label>
-                                {% if usernameError is defined and usernameError %}
-                                    <div class="invalid-feedback">{{ usernameError }}</div>
+                                {# Display usernameError if it exists #}
+                                {% if errors.usernameError is defined %}
+                                    <div class="invalid-feedback">{{ errors.usernameError }}</div>
                                 {% endif %}
                             </div>
                         </div>
-                        
-                        <!-- Email -->
+
                         <div class="col-md-6">
                             <div class="form-floating form-floating-outline mb-3">
-                                <input type="email" class="form-control" id="email" name="email" value="{{ email|default('') }}" required>
+                                {# Add is-invalid class if emailError exists #}
+                                {# Repopulate value with submitted email #}
+                                <input type="text" class="form-control {% if errors.emailError is defined %}is-invalid{% endif %}"
+                                       id="email" name="email" value="{{ email|default('') }}">
                                 <label for="email">Email</label>
-                            </div>
-                        </div>
-                        
-                        <!-- Password -->
-                        <div class="col-md-6">
-                            <div class="form-floating form-floating-outline mb-3">
-                                <input type="password" class="form-control {% if passwordError is defined and passwordError %}is-invalid{% endif %}" 
-                                    id="password" name="password" required>
-                                <label for="password">Password</label>
-                            </div>
-                        </div>
-                        
-                        <!-- Confirm Password -->
-                        <div class="col-md-6">
-                            <div class="form-floating form-floating-outline mb-3">
-                                <input type="password" class="form-control {% if passwordError is defined and passwordError %}is-invalid{% endif %}" 
-                                    id="confirm_password" name="confirm_password" required>
-                                <label for="confirm_password">Confirm Password</label>
-                                {% if passwordError is defined and passwordError %}
-                                    <div class="invalid-feedback">{{ passwordError }}</div>
+                                {# Display emailError if it exists #}
+                                {% if errors.emailError is defined %}
+                                    <div class="invalid-feedback">{{ errors.emailError }}</div>
                                 {% endif %}
                             </div>
                         </div>
-                        
-                        <!-- Nom -->
+
                         <div class="col-md-6">
                             <div class="form-floating form-floating-outline mb-3">
-                                <input type="text" class="form-control" id="nom" name="nom" value="{{ nom|default('') }}" required>
-                                <label for="nom">Nom</label>
+                                {# Add is-invalid class if passwordError exists #}
+                                {# DO NOT repopulate password fields #}
+                                <input type="password" class="form-control {% if errors.passwordError is defined %}is-invalid{% endif %}"
+                                       id="password" name="password">
+                                <label for="password">Password (min 8 chars, Aa, 1)</label>
+                                {# Display passwordError if it exists #}
+                                {% if errors.passwordError is defined %}
+                                    <div class="invalid-feedback">{{ errors.passwordError }}</div>
+                                {% endif %}
                             </div>
                         </div>
-                        
-                        <!-- Prenom -->
+
                         <div class="col-md-6">
                             <div class="form-floating form-floating-outline mb-3">
-                                <input type="text" class="form-control" id="prenom" name="prenom" value="{{ prenom|default('') }}" required>
-                                <label for="prenom">Prenom</label>
+                                {# Add is-invalid class if confirmPasswordError exists #}
+                                {# DO NOT repopulate password fields #}
+                                <input type="password" class="form-control {% if errors.confirmPasswordError is defined %}is-invalid{% endif %}"
+                                       id="confirm_password" name="confirm_password">
+                                <label for="confirm_password">Confirm Password</label>
+                                 {# Display confirmPasswordError if it exists #}
+                                {% if errors.confirmPasswordError is defined %}
+                                    <div class="invalid-feedback">{{ errors.confirmPasswordError }}</div>
+                                {% endif %}
                             </div>
                         </div>
-                        
-                        <!-- Avatar -->
+
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline mb-3">
+                                {# Add is-invalid class if nomError exists #}
+                                {# Repopulate value with submitted nom #}
+                                <input type="text" class="form-control {% if errors.nomError is defined %}is-invalid{% endif %}"
+                                       id="nom" name="nom" value="{{ nom|default('') }}">
+                                <label for="nom">Nom (min 2 chars, no numbers)</label>
+                                {# Display nomError if it exists #}
+                                {% if errors.nomError is defined %}
+                                    <div class="invalid-feedback">{{ errors.nomError }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline mb-3">
+                                 {# Add is-invalid class if prenomError exists #}
+                                 {# Repopulate value with submitted prenom #}
+                                <input type="text" class="form-control {% if errors.prenomError is defined %}is-invalid{% endif %}"
+                                       id="prenom" name="prenom" value="{{ prenom|default('') }}">
+                                <label for="prenom">Prenom (min 2 chars, no numbers)</label>
+                                {# Display prenomError if it exists #}
+                                {% if errors.prenomError is defined %}
+                                    <div class="invalid-feedback">{{ errors.prenomError }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="avatar" class="form-label">Avatar</label>
-                                <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" required>
+                                <label for="avatar" class="form-label">Avatar (JPEG, PNG, GIF, WEBP, max 2MB)</label>
+                                {# Add is-invalid class if avatarError exists #}
+                                <input type="file" class="form-control {% if errors.avatarError is defined %}is-invalid{% endif %}"
+                                       id="avatar" name="avatar" accept="image/jpeg,image/png,image/gif,image/webp"> {# accept is a hint, not validation #}
+                                {# Display avatarError if it exists. d-block is often needed for file input feedback #}
+                                {% if errors.avatarError is defined %}
+                                    <div class="invalid-feedback d-block">{{ errors.avatarError }}</div>
+                                {% endif %}
+                                {# Optional: Add an img tag for preview #}
+                                {# <img id="avatar-preview" src="#" alt="Avatar Preview" style="max-width: 100px; max-height: 100px; margin-top: 10px; display: none;" /> #}
                             </div>
                         </div>
-                        
-                        <!-- Role -->
+
                         <div class="col-md-6">
-                            <div class="form-floating form-floating-outline mb-3">
-                                <select class="form-select" id="role_id" name="role_id" required>
-                                    <option value="">-- Select a Role --</option>
+                             <div class="form-floating form-floating-outline mb-3">
+                                {# Add is-invalid class if roleIdError exists #}
+                                <select class="form-select {% if errors.roleIdError is defined %}is-invalid{% endif %}" id="role_id" name="role_id">
+                                    {# Add a default empty/prompt option, selected if no role_id was submitted or it was empty #}
+                                    <option value="" {% if role_id is not defined or not role_id %}selected{% endif %}>-- Select a Role --</option>
+                                    {# Loop through available roles #}
                                     {% for role in roles %}
+                                        {# Check if submitted role_id matches the current role's id for re-selection #}
                                         <option value="{{ role.id }}" {% if role_id is defined and role.id == role_id %}selected{% endif %}>
-                                            {{ role.role }}
+                                            {{ role.role }} {# Assuming your Role entity has a 'role' property or getRole() method #}
                                         </option>
                                     {% endfor %}
                                 </select>
                                 <label for="role_id">Role</label>
+                                {# Display roleIdError if it exists #}
+                                {% if errors.roleIdError is defined %}
+                                     <div class="invalid-feedback">{{ errors.roleIdError }}</div>
+                                {% endif %}
                             </div>
                         </div>
-                    </div>
-                    
+                    </div> {# End .row.g-3 #}
+
+                    {# Crucial: Include the CSRF token #}
                     <input type="hidden" name="_token" value="{{ csrf_token('user_item') }}">
-                    
+
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary me-2">
                             <i class="ri-user-add-line ri-16px me-1"></i> Add User
@@ -115,45 +166,36 @@
                         <button type="reset" class="btn btn-outline-secondary">Reset</button>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
-</div>
+            </div> {# End .card-body #}
+        </div> {# End .card #}
+    </div> {# End .col-xl-8 #}
+</div> {# End .row #}
 {% endblock %}
+
 
 {% block javascripts %}
 {{ parent() }}
+{# You can keep JS for non-validation enhancements like the avatar preview #}
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Password validation
-        const password = document.getElementById('password');
-        const confirmPassword = document.getElementById('confirm_password');
-        
-        const validatePassword = () => {
-            if (password.value !== confirmPassword.value) {
-                confirmPassword.setCustomValidity("Passwords don't match");
-            } else {
-                confirmPassword.setCustomValidity('');
-            }
-        };
-        
-        password.addEventListener('change', validatePassword);
-        confirmPassword.addEventListener('keyup', validatePassword);
-        
-        // Preview avatar image (optional enhancement)
-        const avatarInput = document.getElementById('avatar');
-        avatarInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // If you want to show a preview, you could add an img element and set its src
-                    // For now, we'll just log that a file was selected
-                    console.log('File selected:', file.name);
-                }
-                reader.readAsDataURL(file);
-            }
-        });
+ document.addEventListener('DOMContentLoaded', () => {
+    // Preview avatar image (optional enhancement)
+    const avatarInput = document.getElementById('avatar');
+    const avatarPreview = document.getElementById('avatar-preview'); // Make sure you have an <img id="avatar-preview"> tag above
+
+    avatarInput?.addEventListener('change', function() {
+        const file = this.files?.[0];
+        if (file && avatarPreview) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                 avatarPreview.src = e.target.result;
+                 avatarPreview.style.display = 'block';
+             }
+            reader.readAsDataURL(file);
+        } else if (avatarPreview) {
+            avatarPreview.src = '#';
+            avatarPreview.style.display = 'none';
+        }
     });
+ });
 </script>
 {% endblock %}

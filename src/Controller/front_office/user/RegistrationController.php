@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile; // Make sure this is imported
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class RegistrationController extends AbstractController
 {
@@ -35,12 +35,12 @@ class RegistrationController extends AbstractController
         }
 
         // Get form data
-        $username = $request->request->get('username');
-        $email = $request->request->get('email');
-        $password = $request->request->get('password');
-        $confirmPassword = $request->request->get('confirm_password');
-        $nom = $request->request->get('nom');
-        $prenom = $request->request->get('prenom');
+        $username = trim($request->request->get('username', ''));
+        $email = trim($request->request->get('email', ''));
+        $password = $request->request->get('password', '');
+        $confirmPassword = $request->request->get('confirm_password', '');
+        $nom = trim($request->request->get('nom', ''));
+        $prenom = trim($request->request->get('prenom', ''));
         /** @var UploadedFile|null $avatarFile */
         $avatarFile = $request->files->get('avatar'); // Get the file object
 
@@ -56,13 +56,37 @@ class RegistrationController extends AbstractController
         $errors = [];
 
         try {
-            // Basic validation (consider using Symfony Forms & Validator for robust validation)
-            if (empty($username) || empty($email) || empty($password) || empty($nom) || empty($prenom)) {
-                $errors[] = 'All fields except avatar are required';
+            // Input validation - check each field individually for more specific error messages
+            if (empty($username)) {
+                $errors[] = 'Username is required';
+            } elseif (strlen($username) < 3) {
+                $errors[] = 'Username must be at least 3 characters long';
             }
 
-            if ($password !== $confirmPassword) {
+            if (empty($email)) {
+                $errors[] = 'Email address is required';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'Please enter a valid email address';
+            }
+
+            if (empty($password)) {
+                $errors[] = 'Password is required';
+            } elseif (strlen($password) < 8) {
+                $errors[] = 'Password must be at least 8 characters long';
+            }
+
+            if (empty($confirmPassword)) {
+                $errors[] = 'Password confirmation is required';
+            } elseif ($password !== $confirmPassword) {
                 $errors[] = 'Passwords do not match';
+            }
+
+            if (empty($nom)) {
+                $errors[] = 'Last name is required';
+            }
+
+            if (empty($prenom)) {
+                $errors[] = 'First name is required';
             }
 
             // Check if username already exists
@@ -78,10 +102,22 @@ class RegistrationController extends AbstractController
             }
 
             // Validate avatar if provided (optional: add checks for size, mime type etc.)
-            if ($avatarFile && !$avatarFile->isValid()) {
-                 $errors[] = 'Avatar upload failed: ' . $avatarFile->getErrorMessage();
+            if ($avatarFile) {
+                if (!$avatarFile->isValid()) {
+                    $errors[] = 'Avatar upload failed: ' . $avatarFile->getErrorMessage();
+                }
+                
+                // Additional validations for avatar
+                $maxSize = 2 * 1024 * 1024; // 2MB
+                if ($avatarFile->getSize() > $maxSize) {
+                    $errors[] = 'Avatar file is too large (max 2MB)';
+                }
+                
+                $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!in_array($avatarFile->getMimeType(), $allowedMimeTypes)) {
+                    $errors[] = 'Avatar must be a JPG, PNG or GIF image';
+                }
             }
-
 
             // If there are any errors, render the login template but stay on signup
             if (!empty($errors)) {
@@ -119,34 +155,26 @@ class RegistrationController extends AbstractController
             }
             $user->setRole($userRole);
 
-            // --- MODIFIED AVATAR LOGIC ---
-            $avatarFilename = null; // Initialize avatar filename as null
+            // Avatar handling
+            $avatarFilename = null;
 
-            if ($avatarFile) { // Check if a file was actually uploaded
+            if ($avatarFile) {
                 $originalFilename = pathinfo($avatarFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $avatarFile->guessExtension();
 
                 try {
                     $avatarFile->move(
-                        $this->getParameter('avatars_directory'), // Your configured upload directory
+                        $this->getParameter('avatars_directory'),
                         $newFilename
                     );
-                    // On success, set the filename (without path)
                     $avatarFilename = $newFilename;
-
                 } catch (FileException $e) {
-                    // Log the error maybe
-                    // error_log('Avatar upload failed: ' . $e->getMessage());
-                    // Add a flash message or error if you want to inform the user specifically about avatar failure
                     $this->addFlash('warning', 'Account created, but avatar could not be uploaded.');
-                    // Keep $avatarFilename as null (database default)
                 }
             }
-             // If $avatarFile was null initially, or if move failed, $avatarFilename remains null.
-            $user->setAvatar($avatarFilename); // Set the filename or null
-            // --- END OF MODIFIED AVATAR LOGIC ---
-
+            
+            $user->setAvatar($avatarFilename);
 
             // Save user to database
             $entityManager->persist($user);

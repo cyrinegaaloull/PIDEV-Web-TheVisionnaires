@@ -51,8 +51,14 @@
                 <div class="card-body">
                     <form action="{{ path('update_role', {'id': role.id}) }}" method="post">
                         <div class="form-floating form-floating-outline mb-4">
-                            <input type="text" class="form-control" id="role" name="role" value="{{ role.role }}" required>
+                            <input type="text" class="form-control {% if errors is defined and errors['role'] is defined %}is-invalid{% endif %}" 
+                                  id="role" name="role" value="{{ roleName|default(role.role) }}">
                             <label for="role">Role Name</label>
+                            {% if errors is defined and errors['role'] is defined %}
+                              <div class="invalid-feedback">
+                                {{ errors['role'] }}
+                              </div>
+                            {% endif %}
                         </div>
                         
                         <input type="hidden" name="_token" value="{{ csrf_token('update_role' ~ role.id) }}">
@@ -83,6 +89,16 @@
                         <li class="mb-2">Ensure users with this role have appropriate permissions</li>
                         <li>Review all users assigned to this role</li>
                     </ul>
+                    
+                    <div class="alert alert-info mt-3">
+                      <p class="mb-0"><strong>Role validation rules:</strong></p>
+                      <ul class="mb-0">
+                        <li>Must be at least 3 characters long</li>
+                        <li>Cannot exceed 50 characters</li>
+                        <li>Can only contain letters, numbers, spaces, underscores, and hyphens</li>
+                        <li>Must be unique in the system</li>
+                      </ul>
+                    </div>
                 </div>
             </div>
         </div>

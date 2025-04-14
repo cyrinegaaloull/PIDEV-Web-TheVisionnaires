@@ -24,8 +24,14 @@
       <div class="card-body">
         <form action="{{ path('add_role') }}" method="post">
           <div class="form-floating form-floating-outline mb-4">
-            <input type="text" class="form-control" id="role" name="role" placeholder="Admin" required />
+            <input type="text" class="form-control {% if errors is defined and errors['role'] is defined %}is-invalid{% endif %}" 
+                  id="role" name="role" placeholder="Admin" value="{{ roleName|default('') }}" />
             <label for="role">Role Name</label>
+            {% if errors is defined and errors['role'] is defined %}
+              <div class="invalid-feedback">
+                {{ errors['role'] }}
+              </div>
+            {% endif %}
           </div>
           
           <input type="hidden" name="_token" value="{{ csrf_token('role_item') }}">
@@ -49,7 +55,15 @@
       </div>
       <div class="card-body">
         <p>Roles define the permissions and access levels for users within the system. Each role can have specific capabilities assigned to it.</p>
-        
+        <div class="alert alert-info">
+          <p class="mb-0"><strong>Role validation rules:</strong></p>
+          <ul class="mb-0">
+            <li>Must be at least 3 characters long</li>
+            <li>Cannot exceed 50 characters</li>
+            <li>Can only contain letters, numbers, spaces, underscores, and hyphens</li>
+            <li>Must be unique in the system</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

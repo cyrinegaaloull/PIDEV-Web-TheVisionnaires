@@ -2,21 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login / Signup</title>
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
+        /* Make sure html and body take full height and allow scrolling */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            overflow-y: auto; /* Allow vertical scrolling */
+        }
+
+        /* Ensure the container doesn't restrict height */
+        .container {
+            min-height: 100%;
+            position: relative;
+            overflow-y: auto; /* Allow vertical scrolling within container if needed */
+            padding-bottom: 20px; /* Add some bottom padding for better visual appearance */
+        }
+        
+        /* Make form containers scrollable if they grow too large */
+        .form-wrapper {
+            max-height: 100%;
+            overflow-y: auto;
+            padding-right: 5px; /* Small padding for scrollbar */
+        }
+        
+        /* Ensure forms have proper spacing */
+        .form {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
         /* Flash message styling */
-.flash-container {
-    position: fixed; 
-    bottom: 20px;   
-    left: 50%;
-    transform: translateX(-50%); /* Changed from -46% to -50% */
-    width: 80%;     
-    max-width: 500px;
-    z-index: 1000;
-    text-align: center;
-}
+        .flash-container {
+            position: fixed; 
+            bottom: 20px;   
+            left: 50%;
+            transform: translateX(-50%); /* Changed from -46% to -50% */
+            width: 80%;     
+            max-width: 500px;
+            z-index: 1000;
+            text-align: center;
+        }
+        
         .flash-message {
             padding: 12px 15px; /* Slightly more padding */
             border-radius: 5px;
@@ -27,21 +59,25 @@
             display: block; /* Ensure it takes up space */
             box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Add subtle shadow */
         }
+        
         .flash-success {
             background-color: #d4edda; /* Softer success background */
             color: #155724;         /* Darker success text */
             border: 1px solid #c3e6cb;
         }
+        
         .flash-danger {
             background-color: #f8d7da; /* Softer danger background */
             color: #721c24;         /* Darker danger text */
             border: 1px solid #f5c6cb;
         }
+        
         .flash-warning {
             background-color: #fff3cd; /* Softer warning background */
             color: #856404;         /* Darker warning text */
             border: 1px solid #ffeeba;
         }
+        
         .flash-info { /* Add an info style if needed */
              background-color: #d1ecf1;
              color: #0c5460;
@@ -50,7 +86,6 @@
 
         /* Enhanced form styling */
         .input-group { margin-bottom: 15px; }
-        .form { padding: 20px; }
         .form-title { margin-bottom: 20px; font-size: 1.5rem; font-weight: 600; text-align: center; }
 
         /* Custom file input */
@@ -65,14 +100,15 @@
         button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
         /* Animation for flash messages */
- @keyframes fadeInUp {
-    from { opacity: 0; transform: translate(-50%, 20px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
-}
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
         .flash-animate {
-    animation: fadeInUp 0.5s ease-out forwards;
-    opacity: 0;
-}
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
         
         /* NEW STYLES FOR SIGNUP ERRORS */
         .signup-errors-container {
@@ -102,6 +138,27 @@
             0%, 100% { transform: translateX(0); }
             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
             20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        /* Make sure content row is responsive */
+        .content-row {
+            flex-wrap: wrap;
+        }
+        
+        /* Responsive adjustments */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .row {
+                flex-direction: column;
+            }
+            
+            .form-wrapper {
+                width: 100%;
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -152,27 +209,27 @@
                     <form id="signup-form" method="post" action="{{ path('app_register') }}" enctype="multipart/form-data">
                         <div class="input-group">
                             <i class='bx bxs-user'></i>
-                            <input type="text" name="username" placeholder="Username" value="{{ form_data.username|default('') }}" required>
+                            <input type="text" name="username" placeholder="Username" value="{{ form_data.username|default('') }}" >
                         </div>
                         <div class="input-group">
                             <i class='bx bx-mail-send'></i>
-                            <input type="email" name="email" placeholder="Email" value="{{ form_data.email|default('') }}" required>
+                            <input type="text" name="email" placeholder="Email" value="{{ form_data.email|default('') }}" >
                         </div>
                         <div class="input-group">
                             <i class='bx bxs-lock-alt'></i>
-                            <input type="password" name="password" placeholder="Password" required>
+                            <input type="password" name="password" placeholder="Password" >
                         </div>
                         <div class="input-group">
                             <i class='bx bxs-lock-alt'></i>
-                            <input type="password" name="confirm_password" placeholder="Confirm password" required>
+                            <input type="password" name="confirm_password" placeholder="Confirm password" >
                         </div>
                         <div class="input-group">
                             <i class='bx bxs-user-detail'></i>
-                            <input type="text" name="nom" placeholder="Last Name" value="{{ form_data.nom|default('') }}" required>
+                            <input type="text" name="nom" placeholder="Last Name" value="{{ form_data.nom|default('') }}" >
                         </div>
                         <div class="input-group">
                             <i class='bx bxs-user-detail'></i>
-                            <input type="text" name="prenom" placeholder="First Name" value="{{ form_data.prenom|default('') }}" required>
+                            <input type="text" name="prenom" placeholder="First Name" value="{{ form_data.prenom|default('') }}" >
                         </div>
                         <div class="input-file-group">
                             <i class='bx bxs-image'></i>

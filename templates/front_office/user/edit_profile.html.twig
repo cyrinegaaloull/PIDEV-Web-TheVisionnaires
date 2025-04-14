@@ -593,6 +593,20 @@
                         <form method="post" enctype="multipart/form-data">
                             <input type="hidden" name="_token" value="{{ csrf_token('edit_profile' ~ user.getUserId()) }}">
 
+                            {# --- Avatar File Input (Visually Hidden, Triggered by JS) --- #}
+<div class="form-group" style="height: 0; overflow: hidden; margin: 0; padding: 0; border: 0;">
+    {# Label is optional for screen readers if another element provides context #}
+    <label for="avatar" class="visually-hidden">Choose a new profile picture</label> 
+    <input type="file" 
+           id="avatar" 
+           name="avatar" 
+           class="form-control" 
+           accept="image/png, image/jpeg, image/gif" 
+           style="position: absolute; left: -9999px;"> 
+    {# 'accept' attribute restricts file types in the browser dialog #}
+    {# Inline style or a CSS class hides it effectively #}
+</div>
+
                             {# --- Display Current Avatar (Top) --- #}
                             <div class="profile-avatar-top">
                                 <div class="profile-avatar-container">
