@@ -1,0 +1,314 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Tableau de bord Assistance - Admin | LocalLens{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('assets/back_office/css/NaimaCss.css') }}">
+{% endblock %}
+
+{% block body %}
+<!-- En-tête du tableau de bord -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="card-title mb-1">Tableau de bord Assistance</h1>
+                        <p class="card-text text-muted">Gestion des établissements, services et avis</p>
+                    </div>
+                    <div>
+                        <div class="btn-group">
+                            <a href="{{ path('admin_assistance_etablissements_list') }}" class="btn btn-primary">
+                                <i class="ri-building-line me-1"></i> Gérer les locaux
+                            </a>
+                            <a href="{{ path('admin_assistance_services_list') }}" class="btn btn-outline-primary">
+                                <i class="ri-service-line me-1"></i> Gérer les prestations
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistiques en cartes -->
+<div class="row mb-4">
+    <!-- Établissements -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="avatar avatar-md bg-primary p-2 mx-auto mb-3">
+                    <i class="ri-building-line ri-lg text-white"></i>
+                </div>
+                <h1 class="font-weight-bold mb-1">{{ stats.totalEtablissements }}</h1>
+                <p class="text-muted mb-3">Locaux enregistrés</p>
+                <div class="d-grid">
+                    <a href="{{ path('admin_assistance_etablissements_list') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="ri-eye-line me-1"></i> Voir la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Services -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="avatar avatar-md bg-success p-2 mx-auto mb-3">
+                    <i class="ri-service-line ri-lg text-white"></i>
+                </div>
+                <h1 class="font-weight-bold mb-1">{{ stats.totalServices }}</h1>
+                <p class="text-muted mb-3">Prestations actives</p>
+                <div class="d-grid">
+                    <a href="{{ path('admin_assistance_services_list') }}" class="btn btn-sm btn-outline-success">
+                        <i class="ri-eye-line me-1"></i> Voir la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Avis -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="avatar avatar-md bg-info p-2 mx-auto mb-3">
+                    <i class="ri-star-line ri-lg text-white"></i>
+                </div>
+                <h1 class="font-weight-bold mb-1">{{ stats.totalAvis }}</h1>
+                <p class="text-muted mb-3">Évaluations clients</p>
+                <div class="d-grid">
+                    <a href="{{ path('admin_assistance_avis_list') }}" class="btn btn-sm btn-outline-info">
+                        <i class="ri-eye-line me-1"></i> Voir les évaluations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions rapides -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Actions rapides - Assistance</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3 col-sm-6">
+                        <a href="{{ path('admin_assistance_etablissement_create') }}" class="btn btn-primary d-flex flex-column align-items-center justify-content-center p-4 h-100 w-100">
+                            <i class="ri-add-line ri-2x mb-2"></i>
+                            <span>Ajouter un local</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <a href="{{ path('admin_assistance_service_create') }}" class="btn btn-success d-flex flex-column align-items-center justify-content-center p-4 h-100 w-100">
+                            <i class="ri-add-line ri-2x mb-2"></i>
+                            <span>Ajouter une prestation</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <a href="{{ path('admin_assistance_stats_dashboard') }}" class="btn btn-info d-flex flex-column align-items-center justify-content-center p-4 h-100 w-100">
+                            <i class="ri-bar-chart-line ri-2x mb-2"></i>
+                            <span>Statistiques Assistance</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <a href="#" class="btn btn-secondary d-flex flex-column align-items-center justify-content-center p-4 h-100 w-100">
+                            <i class="ri-file-chart-line ri-2x mb-2"></i>
+                            <span>Rapport Assistance</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top établissements selon les avis -->
+{% if topEtablissements is defined and topEtablissements|length > 0 %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Top locaux - Assistance</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Local</th>
+                                <th>Note moyenne</th>
+                                <th>Évaluations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for etab in topEtablissements %}
+                            <tr>
+                                <td>{{ etab.etabname }}</td>
+                                <td>
+                                    <div class="text-warning">
+                                        {% for i in 1..5 %}
+                                            {% if i <= etab.avgRating|round %}
+                                                <i class="ri-star-fill"></i>
+                                            {% else %}
+                                                <i class="ri-star-line"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <span class="ms-1">{{ etab.avgRating|number_format(1) }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ etab.totalAvis }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Distribution des prestations - Assistance</h5>
+            </div>
+            <div class="card-body">
+                {% if servicesByEtab is defined and servicesByEtab|length > 0 %}
+                <div class="chart-container mb-3" style="height: 250px;">
+                    <canvas id="serviceDistributionChart"></canvas>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Local</th>
+                                <th>Nombre de prestations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for etab in servicesByEtab %}
+                            <tr>
+                                <td>{{ etab.etabname }}</td>
+                                <td>{{ etab.serviceCount }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    Aucune donnée disponible sur la distribution des prestations.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Dernières activités (exemple fictif) -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Activités récentes - Assistance</h5>
+            </div>
+            <div class="card-body">
+                <ul class="timeline">
+                    <li class="timeline-item">
+                        <span class="timeline-point timeline-point-primary">
+                            <i class="ri-add-line"></i>
+                        </span>
+                        <div class="timeline-event">
+                            <div class="timeline-header">
+                                <h6 class="mb-0">Nouveau local ajouté</h6>
+                                <small class="text-muted">Il y a 2 heures</small>
+                            </div>
+                            <p class="mb-0">Un nouveau local a été ajouté au système d'assistance</p>
+                        </div>
+                    </li>
+                    <li class="timeline-item">
+                        <span class="timeline-point timeline-point-info">
+                            <i class="ri-star-line"></i>
+                        </span>
+                        <div class="timeline-event">
+                            <div class="timeline-header">
+                                <h6 class="mb-0">Nouvelle évaluation client</h6>
+                                <small class="text-muted">Il y a 5 heures</small>
+                            </div>
+                            <p class="mb-0">Un client a ajouté une nouvelle évaluation pour un local</p>
+                        </div>
+                    </li>
+                    <li class="timeline-item">
+                        <span class="timeline-point timeline-point-success">
+                            <i class="ri-edit-line"></i>
+                        </span>
+                        <div class="timeline-event">
+                            <div class="timeline-header">
+                                <h6 class="mb-0">Mise à jour de prestation</h6>
+                                <small class="text-muted">Hier</small>
+                            </div>
+                            <p class="mb-0">Les informations d'une prestation ont été mises à jour</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Service Distribution Chart
+        {% if servicesByEtab is defined and servicesByEtab|length > 0 %}
+        var serviceCtx = document.getElementById('serviceDistributionChart').getContext('2d');
+        var serviceLabels = [{% for etab in servicesByEtab %}'{{ etab.etabname }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+        var serviceData = [{% for etab in servicesByEtab %}{{ etab.serviceCount }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        
+        var serviceDistributionChart = new Chart(serviceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: serviceLabels,
+                datasets: [{
+                    data: serviceData,
+                    backgroundColor: [
+                        'rgba(115, 103, 240, 0.7)',
+                        'rgba(40, 199, 111, 0.7)',
+                        'rgba(234, 84, 85, 0.7)',
+                        'rgba(0, 207, 232, 0.7)',
+                        'rgba(255, 159, 67, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(115, 103, 240, 1)',
+                        'rgba(40, 199, 111, 1)',
+                        'rgba(234, 84, 85, 1)',
+                        'rgba(0, 207, 232, 1)',
+                        'rgba(255, 159, 67, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        {% endif %}
+    });
+</script>
+{% endblock %}
+{% endblock %}

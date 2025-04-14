@@ -1,0 +1,83 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}Services de l'établissement{% endblock %}
+
+{% block body %}
+  <section class="ftco-section bg-light" style="padding-top: 40px; padding-bottom: 40px;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-12 text-center heading-section ftco-animate">
+          <span class="subheading" style="font-size: 40px;">Services</span>
+          <h2 class="mb-4">Services de l'établissement : {{ etablissement.etabname }}</h2>
+        </div>
+      </div>
+      
+      <!-- Messages flash -->
+      {% for label, messages in app.flashes %}
+        {% for message in messages %}
+          <div class="row justify-content-center mb-4">
+            <div class="col-md-8">
+              <div class="alert alert-{{ label }}" role="alert">
+                {{ message }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endfor %}
+      
+      <!-- Bouton Ajouter -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-md-8 text-center">
+          <a href="{{ path('ajouter_service', {'id': etablissement.etabid}) }}" class="btn btn-primary">
+            <i class="fa fa-plus mr-2"></i> Ajouter un service
+          </a>
+          <a href="{{ path('modifier_etablissement', {'id': etablissement.etabid}) }}" class="btn btn-secondary ml-2">
+            <i class="fa fa-arrow-left mr-2"></i> Retour à l'établissement
+          </a>
+        </div>
+      </div>
+      
+      {% if services is empty %}
+        <div class="row justify-content-center">
+          <div class="col-md-8 ftco-animate">
+            <div class="alert alert-info text-center p-4">
+              <p class="mb-0">Aucun service trouvé pour cet établissement. Vous pouvez en ajouter un nouveau.</p>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="row justify-content-center">
+          <div class="col-md-8 ftco-animate">
+            <div class="bg-white p-4 rounded shadow">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Nom du service</th>
+                    <th>Prix</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for service in services %}
+                    <tr>
+                      <td>{{ service.servicename }}</td>
+                      <td>{{ service.serviceprix }} DT</td>
+                      <td>
+                        <a href="{{ path('modifier_service', {'id': service.serviceid}) }}" class="btn btn-warning btn-sm">
+                          <i class="fa fa-edit"></i> Modifier
+                        </a>
+                        <a href="{{ path('supprimer_service', {'id': service.serviceid}) }}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce service?');">
+                          <i class="fa fa-trash"></i> Supprimer
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

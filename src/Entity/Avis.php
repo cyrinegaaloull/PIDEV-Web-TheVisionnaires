@@ -1,7 +1,9 @@
 <?php
 
+
 namespace App\Entity; 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Etablissement;
 
 #[ORM\Table(name: 'avis')]
 #[ORM\Index(name: 'etabID', columns: ['etabID'])]
@@ -14,8 +16,14 @@ class Avis
     #[ORM\Column(name: 'avisID', type: 'integer', nullable: false)]
     private $avisid;
 
+
+    #[ORM\ManyToOne(targetEntity: Etablissement::class)]
+    #[ORM\JoinColumn(name: 'etabID', referencedColumnName: 'etabID', nullable: false)]
+    private ?Etablissement $etablissement = null;
+
     #[ORM\Column(name: 'etabID', type: 'integer', nullable: false)]
     private $etabid;
+
 
     #[ORM\Column(name: 'userID', type: 'integer', nullable: false)]
     private $userid;
@@ -37,27 +45,13 @@ class Avis
     }
 
     /**
-     * Set etabid.
-     *
-     * @param int $etabid
-     *
-     * @return Avis
-     */
-    public function setEtabid($etabid)
-    {
-        $this->etabid = $etabid;
-
-        return $this;
-    }
-
-    /**
-     * Get etabid.
+     * Get userid.
      *
      * @return int
      */
-    public function getEtabid()
+    public function getUserid()
     {
-        return $this->etabid;
+        return $this->userid;
     }
 
     /**
@@ -70,31 +64,6 @@ class Avis
     public function setUserid($userid)
     {
         $this->userid = $userid;
-
-        return $this;
-    }
-
-    /**
-     * Get userid.
-     *
-     * @return int
-     */
-    public function getUserid()
-    {
-        return $this->userid;
-    }
-
-    /**
-     * Set rating.
-     *
-     * @param int $rating
-     *
-     * @return Avis
-     */
-    public function setRating($rating)
-    {
-        $this->rating = $rating;
-
         return $this;
     }
 
@@ -109,16 +78,15 @@ class Avis
     }
 
     /**
-     * Set dateavis.
+     * Set rating.
      *
-     * @param \DateTime $dateavis
+     * @param int $rating
      *
      * @return Avis
      */
-    public function setDateavis($dateavis)
+    public function setRating($rating)
     {
-        $this->dateavis = $dateavis;
-
+        $this->rating = $rating;
         return $this;
     }
 
@@ -130,5 +98,35 @@ class Avis
     public function getDateavis()
     {
         return $this->dateavis;
+    }
+
+    /**
+     * Set dateavis.
+     *
+     * @param \DateTime $dateavis
+     *
+     * @return Avis
+     */
+    public function setDateavis($dateavis)
+    {
+        $this->dateavis = $dateavis;
+        return $this;
+    }
+
+    // Méthode pour compatibilité avec les anciennes requêtes
+    public function getEtabid(): ?int
+    {
+        return $this->etablissement ? $this->etablissement->getEtabid() : null;
+    }
+
+    public function getEtablissement(): ?Etablissement
+    {
+        return $this->etablissement;
+    }
+
+    public function setEtablissement(?Etablissement $etablissement): self
+    {
+        $this->etablissement = $etablissement;
+        return $this;
     }
 }

@@ -1,0 +1,104 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Administration - Liste des Établissements | LocalLens{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('assets/back_office/css/NaimaCss.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Administration des établissements</h5>
+                <a href="{{ path('admin_assistance_etablissement_create') }}" class="btn btn-primary">
+                    <i class="ri-add-line me-1"></i> Ajouter un établissement
+                </a>
+            </div>
+            <div class="card-body">
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+                
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover" id="etablissementsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Adresse</th>
+                                <th>Catégorie</th>
+                                <th>Horaire</th>
+                                <th>Région</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            {% for etablissement in etablissements %}
+                            <tr>
+                                <td>{{ etablissement.etabid }}</td>
+                                <td>{{ etablissement.etabname }}</td>
+                                <td>{{ etablissement.etabaddress }}</td>
+                                <td>{{ etablissement.categoryid.categoryname }}</td>
+                                <td>{{ etablissement.etabhoraire }}</td>
+                                <td>{{ etablissement.region }}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                            <i class="ri-more-2-fill"></i>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="{{ path('admin_assistance_etablissement_edit', {'etabid': etablissement.etabid}) }}">
+                                                <i class="ri-pencil-line me-2"></i> Modifier
+                                            </a>
+                                            <form method="post" action="{{ path('admin_assistance_etablissement_delete', {'etabid': etablissement.etabid}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet établissement?');" class="d-inline">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ etablissement.etabid) }}">
+                                                <button class="dropdown-item">
+                                                    <i class="ri-delete-bin-line me-2"></i> Supprimer
+                                                </button>
+                                            </form>
+                                            <a class="dropdown-item" href="{{ path('admin_assistance_services_list') }}?etablissement={{ etablissement.etabid }}">
+                                                <i class="ri-service-line me-2"></i> Voir les services
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center">Aucun établissement trouvé</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialisation du tableau avec DataTables pour des fonctionnalités avancées
+        if ($.fn.DataTable) {
+            $('#etablissementsTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.25/i18n/French.json'
+                },
+                responsive: true,
+                columnDefs: [
+                    { orderable: false, targets: 6 } // Désactiver le tri sur la colonne Actions
+                ]
+            });
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

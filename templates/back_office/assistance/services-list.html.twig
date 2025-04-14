@@ -1,0 +1,150 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Administration - Liste des Services | LocalLens{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('assets/back_office/css/NaimaCss.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Administration des services</h5>
+                <div>
+                    <a href="{{ path('admin_assistance_service_create') }}" class="btn btn-primary">
+                        <i class="ri-add-line me-1"></i> Ajouter un service
+                    </a>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <i class="ri-filter-line me-1"></i> Filtrer
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+                
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-hover" id="servicesTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom du service</th>
+                                <th>Prix</th>
+                                <th>Établissement</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            {% for service in services %}
+<tr>
+    <td>{{ service.serviceid }}</td>
+    <td>{{ service.servicename }}</td>
+    <td>{{ service.serviceprix|number_format(2, ',', ' ') }} DT</td>
+    <td>
+        {% if service.etablissement is not null %}
+            <a href="{{ path('admin_assistance_etablissement_edit', {'etabid': service.etablissement.etabid}) }}">
+                {{ service.etablissement.etabname }}
+            </a>
+        {% else %}
+            <span class="badge bg-label-danger">Non défini</span>
+        {% endif %}
+    </td>
+    <td>
+        <div class="dropdown">
+            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                <i class="ri-more-2-fill"></i>
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="{{ path('admin_assistance_service_edit', {'serviceid': service.serviceid}) }}">
+                    <i class="ri-pencil-line me-2"></i> Modifier
+                </a>
+                <form method="post" action="{{ path('admin_assistance_service_delete', {'serviceid': service.serviceid}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce service?');" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ service.serviceid) }}">
+                    <button type="submit" class="dropdown-item">
+                        <i class="ri-delete-bin-line me-2"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </td>
+</tr>
+{% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de filtre -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filtrer les services</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm" action="{{ path('admin_assistance_services_list') }}" method="get">
+                    <div class="mb-3">
+                        <label class="form-label">Établissement</label>
+                        <select name="etablissement" class="form-select">
+                            <option value="">Tous les établissements</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prix maximum</label>
+                        <input type="number" name="prix_max" class="form-control" placeholder="Prix maximum" min="0" step="0.01">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" form="filterForm" class="btn btn-primary">Appliquer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialisation du tableau avec DataTables
+        if ($.fn.DataTable) {
+            $('#servicesTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.25/i18n/French.json'
+                },
+                responsive: true,
+                columnDefs: [
+                    { orderable: false, targets: 4 } // Désactiver le tri sur la colonne Actions
+                ]
+            });
+        }
+
+        // Chargement dynamique des établissements pour le filtre
+        fetch("{{ path('admin_assistance_etablissements_list_json') }}")
+            .then(response => response.json())
+            .then(data => {
+                const etablissementSelect = document.querySelector('select[name="etablissement"]');
+                data.forEach(etab => {
+                    const option = document.createElement('option');
+                    option.value = etab.etabid;
+                    option.textContent = etab.etabname;
+                    etablissementSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Erreur de chargement des établissements:', error));
+    });
+</script>
+{% endblock %}
