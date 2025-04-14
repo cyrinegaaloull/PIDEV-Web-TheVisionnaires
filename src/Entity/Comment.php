@@ -4,33 +4,24 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="comment", indexes={@ORM\Index(name="post_id", columns={"post_id"})})
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'comment')]
+#[ORM\Index(name: 'post_id', columns: ['post_id'])]
 class Comment
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(name="comment_id", type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'comment_id', type: 'integer')]
     private ?int $commentId = null;
 
-    /**
-     * @ORM\Column(name="user_id", type="integer", nullable=true)
-     */
+    #[ORM\Column(name: 'user_id', type: 'integer', nullable: true)]
     private ?int $userId = null;
 
-    /**
-     * @ORM\Column(name="content", type="text", length=65535)
-     */
+    #[ORM\Column(name: 'content', type: 'text', length: 65535)]
     private string $content;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Post", inversedBy="comments")
-     * @ORM\JoinColumn(name="post_id", referencedColumnName="post_id", nullable=false, onDelete="CASCADE")
-     */
+    #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'post_id', nullable: false, onDelete: 'CASCADE')]
     private ?Post $post = null;
 
     public function getCommentId(): ?int

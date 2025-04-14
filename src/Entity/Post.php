@@ -7,62 +7,45 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="post")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'post')]
 class Post
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(name="post_id", type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'post_id', type: 'integer')]
     private ?int $postId = null;
 
-    /**
-     * @ORM\Column(name="user_id", type="integer", nullable=true)
-     */
+    #[ORM\Column(name: 'user_id', type: 'integer', nullable: true)]
     private ?int $userId = null;
 
-    /**
-     * @ORM\Column(name="title", type="string", length=255)
-     *
-     * @Assert\NotBlank(message="Le titre ne doit pas être vide.")
-     * @Assert\Length(
-     *      min=3,
-     *      max=255,
-     *      minMessage="Le titre doit comporter au moins {{ limit }} caractères.",
-     *      maxMessage="Le titre ne doit pas dépasser {{ limit }} caractères."
-     * )
-     */
+    #[ORM\Column(name: 'title', type: 'string', length: 255)]
+    #[Assert\NotBlank(message: 'Le titre ne doit pas être vide.')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Le titre doit comporter au moins {{ limit }} caractères.',
+        maxMessage: 'Le titre ne doit pas dépasser {{ limit }} caractères.'
+    )]
     private string $title;
 
-    /**
-     * @ORM\Column(name="content", type="text")
-     *
-     * @Assert\NotBlank(message="Le contenu ne doit pas être vide.")
-     * @Assert\Length(
-     *      min=10,
-     *      minMessage="Le contenu doit comporter au moins {{ limit }} caractères."
-     * )
-     */
+    #[ORM\Column(name: 'content', type: 'text')]
+    #[Assert\NotBlank(message: 'Le contenu ne doit pas être vide.')]
+    #[Assert\Length(
+        min: 10,
+        minMessage: 'Le contenu doit comporter au moins {{ limit }} caractères.'
+    )]
     private string $content;
 
-    /**
-     * @ORM\Column(name="category", type="string", length=255)
-     *
-     * @Assert\NotBlank(message="La catégorie est obligatoire.")
-     * @Assert\Length(
-     *      max=255,
-     *      maxMessage="La catégorie ne doit pas dépasser {{ limit }} caractères."
-     * )
-     */
+    #[ORM\Column(name: 'category', type: 'string', length: 255)]
+    #[Assert\NotBlank(message: 'La catégorie est obligatoire.')]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'La catégorie ne doit pas dépasser {{ limit }} caractères.'
+    )]
     private string $category;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post", cascade={"remove"})
-     */
+    #[ORM\OneToMany(targetEntity: 'App\\Entity\\Comment', mappedBy: 'post', cascade: ['remove'])]
     private Collection $comments;
 
     public function __construct()
