@@ -6,8 +6,9 @@ use App\Entity\Club;
 use App\Entity\Users;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use App\Repository\ClubMembersRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ClubMembersRepository::class)]
 #[ORM\Table(name: 'club_members')]
 class ClubMembers
 {
