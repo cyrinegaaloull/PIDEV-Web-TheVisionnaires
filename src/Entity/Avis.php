@@ -1,4 +1,6 @@
 <?php
+
+
 namespace App\Entity; 
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Etablissement;
@@ -14,9 +16,14 @@ class Avis
     #[ORM\Column(name: 'avisID', type: 'integer', nullable: false)]
     private $avisid;
 
+
     #[ORM\ManyToOne(targetEntity: Etablissement::class)]
     #[ORM\JoinColumn(name: 'etabID', referencedColumnName: 'etabID', nullable: false)]
     private ?Etablissement $etablissement = null;
+
+    #[ORM\Column(name: 'etabID', type: 'integer', nullable: false)]
+    private $etabid;
+
 
     #[ORM\Column(name: 'userID', type: 'integer', nullable: false)]
     private $userid;

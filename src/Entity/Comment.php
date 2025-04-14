@@ -1,131 +1,64 @@
 <?php
 
-
 namespace App\Entity;
-use App\Entity\Post;
+
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Comment
- *
- * @ORM\Table(name="comment", indexes={@ORM\Index(name="post_id", columns={"post_id"})})
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'comment')]
+#[ORM\Index(name: 'post_id', columns: ['post_id'])]
 class Comment
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="comment_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $commentId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'comment_id', type: 'integer')]
+    private ?int $commentId = null;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="user_id", type="integer", nullable=true)
-     */
-    private $userId;
+    #[ORM\Column(name: 'user_id', type: 'integer', nullable: true)]
+    private ?int $userId = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="content", type="text", length=65535, nullable=false)
-     */
-    private $content;
+    #[ORM\Column(name: 'content', type: 'text', length: 65535)]
+    private string $content;
 
-    /**
-     * @var Post
-     *
-     * @ORM\ManyToOne(targetEntity="Post")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="post_id", referencedColumnName="post_id")
-     * })
-     */
-    private $post;
+    #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'post_id', nullable: false, onDelete: 'CASCADE')]
+    private ?Post $post = null;
 
-
-    /**
-     * Get commentId.
-     *
-     * @return int
-     */
-    public function getCommentId()
+    public function getCommentId(): ?int
     {
         return $this->commentId;
     }
 
-    /**
-     * Set userId.
-     *
-     * @param int|null $userId
-     *
-     * @return Comment
-     */
-    public function setUserId($userId = null)
-    {
-        $this->userId = $userId;
-
-        return $this;
-    }
-
-    /**
-     * Get userId.
-     *
-     * @return int|null
-     */
-    public function getUserId()
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
 
-    /**
-     * Set content.
-     *
-     * @param string $content
-     *
-     * @return Comment
-     */
-    public function setContent($content)
+    public function setUserId(?int $userId): self
     {
-        $this->content = $content;
-
+        $this->userId = $userId;
         return $this;
     }
 
-    /**
-     * Get content.
-     *
-     * @return string
-     */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
 
-    /**
-     * Set post.
-     *
-     * @param \Post|null $post
-     *
-     * @return Comment
-     */
-    public function setPost(Post $post = null)
+    public function setContent(string $content): self
     {
-        $this->post = $post;
-
+        $this->content = $content;
         return $this;
     }
 
-    /**
-     * Get post.
-     *
-     * @return \Post|null
-     */
-    public function getPost()
+    public function getPost(): ?Post
     {
         return $this->post;
+    }
+
+    public function setPost(?Post $post): self
+    {
+        $this->post = $post;
+        return $this;
     }
 }

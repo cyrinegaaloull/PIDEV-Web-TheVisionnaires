@@ -26,6 +26,16 @@ class Service
     private $etablissement;
 
     public function getServiceid(): ?int
+
+    #[ORM\Column(name: 'etabID', type: 'integer', nullable: false)]
+    private $etabid;
+
+    /**
+     * Get serviceid.
+     *
+     * @return int
+     */
+    public function getServiceid()
     {
         return $this->serviceid;
     }

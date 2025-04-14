@@ -1,158 +1,81 @@
 <?php
 
-
 namespace App\Entity;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Membership
- *
- * @ORM\Table(name="membership", indexes={@ORM\Index(name="idx_clubID", columns={"clubID"}), @ORM\Index(name="fk_applicantID", columns={"memberID"})})
- * @ORM\Entity
- */
+use App\Entity\Club;
+use App\Entity\Users;
+use Doctrine\ORM\Mapping as ORM;
+use DateTime;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'membership')]
 class Membership
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="membershipID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $membershipid;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'membershipID', type: 'integer', nullable: false)]
+    private int $membershipid;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="membershipStatus", type="string", length=0, nullable=false, options={"default"="EN_ATTENTE"})
-     */
-    private $membershipstatus = 'EN_ATTENTE';
+    #[ORM\Column(name: 'membershipStatus', type: 'string', length: 0, nullable: false, options: ['default' => 'EN_ATTENTE'])]
+    private string $membershipstatus = 'EN_ATTENTE';
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="requestDate", type="date", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
-     */
-    private $requestdate = 'CURRENT_TIMESTAMP';
+    #[ORM\Column(name: 'requestDate', type: 'date', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private DateTime $requestdate;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="clubID", type="integer", nullable=false)
-     */
-    private $clubid;
+    #[ORM\ManyToOne(targetEntity: Club::class)]
+    #[ORM\JoinColumn(name: 'clubID', referencedColumnName: 'clubid', nullable: false, onDelete: 'CASCADE')]
+    private Club $clubid;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="memberID", type="integer", nullable=false)
-     */
-    private $memberid;
+    #[ORM\ManyToOne(targetEntity: Users::class)]
+    #[ORM\JoinColumn(name: 'memberID', referencedColumnName: 'userId', nullable: false, onDelete: 'CASCADE')]
+    private Users $memberid;
 
-
-    /**
-     * Get membershipid.
-     *
-     * @return int
-     */
-    public function getMembershipid()
+    public function getMembershipid(): int
     {
         return $this->membershipid;
     }
 
-    /**
-     * Set membershipstatus.
-     *
-     * @param string $membershipstatus
-     *
-     * @return Membership
-     */
-    public function setMembershipstatus($membershipstatus)
-    {
-        $this->membershipstatus = $membershipstatus;
-
-        return $this;
-    }
-
-    /**
-     * Get membershipstatus.
-     *
-     * @return string
-     */
-    public function getMembershipstatus()
+    public function getMembershipstatus(): string
     {
         return $this->membershipstatus;
     }
 
-    /**
-     * Set requestdate.
-     *
-     * @param \DateTime $requestdate
-     *
-     * @return Membership
-     */
-    public function setRequestdate($requestdate)
+    public function setMembershipstatus(string $membershipstatus): self
     {
-        $this->requestdate = $requestdate;
-
+        $this->membershipstatus = $membershipstatus;
         return $this;
     }
 
-    /**
-     * Get requestdate.
-     *
-     * @return \DateTime
-     */
-    public function getRequestdate()
+    public function getRequestdate(): DateTime
     {
         return $this->requestdate;
     }
 
-    /**
-     * Set clubid.
-     *
-     * @param int $clubid
-     *
-     * @return Membership
-     */
-    public function setClubid($clubid)
+    public function setRequestdate(DateTime $requestdate): self
     {
-        $this->clubid = $clubid;
-
+        $this->requestdate = $requestdate;
         return $this;
     }
 
-    /**
-     * Get clubid.
-     *
-     * @return int
-     */
-    public function getClubid()
+    public function getClubid(): Club
     {
         return $this->clubid;
     }
 
-    /**
-     * Set memberid.
-     *
-     * @param int $memberid
-     *
-     * @return Membership
-     */
-    public function setMemberid($memberid)
+    public function setClubid(Club $clubid): self
     {
-        $this->memberid = $memberid;
-
+        $this->clubid = $clubid;
         return $this;
     }
 
-    /**
-     * Get memberid.
-     *
-     * @return int
-     */
-    public function getMemberid()
+    public function getMemberid(): Users
     {
         return $this->memberid;
+    }
+
+    public function setMemberid(Users $memberid): self
+    {
+        $this->memberid = $memberid;
+        return $this;
     }
 }
