@@ -34,6 +34,13 @@
           >
             <i class="ri-delete-bin-line"></i>
           </button>
+          <button class="btn btn-outline-primary btn-icon btn-sm btn-circle show-members" 
+                  data-bs-toggle="offcanvas" 
+                  data-bs-target="#clubMembersOffcanvas" 
+                  data-club-id="{{ club.clubid }}"
+                  title="Voir les membres">
+            <i class="ri-team-line"></i>
+          </button>
         </td>
       </tr>
     {% else %}

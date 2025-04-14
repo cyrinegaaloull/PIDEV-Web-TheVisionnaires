@@ -1,0 +1,98 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+{% block title %}Demandes d'adhésion - Admin{% endblock %}
+
+{% block body %}
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Demandes d'adhésion</h5>
+    <a href="{{ path('admin_membership_export') }}" class="btn btn-outline-success me-2" title="Exporter en CSV">
+      <i class="ri-file-excel-2-line me-1"></i> Exporter
+    </a>
+
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <input type="text" id="search-input" class="form-control" placeholder="Rechercher un utilisateur ou un club...">
+    </div>
+    <div class="col-md-3">
+      <select id="filter-select" class="form-select">
+        <option value="">Trier par</option>
+        <option value="alpha_asc">Nom A-Z</option>
+        <option value="alpha_desc">Nom Z-A</option>
+        <option value="date_asc">Plus ancien</option>
+        <option value="date_desc">Plus récent</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select id="status-select" class="form-select">
+        <option value="">Tous les statuts</option>
+        <option value="EN_ATTENTE">En attente</option>
+        <option value="ACCEPTE">Acceptée</option>
+        <option value="REFUSE">Refusée</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="memberships-table-container">
+    {% include 'back_office/clubs/_memberships-table.html.twig' %}
+  </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+      Total : {{ totalMemberships }} demandes
+    </div>
+  </div>
+
+</div>
+
+
+
+<style>
+  .pagination-rounded .page-link {
+    border-radius: 1.5rem !important;
+  }
+  .btn-circle {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50% !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
+<script>
+  function fetchMemberships(page = 1) {
+    const search = document.getElementById('search-input').value;
+    const filter = document.getElementById('filter-select').value;
+    const status = document.getElementById('status-select').value;
+
+    const url = new URL("{{ path('admin_membership_list') }}", window.location.origin);
+    url.searchParams.append('page', page);
+    if (search) url.searchParams.append('search', search);
+    if (filter) url.searchParams.append('filter', filter);
+    if (status) url.searchParams.append('status', status);
+
+    fetch(url, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('memberships-table-container').innerHTML = html;
+    });
+  }
+
+  document.getElementById('search-input').addEventListener('input', () => fetchMemberships(1));
+  document.getElementById('filter-select').addEventListener('change', () => fetchMemberships(1));
+  document.getElementById('status-select').addEventListener('change', () => fetchMemberships(1));
+
+  document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('page-link-ajax')) {
+      e.preventDefault();
+      fetchMemberships(e.target.dataset.page);
+    }
+  });
+</script>
+{% endblock %}
