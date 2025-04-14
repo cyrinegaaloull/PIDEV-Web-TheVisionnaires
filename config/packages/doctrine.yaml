@@ -17,11 +17,11 @@ doctrine:
         auto_mapping: true
         mappings:
             App:
-                type: annotation
+                type: attribute  # Changé de 'annotation' à 'attribute'
                 is_bundle: false
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
-                alias: App
+                alias: App 
 
 when@test:
     doctrine:

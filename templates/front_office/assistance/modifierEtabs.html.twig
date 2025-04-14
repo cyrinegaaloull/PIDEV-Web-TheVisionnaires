@@ -1,0 +1,81 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}Modifier un établissement{% endblock %}
+
+{% block body %}
+  <!-- Formulaire Section -->
+  <section class="ftco-section bg-light" style="padding-top: 40px; padding-bottom: 40px;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-12 text-center heading-section ftco-animate">
+          <span class="subheading" style="font-size: 40px;">{{ titre }}</span>
+          <h2 class="mb-4" style="padding-bottom: 40px;">Modifiez les informations de l'établissement</h2>
+        </div>
+      </div>
+      
+      <!-- Messages flash -->
+      {% for label, messages in app.flashes %}
+        {% for message in messages %}
+          <div class="row justify-content-center mb-4">
+            <div class="col-md-8">
+              <div class="alert alert-{{ label }}" role="alert">
+                {{ message }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endfor %}
+      
+      <div class="row justify-content-center">
+        <div class="col-md-8 ftco-animate">
+          <div class="bg-white p-5 rounded shadow">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+              <div class="mb-4">
+                {{ form_label(form.etabname) }}
+                {{ form_widget(form.etabname) }}
+                <small class="text-danger">{{ form_errors(form.etabname) }}</small>
+              </div>
+              
+              <div class="mb-4">
+                {{ form_label(form.etabaddress) }}
+                {{ form_widget(form.etabaddress) }}
+                <small class="text-danger">{{ form_errors(form.etabaddress) }}</small>
+              </div>
+              
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  {{ form_label(form.region) }}
+                  {{ form_widget(form.region) }}
+                  <small class="text-danger">{{ form_errors(form.region) }}</small>
+                </div>
+                <div class="col-md-6">
+                  {{ form_label(form.horaireDateObject) }}
+                  {{ form_widget(form.horaireDateObject) }}
+                  <small class="text-danger">{{ form_errors(form.horaireDateObject) }}</small>
+                </div>
+              </div>
+              
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  {{ form_label(form.geolocation) }}
+                  {{ form_widget(form.geolocation) }}
+                  <small class="text-danger">{{ form_errors(form.geolocation) }}</small>
+                </div>
+                <div class="col-md-6">
+                  {{ form_label(form.categoryid) }}
+                  {{ form_widget(form.categoryid) }}
+                  <small class="text-danger">{{ form_errors(form.categoryid) }}</small>
+                </div>
+              </div>
+              
+              <div class="text-center mt-4">
+                {{ form_widget(form.submit) }}
+                <a href="{{ path('liste_etablissements') }}" class="btn btn-secondary ml-2">Annuler</a>
+              </div>
+            {{ form_end(form) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

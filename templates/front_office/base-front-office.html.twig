@@ -28,11 +28,10 @@
   <link rel="stylesheet" href="{{ asset('back_office/vendor/fonts/remixicon/remixicon.css') }}">
 
 
-
-
   <style>
     html { overflow-y: scroll; } /* Always show scrollbar */
   </style>
+   {% block stylesheets %}{% endblock %} 
 </head>
 <body>
 
@@ -59,7 +58,7 @@
           <a href="#" class="nav-link">Clubs</a>
         </li>
         <li class="nav-item {% if app.request.attributes.get('_route') == 'app_assistance' %}active{% endif %}">
-          <a href="#" class="nav-link">Assistance</a>
+          <a href="{{ path('liste_etablissements') }}" class="nav-link">Assistance</a>
         </li>
         <li class="nav-item {% if app.request.attributes.get('_route') == 'app_social' %}active{% endif %}">
           <a href="#" class="nav-link">Fil Social</a>
@@ -75,7 +74,7 @@
         {% endif %}
 
 
-        {% if user %}
+          {% if user %}
           <!-- If the user is logged in, display their info -->
           <li class="nav-item dropdown user-dropdown">
             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button">
@@ -97,7 +96,7 @@
         <li class="nav-item ml-3">
           <a href="#" class="login-btn">Se connecter</a>
         </li>
-        {% endif %}
+        {% endif %} 
       </ul>
     </div>
   </div>
@@ -172,6 +171,9 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY"></script>
   <script src="{{ asset('assets/front_office/js/google-map.js') }}"></script>
   <script src="{{ asset('assets/front_office/js/main.js') }}"></script>
+
+  
+  {% block javascripts %}{% endblock %}
 
 </body>
 </html>

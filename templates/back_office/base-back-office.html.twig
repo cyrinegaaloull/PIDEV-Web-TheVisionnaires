@@ -102,23 +102,38 @@
           </ul>
         </li>
         <!-- Assistance -->
-        <li class="menu-item">
-          <a href="#" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ri-government-line"></i>
-            <div>Assistance</div>
-          </a>
-          <ul class="menu-sub">
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 1</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 2</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 3</a>
-            </li>
-          </ul>
-        </li>
+<li class="menu-item">
+  <a href="#" class="menu-link menu-toggle">
+    <i class="menu-icon tf-icons ri-government-line"></i>
+    <div>Assistance</div>
+  </a>
+  <ul class="menu-sub">
+    <li class="menu-item">
+      <a href="{{ path('admin_assistance_dashboard') }}" class="menu-link">
+        <i class="menu-icon tf-icons ri-dashboard-line"></i>
+        Tableau de bord
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="{{ path('admin_assistance_etablissements_list') }}" class="menu-link">
+        <i class="menu-icon tf-icons ri-store-line"></i>
+        Établissements
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="{{ path('admin_assistance_services_list') }}" class="menu-link">
+        <i class="menu-icon tf-icons ri-service-line"></i>
+        Prestations
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="{{ path('admin_assistance_avis_list') }}" class="menu-link">
+        <i class="menu-icon tf-icons ri-star-line"></i>
+        Évaluations
+      </a>
+    </li>
+  </ul>
+</li>
         <!-- Navigation -->
         <li class="menu-item">
           <a href="#" class="menu-link menu-toggle">
@@ -330,5 +345,9 @@
 <script src="{{ asset('assets/back_office/vendor/js/menu.js') }}"></script>
 <script src="{{ asset('assets/back_office/vendor/libs/apex-charts/apexcharts.js') }}"></script>
 <script src="{{ asset('assets/back_office/js/main.js') }}"></script>
+
+{% block javascripts %}
+{# Les scripts spécifiques aux pages enfants seront ajoutés ici #}
+{% endblock %}
 </body>
 </html>

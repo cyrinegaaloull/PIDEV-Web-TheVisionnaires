@@ -1,54 +1,31 @@
 <?php
-
-
 namespace App\Entity; 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Etablissement;
 
-/**
- * Avis
- *
- * @ORM\Table(name="avis", indexes={@ORM\Index(name="etabID", columns={"etabID"}), @ORM\Index(name="userID", columns={"userID"})})
- * @ORM\Entity
- */
+#[ORM\Table(name: 'avis')]
+#[ORM\Index(name: 'etabID', columns: ['etabID'])]
+#[ORM\Index(name: 'userID', columns: ['userID'])]
+#[ORM\Entity]
 class Avis
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="avisID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'avisID', type: 'integer', nullable: false)]
     private $avisid;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="etabID", type="integer", nullable=false)
-     */
-    private $etabid;
+    #[ORM\ManyToOne(targetEntity: Etablissement::class)]
+    #[ORM\JoinColumn(name: 'etabID', referencedColumnName: 'etabID', nullable: false)]
+    private ?Etablissement $etablissement = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="userID", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: 'userID', type: 'integer', nullable: false)]
     private $userid;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="rating", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: 'rating', type: 'integer', nullable: false)]
     private $rating;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="dateAvis", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
-     */
+    #[ORM\Column(name: 'dateAvis', type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $dateavis = 'CURRENT_TIMESTAMP';
-
 
     /**
      * Get avisid.
@@ -58,44 +35,6 @@ class Avis
     public function getAvisid()
     {
         return $this->avisid;
-    }
-
-    /**
-     * Set etabid.
-     *
-     * @param int $etabid
-     *
-     * @return Avis
-     */
-    public function setEtabid($etabid)
-    {
-        $this->etabid = $etabid;
-
-        return $this;
-    }
-
-    /**
-     * Get etabid.
-     *
-     * @return int
-     */
-    public function getEtabid()
-    {
-        return $this->etabid;
-    }
-
-    /**
-     * Set userid.
-     *
-     * @param int $userid
-     *
-     * @return Avis
-     */
-    public function setUserid($userid)
-    {
-        $this->userid = $userid;
-
-        return $this;
     }
 
     /**
@@ -109,16 +48,15 @@ class Avis
     }
 
     /**
-     * Set rating.
+     * Set userid.
      *
-     * @param int $rating
+     * @param int $userid
      *
      * @return Avis
      */
-    public function setRating($rating)
+    public function setUserid($userid)
     {
-        $this->rating = $rating;
-
+        $this->userid = $userid;
         return $this;
     }
 
@@ -133,16 +71,15 @@ class Avis
     }
 
     /**
-     * Set dateavis.
+     * Set rating.
      *
-     * @param \DateTime $dateavis
+     * @param int $rating
      *
      * @return Avis
      */
-    public function setDateavis($dateavis)
+    public function setRating($rating)
     {
-        $this->dateavis = $dateavis;
-
+        $this->rating = $rating;
         return $this;
     }
 
@@ -154,5 +91,35 @@ class Avis
     public function getDateavis()
     {
         return $this->dateavis;
+    }
+
+    /**
+     * Set dateavis.
+     *
+     * @param \DateTime $dateavis
+     *
+     * @return Avis
+     */
+    public function setDateavis($dateavis)
+    {
+        $this->dateavis = $dateavis;
+        return $this;
+    }
+
+    // Méthode pour compatibilité avec les anciennes requêtes
+    public function getEtabid(): ?int
+    {
+        return $this->etablissement ? $this->etablissement->getEtabid() : null;
+    }
+
+    public function getEtablissement(): ?Etablissement
+    {
+        return $this->etablissement;
+    }
+
+    public function setEtablissement(?Etablissement $etablissement): self
+    {
+        $this->etablissement = $etablissement;
+        return $this;
     }
 }

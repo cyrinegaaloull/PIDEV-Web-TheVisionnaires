@@ -1,0 +1,136 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}Ajouter un établissement{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <style>
+    .select2-container--default .select2-selection--single {
+      height: calc(1.5em + 0.75rem + 2px);
+      padding: 0.375rem 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      line-height: 1.5;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: calc(1.5em + 0.75rem);
+    }
+    .select2-dropdown {
+      border-color: #ced4da;
+    }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+      background-color: #17a2b8;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <!-- Formulaire Section -->
+  <section class="ftco-section bg-light" style="padding-top: 40px; padding-bottom: 40px;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-12 text-center heading-section ftco-animate">
+          <span class="subheading" style="font-size: 40px;">{{ titre }}</span>
+          <h2 class="mb-4" style="padding-bottom: 40px;">Remplissez les informations de l'établissement</h2>
+        </div>
+      </div>
+      
+      <!-- Messages flash -->
+      {% for label, messages in app.flashes %}
+        {% for message in messages %}
+          <div class="row justify-content-center mb-4">
+            <div class="col-md-8">
+              <div class="alert alert-{{ label }}" role="alert">
+                {{ message }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endfor %}
+      
+      <div class="row justify-content-center">
+        <div class="col-md-8 ftco-animate">
+          <div class="bg-white p-5 rounded shadow">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+              <div class="mb-4">
+                {{ form_label(form.etabname) }}
+                {{ form_widget(form.etabname) }}
+                <small class="text-danger">{{ form_errors(form.etabname) }}</small>
+              </div>
+              
+              <div class="mb-4">
+                {{ form_label(form.etabaddress) }}
+                {{ form_widget(form.etabaddress) }}
+                <small class="text-danger">{{ form_errors(form.etabaddress) }}</small>
+              </div>
+              
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  {{ form_label(form.region) }}
+                  {{ form_widget(form.region) }}
+                  <small class="text-danger">{{ form_errors(form.region) }}</small>
+                </div>
+                <div class="col-md-6">
+                  {{ form_label(form.horaireDateObject) }}
+                  {{ form_widget(form.horaireDateObject) }}
+                  <small class="text-danger">{{ form_errors(form.horaireDateObject) }}</small>
+                </div>
+              </div>
+              
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  {{ form_label(form.geolocation) }}
+                  {{ form_widget(form.geolocation) }}
+                  <small class="text-danger">{{ form_errors(form.geolocation) }}</small>
+                </div>
+                <div class="col-md-6">
+                  {{ form_label(form.categoryid) }}
+                  {{ form_widget(form.categoryid, {'attr': {'class': 'form-control select2-autocomplete'}}) }}
+                  <small class="text-danger">{{ form_errors(form.categoryid) }}</small>
+                </div>
+              </div>
+              
+              <div class="text-center mt-4">
+                {{ form_widget(form.submit) }}
+                <a href="{{ path('liste_etablissements') }}" class="btn btn-secondary ml-2">Annuler</a>
+
+                {# Afficher le bouton uniquement lors de la modification (quand l'ID existe) #}
+  {% if form.vars.value.etabid is not null %}
+    <a href="{{ path('liste_services', {'id': form.vars.value.etabid}) }}" class="btn btn-info ml-2">
+      <i class="fa fa-cogs"></i> liste des services
+    </a>
+  {% endif %}
+              </div>
+            {{ form_end(form) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <!-- Pas besoin de charger jQuery car il est déjà inclus dans le template de base -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('.select2-autocomplete').select2({
+        placeholder: "Rechercher une catégorie...",
+        allowClear: true,
+        width: '100%',
+        language: {
+          noResults: function() {
+            return "Aucune catégorie trouvée";
+          },
+          searching: function() {
+            return "Recherche en cours...";
+          }
+        }
+      });
+    });
+  </script>
+{% endblock %}
