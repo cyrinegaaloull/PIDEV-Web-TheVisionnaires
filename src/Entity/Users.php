@@ -4,11 +4,13 @@ namespace App\Entity;
 
 use App\Entity\Roles;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: "users")]
 #[ORM\Index(name: "role_id", columns: ["role_id"])]
-class Users
+class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
@@ -36,8 +38,6 @@ class Users
     #[ORM\ManyToOne(targetEntity: Roles::class)]
     #[ORM\JoinColumn(name: "role_id", referencedColumnName: "id")]
     private ?Roles $role = null;
-
-    // Getters and Setters (unchanged, you can keep them as-is)
 
     public function getUserId(): int
     {
@@ -72,7 +72,7 @@ class Users
         return $this;
     }
 
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -119,5 +119,30 @@ class Users
     public function getRole(): ?Roles
     {
         return $this->role;
+    }
+
+    public function getRoles(): array
+    {
+        $userRoles = [];
+        if ($this->role) {
+            $userRoles[] = $this->role->getName();
+        }
+        $userRoles[] = 'ROLE_USER';
+        return array_unique($userRoles);
+    }
+
+    public function eraseCredentials(): void
+    {
+        // Clear temporary, sensitive data if stored
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
     }
 }

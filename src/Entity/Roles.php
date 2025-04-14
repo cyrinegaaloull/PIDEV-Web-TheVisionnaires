@@ -31,4 +31,16 @@ class Roles
     {
         return $this->role;
     }
+
+    /**
+     * Alias pour Symfony Security : retourne un rôle valide (ex: ROLE_ADMIN)
+     */
+    public function getName(): string
+    {
+        $roleName = $this->role;
+        if (!str_starts_with($roleName, 'ROLE_')) {
+            $roleName = 'ROLE_' . strtoupper($roleName);
+        }
+        return $roleName;
+    }
 }
