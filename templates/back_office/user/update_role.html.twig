@@ -1,0 +1,120 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Update Role{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    /* Flash message styles */
+    .flash-message {
+        position: fixed;
+        bottom: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 15px 25px;
+        border-radius: 5px;
+        opacity: 0;
+        transition: all 0.5s ease;
+        z-index: 1000;
+    }
+    .flash-message.success {
+        background-color: #4CAF50;
+        color: white;
+    }
+    .flash-message.error,
+    .flash-message.danger {
+        background-color: red;
+        color: white;
+    }
+    .flash-message.show {
+        bottom: 30px;
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    {# Flash messages #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash-message {{ label }}" id="flash-message">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Update Role</h5>
+                    <small class="text-muted">Edit role details</small>
+                </div>
+                <div class="card-body">
+                    <form action="{{ path('update_role', {'id': role.id}) }}" method="post">
+                        <div class="form-floating form-floating-outline mb-4">
+                            <input type="text" class="form-control {% if errors is defined and errors['role'] is defined %}is-invalid{% endif %}" 
+                                  id="role" name="role" value="{{ roleName|default(role.role) }}">
+                            <label for="role">Role Name</label>
+                            {% if errors is defined and errors['role'] is defined %}
+                              <div class="invalid-feedback">
+                                {{ errors['role'] }}
+                              </div>
+                            {% endif %}
+                        </div>
+                        
+                        <input type="hidden" name="_token" value="{{ csrf_token('update_role' ~ role.id) }}">
+                        
+                        <div class="d-flex">
+                            <button type="submit" class="btn btn-primary me-3">Update Role</button>
+                            <a href="{{ path('list_roles') }}" class="btn btn-outline-secondary">
+                                Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tips Card -->
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Role Management Tips</h5>
+                </div>
+                <div class="card-body">
+                    <p>When updating roles, consider the following tips:</p>
+                    
+                    <ul class="ps-3 mb-0">
+                        <li class="mb-2">Use descriptive names for roles</li>
+                        <li class="mb-2">Keep role names consistent</li>
+                        <li class="mb-2">Ensure users with this role have appropriate permissions</li>
+                        <li>Review all users assigned to this role</li>
+                    </ul>
+                    
+                    <div class="alert alert-info mt-3">
+                      <p class="mb-0"><strong>Role validation rules:</strong></p>
+                      <ul class="mb-0">
+                        <li>Must be at least 3 characters long</li>
+                        <li>Cannot exceed 50 characters</li>
+                        <li>Can only contain letters, numbers, spaces, underscores, and hyphens</li>
+                        <li>Must be unique in the system</li>
+                      </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        // Flash message animation
+        const flashMessage = document.getElementById('flash-message');
+        if (flashMessage) {
+            setTimeout(() => flashMessage.classList.add('show'), 100);
+            setTimeout(() => flashMessage.classList.remove('show'), 3000);
+        }
+    });
+</script>
+{% endblock %}

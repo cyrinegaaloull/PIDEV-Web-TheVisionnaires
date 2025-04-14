@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Signup</title>
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* Make sure html and body take full height and allow scrolling */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            overflow-y: auto; /* Allow vertical scrolling */
+        }
+
+        /* Ensure the container doesn't restrict height */
+        .container {
+            min-height: 100%;
+            position: relative;
+            overflow-y: auto; /* Allow vertical scrolling within container if needed */
+            padding-bottom: 20px; /* Add some bottom padding for better visual appearance */
+        }
+        
+        /* Make form containers scrollable if they grow too large */
+        .form-wrapper {
+            max-height: 100%;
+            overflow-y: auto;
+            padding-right: 5px; /* Small padding for scrollbar */
+        }
+        
+        /* Ensure forms have proper spacing */
+        .form {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Flash message styling */
+        .flash-container {
+            position: fixed; 
+            bottom: 20px;   
+            left: 50%;
+            transform: translateX(-50%); /* Changed from -46% to -50% */
+            width: 80%;     
+            max-width: 500px;
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .flash-message {
+            padding: 12px 15px; /* Slightly more padding */
+            border-radius: 5px;
+            margin-bottom: 10px; /* Space between messages if multiple */
+            font-weight: 500;
+            opacity: 1;
+            transition: opacity 0.5s ease, transform 0.3s ease; /* Add transform transition */
+            display: block; /* Ensure it takes up space */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Add subtle shadow */
+        }
+        
+        .flash-success {
+            background-color: #d4edda; /* Softer success background */
+            color: #155724;         /* Darker success text */
+            border: 1px solid #c3e6cb;
+        }
+        
+        .flash-danger {
+            background-color: #f8d7da; /* Softer danger background */
+            color: #721c24;         /* Darker danger text */
+            border: 1px solid #f5c6cb;
+        }
+        
+        .flash-warning {
+            background-color: #fff3cd; /* Softer warning background */
+            color: #856404;         /* Darker warning text */
+            border: 1px solid #ffeeba;
+        }
+        
+        .flash-info { /* Add an info style if needed */
+             background-color: #d1ecf1;
+             color: #0c5460;
+             border: 1px solid #bee5eb;
+        }
+
+        /* Enhanced form styling */
+        .input-group { margin-bottom: 15px; }
+        .form-title { margin-bottom: 20px; font-size: 1.5rem; font-weight: 600; text-align: center; }
+
+        /* Custom file input */
+        .input-file-group { position: relative; display: flex; align-items: center; margin-bottom: 15px; }
+        .input-file-group i { position: absolute; left: 10px; }
+        .file-label { display: inline-block; padding: 8px 12px 8px 35px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .input-file-group input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .file-name { margin-left: 10px; font-size: 0.85em; color: #666; }
+
+        /* Buttons */
+        button { margin-top: 10px; transition: all 0.3s ease; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        /* Animation for flash messages */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        .flash-animate {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        /* NEW STYLES FOR SIGNUP ERRORS */
+        .signup-errors-container {
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .signup-error {
+            color: #e53935;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            background-color: rgba(229, 57, 53, 0.1);
+            border-left: 3px solid #e53935;
+            margin-bottom: 5px;
+        }
+        
+        .signup-error:last-child {
+            margin-bottom: 0;
+        }
+        
+        .shake {
+            animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        /* Make sure content row is responsive */
+        .content-row {
+            flex-wrap: wrap;
+        }
+        
+        /* Responsive adjustments */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .row {
+                flex-direction: column;
+            }
+            
+            .form-wrapper {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="container" class="container {% if show_signup is defined and show_signup %}sign-up{% else %}sign-in{% endif %}">
+
+    <div class="flash-container">
+        {% for type, messages in app.flashes(['success', 'signup_error', 'danger', 'warning', 'info']) %}
+            {% for message in messages %}
+                {# Map flash types to CSS classes #}
+                {% set flash_class = 'info' %} {# Default class #}
+                {% if type == 'success' %}
+                    {% set flash_class = 'success' %}
+                {% elseif type == 'signup_error' or type == 'danger' %}
+                     {% set flash_class = 'danger' %}
+                {% elseif type == 'warning' %}
+                    {% set flash_class = 'warning' %}
+                {% endif %}
+
+                <div class="flash-message flash-{{ flash_class }} flash-animate">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        {# Display standard login errors provided by AuthenticationUtils #}
+        {% if error %}
+            <div class="flash-message flash-danger flash-animate">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+    </div>
+    <div class="row">
+        <div class="col align-items-center flex-col sign-up">
+            <div class="form-wrapper align-items-center">
+                <div class="form sign-up">
+                    <div class="form-title">Create Account</div>
+                    
+                    {# Display signup errors under title #}
+                    {% if signup_errors is defined and signup_errors|length > 0 %}
+                    <div class="signup-errors-container shake">
+                        {% for error in signup_errors %}
+                            <div class="signup-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form id="signup-form" method="post" action="{{ path('app_register') }}" enctype="multipart/form-data">
+                        <div class="input-group">
+                            <i class='bx bxs-user'></i>
+                            <input type="text" name="username" placeholder="Username" value="{{ form_data.username|default('') }}" >
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bx-mail-send'></i>
+                            <input type="text" name="email" placeholder="Email" value="{{ form_data.email|default('') }}" >
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bxs-lock-alt'></i>
+                            <input type="password" name="password" placeholder="Password" >
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bxs-lock-alt'></i>
+                            <input type="password" name="confirm_password" placeholder="Confirm password" >
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bxs-user-detail'></i>
+                            <input type="text" name="nom" placeholder="Last Name" value="{{ form_data.nom|default('') }}" >
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bxs-user-detail'></i>
+                            <input type="text" name="prenom" placeholder="First Name" value="{{ form_data.prenom|default('') }}" >
+                        </div>
+                        <div class="input-file-group">
+                            <i class='bx bxs-image'></i>
+                            <label class="file-label">
+                                <span class="file-text">Choose profile picture</span>
+                                <input type="file" name="avatar" accept="image/*" onchange="updateFileName(this)">
+                            </label>
+                        </div>
+                        <button type="submit">Sign up</button>
+                    </form>
+
+                    <p>
+                        <span>Already have an account?</span>
+                        <b onclick="toggle()" class="pointer">Sign in here</b>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col align-items-center flex-col sign-in">
+            <div class="form-wrapper align-items-center">
+                <div class="form sign-in">
+                    <div class="form-title">Welcome Back</div>
+
+                    <form method="post" action="{{ path('app_login_check') }}">
+                        <div class="input-group">
+                            <i class='bx bxs-user'></i>
+                            <input type="text" name="_username" placeholder="Username" value="{{ last_username }}">
+                        </div>
+                        <div class="input-group">
+                            <i class='bx bxs-lock-alt'></i>
+                            <input type="password" name="_password" placeholder="Password">
+                        </div>
+
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                        <button type="submit">
+                            Sign in
+                        </button>
+                    </form>
+
+                    <p><b>Forgot password?</b></p>
+                    <p>
+                        <span>Don't have an account?</span>
+                        <b onclick="toggle()" class="pointer">Sign up here</b>
+                    </p>
+                </div>
+            </div>
+        </div>
+        </div>
+
+    <div class="row content-row">
+        <div class="col align-items-center flex-col">
+            <div class="text sign-in">
+                <h2>Welcome Back</h2>
+                <p>Sign in to continue your journey with us</p>
+            </div>
+            <div class="img sign-in"></div>
+        </div>
+
+        <div class="col align-items-center flex-col">
+            <div class="img sign-up"></div>
+            <div class="text sign-up">
+                <h2>Join with us</h2>
+                <p>Create an account and start your journey today</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Variables
+    let container = document.getElementById('container');
+
+    // Check URL parameters and initial state
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const registrationSuccess = urlParams.get('registration');
+        
+        // Don't clear form fields on page load if there are signup errors
+        const hasSignupErrors = document.querySelector('.signup-errors-container');
+        
+        // Auto-hide flash messages after a delay
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach((message, index) => {
+            // Apply animation delay based on index for staggered effect if multiple messages
+            message.style.animationDelay = `${index * 0.1}s`;
+
+            setTimeout(() => {
+                message.style.opacity = '0';
+                 // Optional: Add a slight upward movement on fade out
+                message.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    // Remove from DOM after fade out
+                    message.remove();
+                }, 500); // Wait for fade out transition
+            }, 1500 + (index * 100)); // Display duration + staggered delay
+        });
+    });
+
+    // Function to update file name display
+    function updateFileName(input) {
+        const fileName = input.files[0]?.name || "Choose profile picture";
+        const fileLabel = input.closest('.input-file-group').querySelector('.file-text');
+        fileLabel.textContent = fileName;
+    }
+
+    // Toggle function between sign-in and sign-up
+    function toggle() {
+        container.classList.toggle('sign-in');
+        container.classList.toggle('sign-up');
+
+        // Clear form fields when switching
+        clearFormFields();
+        
+        // Also clear any signup errors
+        const errorsContainer = document.querySelector('.signup-errors-container');
+        if (errorsContainer) {
+            errorsContainer.remove();
+        }
+    }
+
+    // Clear form fields
+    function clearFormFields() {
+        const inputs = document.querySelectorAll('.form input:not([type="hidden"]):not([type="submit"])');
+        inputs.forEach(input => {
+            if (input.type === 'file') {
+                input.value = ''; // Clear file input
+                 // Also reset the label text
+                const fileLabel = input.closest('.input-file-group')?.querySelector('.file-text');
+                 if(fileLabel) fileLabel.textContent = 'Choose profile picture';
+            } else {
+                input.value = '';
+            }
+        });
+    }
+</script>
+</body>
+</html>
