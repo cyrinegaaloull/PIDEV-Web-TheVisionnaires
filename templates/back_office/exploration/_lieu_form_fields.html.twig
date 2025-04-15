@@ -1,56 +1,108 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <div class="row g-4">
   <div class="col-md-6">
     <label class="form-label">Nom du lieu</label>
-    {{ form_widget(form.lieuname, {'attr': {'class': 'form-control'}}) }}
-    {{ form_errors(form.lieuname) }}
+    {{ form_widget(form.lieuname, {
+      'attr': {
+        'class': 'form-control' ~ (form.lieuname.vars.errors|length > 0 ? ' is-invalid' : '')
+      }
+    }) }}
+    {% for error in form.lieuname.vars.errors %}
+      <div class="invalid-feedback d-block">{{ error.message }}</div>
+    {% endfor %}
   </div>
 
   <div class="col-md-6">
     <label class="form-label">Adresse</label>
-    {{ form_widget(form.lieuaddress, {'attr': {'class': 'form-control'}}) }}
-    {{ form_errors(form.lieuaddress) }}
+    {{ form_widget(form.lieuaddress, {
+      'attr': {
+        'class': 'form-control' ~ (form.lieuaddress.vars.errors|length > 0 ? ' is-invalid' : '')
+      }
+    }) }}
+    {% for error in form.lieuaddress.vars.errors %}
+      <div class="invalid-feedback d-block">{{ error.message }}</div>
+    {% endfor %}
   </div>
 
   <div class="col-md-6">
     <label class="form-label">Numéro du lieu</label>
-    {{ form_widget(form.lieunumber, {'attr': {'class': 'form-control'}}) }}
-    {{ form_errors(form.lieunumber) }}
+    {{ form_widget(form.lieunumber, {
+      'attr': {
+        'class': 'form-control' ~ (form.lieunumber.vars.errors|length > 0 ? ' is-invalid' : '')
+      }
+    }) }}
+    {% for error in form.lieunumber.vars.errors %}
+      <div class="invalid-feedback d-block">{{ error.message }}</div>
+    {% endfor %}
   </div>
 
   <div class="col-md-6">
     <label class="form-label">Catégorie</label>
-    {{ form_widget(form.lieucategory, {'attr': {'class': 'form-select'}}) }}
-    {{ form_errors(form.lieucategory) }}
+    {{ form_widget(form.lieucategory, {
+      'attr': {
+        'class': 'form-select' ~ (form.lieucategory.vars.errors|length > 0 ? ' is-invalid' : '')
+      }
+    }) }}
+    {% for error in form.lieucategory.vars.errors %}
+      <div class="invalid-feedback d-block">{{ error.message }}</div>
+    {% endfor %}
   </div>
 
   <div class="col-12">
     <label class="form-label">Description</label>
-    {{ form_widget(form.lieudescription, {'attr': {'class': 'form-control', 'rows': 4}}) }}
-    {{ form_errors(form.lieudescription) }}
+    {{ form_widget(form.lieudescription, {
+      'attr': {
+        'class': 'form-control' ~ (form.lieudescription.vars.errors|length > 0 ? ' is-invalid' : '')
+      }
+    }) }}
+    {% for error in form.lieudescription.vars.errors %}
+      <div class="invalid-feedback d-block">{{ error.message }}</div>
+    {% endfor %}
   </div>
 
   <div class="col-md-6">
     <label class="form-label">Heure d'ouverture</label>
-    {{ form_widget(form.lieuopeninghours, {'attr': {'class': 'form-control'}}) }}
-    {{ form_errors(form.lieuopeninghours) }}
+    {{ form_widget(form.lieuopeninghours, {
+      'attr': {
+        'class': 'form-control' ~ (form.lieuopeninghours.vars.errors|length > 0 ? ' is-invalid' : '')
+      }
+    }) }}
+    {% for error in form.lieuopeninghours.vars.errors %}
+      <div class="invalid-feedback d-block">{{ error.message }}</div>
+    {% endfor %}
   </div>
 
   <div class="col-md-6">
     <label class="form-label">Heure de fermeture</label>
-    {{ form_widget(form.lieuclosinghours, {'attr': {'class': 'form-control'}}) }}
-    {{ form_errors(form.lieuclosinghours) }}
+    {{ form_widget(form.lieuclosinghours, {
+      'attr': {
+        'class': 'form-control' ~ (form.lieuclosinghours.vars.errors|length > 0 ? ' is-invalid' : '')
+      }
+    }) }}
+    {% for error in form.lieuclosinghours.vars.errors %}
+      <div class="invalid-feedback d-block">{{ error.message }}</div>
+    {% endfor %}
   </div>
 
   <div class="col-12">
     <label class="form-label">Image du lieu</label>
-    {{ form_widget(form.lieuimage, {'attr': {'class': 'form-control', 'onchange': 'previewImage(event)'}}) }}
-    {{ form_errors(form.lieuimage) }}
-<img 
-  id="preview" 
-  src="{{ lieu.lieuimage ? asset('assets/exploration/images/' ~ lieu.lieuimage) : '#' }}" 
-  alt="Preview" 
-  class="mt-2 rounded shadow-sm border" 
-  style="max-width: 200px; {{ lieu.lieuimage ? '' : 'display: none;' }}"
-/>
+    {{ form_widget(form.lieuimage, {
+      'attr': {
+        'class': 'form-control' ~ (form.lieuimage.vars.errors|length > 0 ? ' is-invalid' : ''),
+        'onchange': 'previewImage(event)'
+      }
+    }) }}
+    {% for error in form.lieuimage.vars.errors %}
+      <div class="invalid-feedback d-block">{{ error.message }}</div>
+    {% endfor %}
+
+    <img 
+      id="preview" 
+      src="{{ lieu.lieuimage ? asset('assets/exploration/images/' ~ lieu.lieuimage) : '#' }}" 
+      alt="Preview" 
+      class="mt-2 rounded shadow-sm border" 
+      style="max-width: 200px; {{ lieu.lieuimage ? '' : 'display: none;' }}"
+    />
   </div>
 </div>

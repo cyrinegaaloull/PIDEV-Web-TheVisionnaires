@@ -4,7 +4,12 @@
 <h4 class="fw-bold mb-4 text-primary">Étape 2 : Complétez les détails du lieu</h4>
 
 <div class="card shadow border rounded-3 p-4 bg-white">
-    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'demo-vertical-spacing'}}) }}
+    {{ form_start(form, {
+  'attr': {
+    'class': 'needs-validation',
+    'novalidate': 'novalidate'
+  }
+}) }}
     {% if not form.vars.valid and form.vars.submitted %}
     <div class="alert alert-danger">
         <strong>Veuillez corriger les erreurs dans le formulaire.</strong>
@@ -23,26 +28,103 @@
 
     <div class="row g-4">
         <div class="col-md-6">
-            {{ form_row(form.lieuname, {'attr': {'class': 'form-control form-control-lg'}}) }}
+            <label class="form-label">Nom du lieu</label>
+  {{ form_widget(form.lieuname, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieuname.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieuname.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
         </div>
         <div class="col-md-6">
-            {{ form_row(form.lieuaddress, {'attr': {'class': 'form-control form-control-lg'}}) }}
+             <label class="form-label">Adresse du lieu</label>
+  {{ form_widget(form.lieuaddress, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieuaddress.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieuaddress.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
         </div>
         <div class="col-12">
-            {{ form_row(form.lieudescription, {'attr': {'rows': '3', 'class': 'form-control'}}) }}
+           <label class="form-label">Description du lieu</label>
+  {{ form_widget(form.lieudescription, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieudescription.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieudescription.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
         </div>
         <div class="col-md-6">
-            {{ form_row(form.lieucategory, {'attr': {'class': 'form-select'}}) }}
-        </div>
+<label class="form-label">Catégorie du lieu</label>
+  {{ form_widget(form.lieucategory, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieucategory.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieucategory.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+   </div>
         <div class="col-md-6">
-            {{ form_row(form.lieunumber, {'attr': {'class': 'form-control'}}) }}
-        </div>
+<label class="form-label">Numéro de téléphone</label>
+  {{ form_widget(form.lieunumber, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieunumber.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieunumber.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+  </div>
         <div class="col-md-6">
-            {{ form_row(form.lieuopeninghours, {'attr': {'class': 'form-control'}}) }}
-        </div>
+<label class="form-label">Heures d'ouverture</label>
+  {{ form_widget(form.lieuopeninghours, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieuopeninghours.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieuopeninghours.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+    </div>
         <div class="col-md-6">
-            {{ form_row(form.lieuclosinghours, {'attr': {'class': 'form-control'}}) }}
-        </div>
+<label class="form-label">Heures de fermeture</label>
+  {{ form_widget(form.lieuclosinghours, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieuclosinghours.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieuclosinghours.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+           </div>
         <div class="col-md-6 mb-3">
     {{ form_row(form.lieuimage, {'attr': {'class': 'form-control', 'onchange': 'previewImage(event)'}}) }}
     <div class="mt-2">

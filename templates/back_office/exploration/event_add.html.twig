@@ -15,38 +15,89 @@
         <div class="card-body">
           {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'eventForm'}}) }}
 
-          <div class="mb-3">{{ form_row(form.eventname) }}</div>
-          <div class="mb-3">{{ form_row(form.eventdescription) }}</div>
-          <div class="mb-3">{{ form_row(form.eventdate) }}</div>
-<div class="mb-3">
-  {{ form_label(form.eventcategory, null, {'label_attr': {'class': 'form-label'}}) }}
-  {{ form_widget(form.eventcategory, {'attr': {'class': 'form-select', 'id': 'event_eventcategory'}}) }}
-  {{ form_errors(form.eventcategory) }}
-</div>
-<div class="mb-3">
-  {{ form_label(form.ticketprice, null, {'label_attr': {'class': 'form-label'}}) }}
-  <div class="input-group">
-    {{ form_widget(form.ticketprice, {'attr': {'class': 'form-control', 'min': '0'}}) }}
-    <span class="input-group-text">DT</span>
-  </div>
-  {{ form_errors(form.ticketprice) }}
-</div>
-<div class="mb-3">
-  <label class="form-label">Image de l'événement</label>
-  <div class="input-group">
-    {{ form_widget(form.eventimage, {'attr': {'class': 'form-control', 'onchange': 'previewImage(event)'}}) }}
-  </div>
-  {{ form_errors(form.eventimage) }}
-  <div class="mt-3" id="imagePreviewContainer" style="display:none;">
-    <img id="imagePreview" src="#" alt="Prévisualisation de l'image" class="img-thumbnail" style="max-width: 200px;">
-  </div>
-</div>
-<div class="mb-3">
-  {{ form_label(form.maxtickets, null, {'label_attr': {'class': 'form-label'}}) }}
-  {{ form_widget(form.maxtickets, {'attr': {'class': 'form-control', 'min': '1'}}) }}
-  {{ form_errors(form.maxtickets) }}
-</div>
+          <div class="mb-3">
+            <label class="form-label">Nom de l'événement</label>
+            {{ form_widget(form.eventname, {'attr': {
+              'class': 'form-control' ~ (form.eventname.vars.errors|length > 0 ? ' is-invalid' : '')
+            }}) }}
+            {% for error in form.eventname.vars.errors %}
+              <div class="invalid-feedback d-block">{{ error.message }}</div>
+            {% endfor %}
+          </div>
 
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            {{ form_widget(form.eventdescription, {'attr': {
+              'class': 'form-control' ~ (form.eventdescription.vars.errors|length > 0 ? ' is-invalid' : '')
+            }}) }}
+            {% for error in form.eventdescription.vars.errors %}
+              <div class="invalid-feedback d-block">{{ error.message }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Date de l'événement</label>
+            {{ form_widget(form.eventdate, {'attr': {
+              'class': 'form-control' ~ (form.eventdate.vars.errors|length > 0 ? ' is-invalid' : '')
+            }}) }}
+            {% for error in form.eventdate.vars.errors %}
+              <div class="invalid-feedback d-block">{{ error.message }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Catégorie</label>
+            {{ form_widget(form.eventcategory, {
+              'attr': {
+                'class': 'form-select' ~ (form.eventcategory.vars.errors|length > 0 ? ' is-invalid' : ''),
+                'id': 'event_eventcategory'
+              }
+            }) }}
+            {% for error in form.eventcategory.vars.errors %}
+              <div class="invalid-feedback d-block">{{ error.message }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Prix du ticket</label>
+            <div class="input-group">
+              {{ form_widget(form.ticketprice, {'attr': {
+                'class': 'form-control' ~ (form.ticketprice.vars.errors|length > 0 ? ' is-invalid' : ''),
+                'min': '0'
+              }}) }}
+              <span class="input-group-text">DT</span>
+            </div>
+            {% for error in form.ticketprice.vars.errors %}
+              <div class="invalid-feedback d-block">{{ error.message }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Image de l'événement</label>
+            <div class="input-group">
+              {{ form_widget(form.eventimage, {'attr': {
+                'class': 'form-control' ~ (form.eventimage.vars.errors|length > 0 ? ' is-invalid' : ''),
+                'onchange': 'previewImage(event)'
+              }}) }}
+            </div>
+            {% for error in form.eventimage.vars.errors %}
+              <div class="invalid-feedback d-block">{{ error.message }}</div>
+            {% endfor %}
+            <div class="mt-3" id="imagePreviewContainer" style="display:none;">
+              <img id="imagePreview" src="#" alt="Prévisualisation de l'image" class="img-thumbnail" style="max-width: 200px;">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Nombre maximum de tickets</label>
+            {{ form_widget(form.maxtickets, {'attr': {
+              'class': 'form-control' ~ (form.maxtickets.vars.errors|length > 0 ? ' is-invalid' : ''),
+              'min': '1'
+            }}) }}
+            {% for error in form.maxtickets.vars.errors %}
+              <div class="invalid-feedback d-block">{{ error.message }}</div>
+            {% endfor %}
+          </div>
 
           <div class="d-grid">
             <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#confirmModal">
@@ -95,37 +146,39 @@
     </div>
   </div>
 </div>
+
 <script>
   document.getElementById('submitFormBtn').addEventListener('click', function () {
-  document.getElementById('eventForm').submit(); // Let Symfony do its magic 🎩
-});
-document.addEventListener('DOMContentLoaded', function () {
-  const catSelect = document.querySelector('#event_eventcategory');
-  if (catSelect) {
-    $(catSelect).select2({
-      placeholder: "Choisir une catégorie",
-      allowClear: true,
-      width: '100%'
-    });
-  }
-});
-function previewImage(event) {
-  const preview = document.getElementById('imagePreview');
-  const container = document.getElementById('imagePreviewContainer');
-  const file = event.target.files[0];
+    document.getElementById('eventForm').submit();
+  });
 
-  if (file && file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      preview.src = e.target.result;
-      container.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  } else {
-    container.style.display = 'none';
-    preview.src = '';
-  }
-}
+  document.addEventListener('DOMContentLoaded', function () {
+    const catSelect = document.querySelector('#event_eventcategory');
+    if (catSelect) {
+      $(catSelect).select2({
+        placeholder: "Choisir une catégorie",
+        allowClear: true,
+        width: '100%'
+      });
+    }
+  });
 
+  function previewImage(event) {
+    const preview = document.getElementById('imagePreview');
+    const container = document.getElementById('imagePreviewContainer');
+    const file = event.target.files[0];
+
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        container.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      container.style.display = 'none';
+      preview.src = '';
+    }
+  }
 </script>
 {% endblock %}

@@ -5,7 +5,6 @@
     {% set imagePath = 'assets/exploration/images/' ~ imageFile %}
 
     <a href="{{ path('lieu_details', { id: lieu.lieuid }) }}" class="img" style="background-image: url('{{ asset(imagePath) }}');">
-        <span class="price">Gratuit</span>
     </a>
     <div class="text p-4">
       <div class="d-flex justify-content-between align-items-start">
