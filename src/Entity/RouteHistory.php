@@ -1,96 +1,46 @@
 <?php
 
-
 namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * RouteHistory
- *
- * @ORM\Table(name="route_history")
- * @ORM\Entity
- */
+#[ORM\Table(name: "route_history")]
+#[ORM\Entity]
 class RouteHistory
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="text", length=65535, nullable=false)
-     */
+    #[ORM\Column(name: "name", type: "text", length: 65535, nullable: false)]
     private $name;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="departure_place_name", type="text", length=65535, nullable=true)
-     */
+    #[ORM\Column(name: "departure_place_name", type: "text", length: 65535, nullable: true)]
     private $departurePlaceName;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="departure_lat", type="float", precision=10, scale=0, nullable=false)
-     */
+    #[ORM\Column(name: "departure_lat", type: "float", precision: 10, scale: 0, nullable: false)]
     private $departureLat;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="departure_lon", type="float", precision=10, scale=0, nullable=false)
-     */
+    #[ORM\Column(name: "departure_lon", type: "float", precision: 10, scale: 0, nullable: false)]
     private $departureLon;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="arrival_place_name", type="text", length=65535, nullable=true)
-     */
+    #[ORM\Column(name: "arrival_place_name", type: "text", length: 65535, nullable: true)]
     private $arrivalPlaceName;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="arrival_lat", type="float", precision=10, scale=0, nullable=false)
-     */
+    #[ORM\Column(name: "arrival_lat", type: "float", precision: 10, scale: 0, nullable: false)]
     private $arrivalLat;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="arrival_lon", type="float", precision=10, scale=0, nullable=false)
-     */
+    #[ORM\Column(name: "arrival_lon", type: "float", precision: 10, scale: 0, nullable: false)]
     private $arrivalLon;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="transport_mode", type="text", length=65535, nullable=false)
-     */
+    #[ORM\Column(name: "transport_mode", type: "text", length: 65535, nullable: false)]
     private $transportMode;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="timestamp", type="text", length=65535, nullable=false)
-     */
+    #[ORM\Column(name: "timestamp", type: "text", length: 65535, nullable: false)]
     private $timestamp;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="description", type="text", length=65535, nullable=true)
-     */
+    #[ORM\Column(name: "description", type: "text", length: 65535, nullable: true)]
     private $description;
-
 
     /**
      * Get id.

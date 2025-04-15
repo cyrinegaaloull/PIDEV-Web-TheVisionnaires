@@ -219,23 +219,18 @@
 
                      </ul>
                  </li>
-                 <li class="menu-item">
-                      <a href="javascript:void(0);" class="menu-link menu-toggle"> {# Use javascript:void(0); #}
-                          <i class="menu-icon tf-icons ri-bus-line"></i>
-                          <div>Navigation</div>
-                      </a>
-                      <ul class="menu-sub">
-                          <li class="menu-item">
-                              <a href="#" class="menu-link">Option 1</a>
-                          </li>
-                          <li class="menu-item">
-                              <a href="#" class="menu-link">Option 2</a>
-                          </li>
-                          <li class="menu-item">
-                              <a href="#" class="menu-link">Option 3</a>
-                          </li>
-                      </ul>
-                  </li>
+                    <li class="menu-item {% if app.request.attributes.get('_route') starts with 'admin_transport_modes' %}active open{% endif %}">
+                    <a href="#" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons ri-bus-line"></i>
+                        <div>Navigation</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item {% if app.request.attributes.get('_route') == 'admin_transport_modes' %}active{% endif %}">
+                        <a href="{{ path('admin_transport_modes') }}" class="menu-link">Modes de transport</a>
+                        </li>
+                        <!-- Add other navigation-related admin pages here -->
+                    </ul>
+                    </li>
                   <li class="menu-item">
                       <a href="javascript:void(0);" class="menu-link menu-toggle"> {# Use javascript:void(0); #}
                           <i class="menu-icon tf-icons ri-message-3-line"></i>

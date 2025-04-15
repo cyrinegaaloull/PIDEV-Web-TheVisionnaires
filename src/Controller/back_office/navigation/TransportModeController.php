@@ -1,6 +1,6 @@
 <?php
 // src/Controller/back_office/TransportModeController.php
-namespace App\Controller\back_office;
+namespace App\Controller\back_office\navigation;
 
 use App\Service\TransportModeService;
 use Psr\Log\LoggerInterface;
