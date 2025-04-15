@@ -5,7 +5,6 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
 #[ORM\Entity(repositoryClass: "App\Repository\LieuRepository")]
 #[ORM\Table(name: "lieu")]
 class Lieu
@@ -14,7 +13,6 @@ class Lieu
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
     #[ORM\Column(name: "lieuID", type: "integer")]
     private ?int $lieuid = null;
-
     #[ORM\Column(name: "lieuName", type: "string", length: 100)]
     #[Assert\NotBlank(message: "Le nom du lieu est requis.")]
     #[Assert\Length(min: 3, max: 100)]
@@ -79,7 +77,6 @@ class Lieu
             }
         }
     }
-
     public function getLieuid(): ?int
     {
         return $this->lieuid;

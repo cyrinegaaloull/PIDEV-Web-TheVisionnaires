@@ -1,0 +1,46 @@
+<div class="col-md-4 ftco-animate">
+  <div class="project-wrap">
+    {% set fallbackImage = 'default.jpg' %}
+    {% set imageFile = lieu.lieuImage is not empty ? lieu.lieuImage : fallbackImage %}
+    {% set imagePath = 'assets/exploration/images/' ~ imageFile %}
+
+    <a href="{{ path('lieu_details', { id: lieu.lieuid }) }}" class="img" style="background-image: url('{{ asset(imagePath) }}');">
+    </a>
+    <div class="text p-4">
+      <div class="d-flex justify-content-between align-items-start">
+        <span class="days">{{ lieu.lieuCategory }}</span>
+        <button class="btn btn-link p-0 favorite-toggle" data-id="{{ lieu.lieuid }}">
+         {% if lieu.isFavorite %}
+            <i class="fa fa-heart text-danger"></i>
+          {% else %}
+            <i class="fa fa-heart-o text-muted"></i>
+          {% endif %}
+        </button>
+      </div>
+        <h3><a href="{{ path('lieu_details', { id: lieu.lieuid }) }}">{{ lieu.lieuName }}</a></h3>
+<p class="location" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; white-space:normal; line-height:1.5em; max-height:3em; min-height:3em;">
+  <span class="fa fa-map-marker"></span> {{ lieu.lieuAddress }}
+</p>
+
+      {% set avgRating = ratings[lieu.lieuid] ?? 0 %}
+<div class="mb-2">
+  {% for i in 1..5 %}
+    {% if i <= avgRating %}
+      <i class="fa fa-star text-warning"></i>
+    {% elseif i - avgRating < 1 %}
+      <i class="fa fa-star-half-o text-warning"></i>
+    {% else %}
+      <i class="fa fa-star-o text-muted"></i>
+    {% endif %}
+  {% endfor %}
+  <small class="text-muted">{{ avgRating }}</small>
+</div>
+<p class="description" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; white-space:normal; line-height:1.5em; max-height:3em; min-height:3em;">
+  {{ lieu.lieuDescription }}
+</p>
+
+
+    </div>
+  </div>
+</div>
+

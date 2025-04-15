@@ -8,38 +8,38 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity]
-#[ORM\Table(name: "users")]
-#[ORM\Index(name: "role_id", columns: ["role_id"])]
+#[ORM\Table(name: 'users')]
+#[ORM\Index(name: 'role_id', columns: ['role_id'])]
 class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
-    #[ORM\Column(name: "user_id", type: "integer", nullable: false)]
-    private int $userId;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'user_id', type: 'integer', nullable: false)]
+    private ?int $userId = null;
 
-    #[ORM\Column(name: "username", type: "string", length: 255, nullable: false)]
+    #[ORM\Column(name: 'username', type: 'string', length: 255, nullable: false)]
     private string $username;
 
-    #[ORM\Column(name: "email", type: "string", length: 255, nullable: false)]
+    #[ORM\Column(name: 'email', type: 'string', length: 255, nullable: false)]
     private string $email;
 
-    #[ORM\Column(name: "password", type: "string", length: 255, nullable: false)]
+    #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: false)]
     private string $password;
 
-    #[ORM\Column(name: "nom", type: "string", length: 255, nullable: false)]
+    #[ORM\Column(name: 'nom', type: 'string', length: 255, nullable: false)]
     private string $nom;
 
-    #[ORM\Column(name: "prenom", type: "string", length: 255, nullable: false)]
+    #[ORM\Column(name: 'prenom', type: 'string', length: 255, nullable: false)]
     private string $prenom;
 
-    #[ORM\Column(name: "avatar", type: "string", length: 255, nullable: false)]
+    #[ORM\Column(name: 'avatar', type: 'string', length: 255, nullable: false)]
     private string $avatar;
 
     #[ORM\ManyToOne(targetEntity: Roles::class)]
-    #[ORM\JoinColumn(name: "role_id", referencedColumnName: "id")]
+    #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'id')]
     private ?Roles $role = null;
 
-    public function getUserId(): int
+    public function getUserId(): ?int
     {
         return $this->userId;
     }

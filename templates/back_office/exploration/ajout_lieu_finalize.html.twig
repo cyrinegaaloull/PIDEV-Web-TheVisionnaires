@@ -1,0 +1,173 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<h4 class="fw-bold mb-4 text-primary">Étape 2 : Complétez les détails du lieu</h4>
+
+<div class="card shadow border rounded-3 p-4 bg-white">
+    {{ form_start(form, {
+  'attr': {
+    'class': 'needs-validation',
+    'novalidate': 'novalidate'
+  }
+}) }}
+    {% if not form.vars.valid and form.vars.submitted %}
+    <div class="alert alert-danger">
+        <strong>Veuillez corriger les erreurs dans le formulaire.</strong>
+    </div>
+{% endif %}
+
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <label class="form-label">Nom du lieu</label>
+  {{ form_widget(form.lieuname, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieuname.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieuname.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+        </div>
+        <div class="col-md-6">
+             <label class="form-label">Adresse du lieu</label>
+  {{ form_widget(form.lieuaddress, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieuaddress.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieuaddress.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+        </div>
+        <div class="col-12">
+           <label class="form-label">Description du lieu</label>
+  {{ form_widget(form.lieudescription, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieudescription.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieudescription.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+        </div>
+        <div class="col-md-6">
+<label class="form-label">Catégorie du lieu</label>
+  {{ form_widget(form.lieucategory, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieucategory.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieucategory.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+   </div>
+        <div class="col-md-6">
+<label class="form-label">Numéro de téléphone</label>
+  {{ form_widget(form.lieunumber, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieunumber.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieunumber.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+  </div>
+        <div class="col-md-6">
+<label class="form-label">Heures d'ouverture</label>
+  {{ form_widget(form.lieuopeninghours, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieuopeninghours.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieuopeninghours.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+    </div>
+        <div class="col-md-6">
+<label class="form-label">Heures de fermeture</label>
+  {{ form_widget(form.lieuclosinghours, {
+    'attr': {
+      'class': 'form-control' ~ (form.lieuclosinghours.vars.errors|length > 0 ? ' is-invalid' : '')
+    }
+  }) }}
+
+  {% for error in form.lieuclosinghours.vars.errors %}
+    <div class="invalid-feedback d-block">
+      {{ error.message }}
+    </div>
+  {% endfor %}
+           </div>
+        <div class="col-md-6 mb-3">
+    {{ form_row(form.lieuimage, {'attr': {'class': 'form-control', 'onchange': 'previewImage(event)'}}) }}
+    <div class="mt-2">
+        <img id="lieu-image-preview" src="#" alt="Aperçu de l'image" class="img-thumbnail" style="display: none; max-width: 250px;" />
+    </div>
+</div>
+
+    </div>
+
+    <div class="d-flex justify-content-end mt-4">
+        <button class="btn btn-primary btn-lg px-4 shadow-sm">
+            <i class="fas fa-save me-2"></i> Enregistrer le lieu
+        </button>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+<style>
+#lieu-image-preview {
+    border-radius: 10px;
+    max-height: 200px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+</style>
+<script>
+function previewImage(event) {
+    const input = event.target;
+    const preview = document.getElementById('lieu-image-preview');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.src = '#';
+        preview.style.display = 'none';
+    }
+}
+</script>
+
+{% endblock %}

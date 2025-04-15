@@ -1,0 +1,43 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<h4 class="fw-bold mb-4 text-primary">Modifier le lieu : {{ lieu.lieuname }}</h4>
+
+<div class="card shadow border rounded-3 p-4">
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    {% for label, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }}">{{ message }}</div>
+      {% endfor %}
+    {% endfor %}
+
+    {% include 'back_office/exploration/_lieu_form_fields.html.twig' %}
+
+    <div class="mt-4 d-flex justify-content-between align-items-center">
+  <a href="{{ path('admin_lieux') }}" class="btn btn-outline-secondary">
+    <i class="ri-arrow-go-back-line me-1"></i> Retour au tableau
+  </a>
+  <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+    <i class="ri-save-line me-2"></i> Enregistrer les modifications
+  </button>
+</div>
+
+    {{ form_end(form) }}
+</div>
+<script>
+function previewImage(event) {
+    const input = event.target;
+    if (!input.files.length) return;
+
+    const reader = new FileReader();
+    reader.onload = function () {
+        const preview = document.getElementById('preview');
+        preview.src = reader.result;
+        preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+</script>
+
+{% endblock %}
+

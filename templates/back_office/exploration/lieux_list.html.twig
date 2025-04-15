@@ -1,0 +1,77 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<h4 class="fw-bold mb-4 text-primary">Table des lieux</h4>
+
+{% for label, messages in app.flashes %}
+  {% for message in messages %}
+    <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endfor %}
+
+<table class="table table-bordered table-hover" id="lieuxTable">
+  <thead class="table-light">
+    <tr>
+      <th>ID</th>
+      <th>Nom</th>
+      <th>Adresse</th>
+      <th>Catégorie</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for lieu in lieux %}
+<tr onclick="window.location='{{ path('admin_lieu_show', {'id': lieu.lieuid}) }}'" style="cursor: pointer;">
+        <td>{{ lieu.lieuid }}</td>
+        <td>{{ lieu.lieuname }}</td>
+        <td>{{ lieu.lieuaddress }}</td>
+        <td>{{ lieu.lieucategory }}</td>
+        <td>
+          <a href="{{ path('admin_lieu_edit', {'id': lieu.lieuid}) }}" class="btn btn-sm btn-outline-primary stop-propagation">
+  <i class="ri-edit-line"></i> Modifier
+</a>
+<button class="btn btn-sm btn-outline-danger stop-propagation" data-bs-toggle="modal" data-bs-target="#confirmDelete{{ lieu.lieuid }}">
+  <i class="ri-delete-bin-6-line"></i> Supprimer
+</button>
+
+
+          <!-- Modal -->
+          <div class="modal fade" id="confirmDelete{{ lieu.lieuid }}" tabindex="-1" aria-labelledby="modalLabel{{ lieu.lieuid }}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Êtes-vous sûr de vouloir supprimer ce lieu ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <a href="{{ path('admin_lieu_delete', {'id': lieu.lieuid}) }}" class="btn btn-danger stop-propagation">Supprimer</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Prevent redirect on action buttons
+    document.querySelectorAll('.stop-propagation').forEach(el => {
+      el.addEventListener('click', e => e.stopPropagation());
+    });
+
+    // Init DataTable
+    new simpleDatatables.DataTable("#lieuxTable");
+  });
+</script>
+
+
+{% endblock %}

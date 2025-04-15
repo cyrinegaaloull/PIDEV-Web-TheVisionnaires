@@ -6,6 +6,7 @@
 
 parameters:
     avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+    your_upload_directory: '%kernel.project_dir%/public/assets/exploration/images'
 
 
 services:
@@ -31,3 +32,10 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Service\NotificationService:
+        arguments:
+            $twilioSid: '%env(TWILIO_ACCOUNT_SID)%'
+            $twilioToken: '%env(TWILIO_AUTH_TOKEN)%'
+            $whatsappNumber: '%env(TWILIO_WHATSAPP_NUMBER)%'
+            $senderEmail: 'cyrinegaaloul6@gmail.com'
+

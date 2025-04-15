@@ -5,18 +5,18 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: "Roles")]
+#[ORM\Table(name: 'Roles')]
 class Roles
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
-    #[ORM\Column(name: "id", type: "integer", nullable: false)]
-    private int $id;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    private ?int $id = null;
 
-    #[ORM\Column(name: "role", type: "string", length: 50, nullable: false)]
+    #[ORM\Column(name: 'role', type: 'string', length: 50, nullable: false)]
     private string $role;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
