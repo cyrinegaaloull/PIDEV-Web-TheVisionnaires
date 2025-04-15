@@ -92,7 +92,7 @@ public function lieuDetails(int $id, LieuRepository $lieuRepository, EventReposi
         throw $this->createNotFoundException('Lieu non trouvé.');
     }
 
-    $events = $eventRepo->findBy(['lieuid' => $lieu->getLieuid()]);
+    $events = $eventRepo->findBy(['lieu' => $lieu]);
     $reviews = $reviewRepo->findBy(['lieuid' => $lieu->getLieuid()]);
 
     return $this->render('front_office/exploration/lieu_details.html.twig', [
@@ -192,7 +192,7 @@ public function notifyUser(
         $this->addFlash('danger', '❌ Échec de l’envoi de la notification: ' . $e->getMessage());
     }    
     
-    return $this->redirectToRoute('lieu_details', ['id' => $event->getLieuid()]);
+    return $this->redirectToRoute('lieu_details', ['id' => $event->getLieu()->getLieuid()]);
 }
 #[Route('/recommendations', name: 'weather_recommendations')]
 public function recommendByWeather(
