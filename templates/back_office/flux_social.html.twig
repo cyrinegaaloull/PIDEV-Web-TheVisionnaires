@@ -19,10 +19,11 @@
           <div class="card">
             <div class="card-body">
               <h6 class="mb-2">{{ post.title }}</h6>
-              <p class="text-muted small">{{ post.content }}</p> {# Removed the truncate filter #}
+              <p class="text-muted small">{{ post.content }}</p> {# Removed truncate filter #}
               <div class="d-flex justify-content-between align-items-center">
                 <small class="text-muted">Publié dans: {{ post.category }}</small>
-                <a href="{{ path('admin_post_details', {'postId': post.postId}) }}" class="btn btn-sm btn-primary">Détails</a>              </div>
+                <a href="{{ path('admin_post_details', {'postId': post.postId}) }}" class="btn btn-sm btn-primary">Détails</a>
+              </div>
             </div>
           </div>
         </div>
