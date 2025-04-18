@@ -1,0 +1,158 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}Nos Établissements{% endblock %}
+
+{% block body %}
+  <!-- Hero Section -->
+  <section class="hero-wrap js-fullheight" style="background-image: url('{{ asset('assets/uploads-naima/buildingss.jpg') }}');">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row no-gutters slider-text js-fullheight align-items-center" data-scrollax-parent="true">
+        <div class="col-md-7 ftco-animate">
+          <h1 class="mb-4">Découvrez nos <br> Établissements </h1>
+          <p class="caps">Explorez les meilleurs établissements de votre ville intelligente.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Établissements Section -->
+  <section class="ftco-section services-section bg-light" style="padding-top: 40px; padding-bottom: 40px;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-12 text-center heading-section ftco-animate">
+          <span class="subheading" style="font-size: 40px;">Nos Établissements</span>
+          <h2 class="mb-4" style="padding-bottom: 40px;">Trouvez les meilleures adresses près de chez vous</h2>
+        </div>
+      </div>
+      
+      <!-- Messages flash -->
+      {% for label, messages in app.flashes %}
+        {% for message in messages %}
+          <div class="row justify-content-center mb-4">
+            <div class="col-md-8">
+              <div class="alert alert-{{ label }}" role="alert">
+                {{ message }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endfor %}
+      
+      <!-- Bouton Ajouter -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-md-8 text-center">
+          <a href="{{ path('ajouter_etablissement') }}" class="btn btn-primary">
+            <i class="fa fa-plus mr-2"></i> Ajouter un établissement
+          </a>
+        </div>
+      </div>
+      
+      {% if etablissements is empty %}
+        <div class="row justify-content-center">
+          <div class="col-md-8 ftco-animate">
+            <div class="alert alert-info text-center p-4">
+              <p class="mb-0">Aucun établissement trouvé. Revenez bientôt pour découvrir nos nouveautés.</p>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="row">
+          {% for etab in etablissements %}
+            <div class="col-md-4 ftco-animate">
+              <div class="service-item text-center p-4 mb-4" style="background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                <div class="icon d-flex align-items-center justify-content-center mb-3">
+                  {% if etab.categoryid %}
+                    {# Icônes spécifiques selon la catégorie #}
+                    {% if etab.categoryid.categoryname == 'Hôtellerie' %}
+                      <i class="fa fa-hotel" style="font-size: 60px; color: #3498db;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Santé' %}
+                      <i class="fa fa-hospital-o" style="font-size: 60px; color: #e74c3c;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Restauration' or etab.categoryid.categoryname == 'Café' %}
+                      <i class="fa fa-cutlery" style="font-size: 60px; color: #f39c12;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Commercial' %}
+                      <i class="fa fa-shopping-bag" style="font-size: 60px; color: #2ecc71;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Éducation' %}
+                      <i class="fa fa-graduation-cap" style="font-size: 60px; color: #9b59b6;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Sport' %}
+                      <i class="fa fa-futbol-o" style="font-size: 60px; color: #27ae60;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Art' %}
+                      <i class="fa fa-paint-brush" style="font-size: 60px; color: #d35400;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Culture' %}
+                      <i class="fa fa-book" style="font-size: 60px; color: #8e44ad;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Industriel' %}
+                      <i class="fa fa-industry" style="font-size: 60px; color: #7f8c8d;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Fonction publique' %}
+                      <i class="fa fa-university" style="font-size: 60px; color: #2c3e50;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Marketing' %}
+                      <i class="fa fa-bullhorn" style="font-size: 60px; color: #f1c40f;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Ingénierie' %}
+                      <i class="fa fa-gears" style="font-size: 60px; color: #95a5a6;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Création' %}
+                      <i class="fa fa-lightbulb-o" style="font-size: 60px; color: #e67e22;"></i>
+                    {% elseif etab.categoryid.categoryname == 'Agroalimentaire' %}
+                      <i class="fa fa-leaf" style="font-size: 60px; color: #16a085;"></i>
+                    {% else %}
+                      {# Icône par défaut pour les autres catégories #}
+                      <i class="fa fa-building" style="font-size: 60px; color: #34495e;"></i>
+                    {% endif %}
+                  {% else %}
+                    {# Icône par défaut si pas de catégorie #}
+                    <i class="fa fa-building" style="font-size: 60px; color: #34495e;"></i>
+                  {% endif %}
+                </div>
+                <h3>{{ etab.etabname }}</h3>
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                  <span class="icon-map-marker mr-2"></span>
+                  <p class="mb-0">{{ etab.etabaddress }}</p>
+                </div>
+                {% if etab.region %}
+                  <div class="mb-2">
+                    <span class="badge badge-primary">{{ etab.region }}</span>
+                  </div>
+                {% endif %}
+                <div class="mb-3">
+                  <span class="icon-clock-o mr-2"></span>
+                  <p class="mb-0">{{ etab.etabhoraire }}</p>
+                </div>
+                {% if etab.geolocation %}
+                  <div class="mb-3">
+                    <span class="icon-location-arrow mr-2"></span>
+                    <p class="mb-0">{{ etab.geolocation }}</p>
+                  </div>
+                {% endif %}
+                {% if etab.categoryid %}
+                  <div class="mb-3">
+                    <span class="icon-tag mr-2"></span>
+                    <p class="mb-0">{{ etab.categoryid.categoryname|default('Non catégorisé') }}</p>
+                  </div>
+                {% endif %}
+
+                <!-- Boutons Modifier et Supprimer -->
+                <div class="mt-3">
+                  <a href="{{ path('modifier_etablissement', {'id': etab.etabid}) }}" class="btn btn-warning btn-sm">
+                    <i class="fa fa-edit"></i> Modifier
+                  </a>
+                  <a href="{{ path('supprimer_etablissement', {'id': etab.etabid}) }}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet établissement?');">
+                    <i class="fa fa-trash"></i> Supprimer
+                  </a>
+                  
+                  {# Bouton pour gérer les services - à ajouter si vous avez implémenté les services #}
+                  <a href="{{ path('liste_services', {'id': etab.etabid}) }}" class="btn btn-info btn-sm mt-2">
+                    <i class="fa fa-cogs"></i> Services
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        
+        <div class="row justify-content-center mt-4">
+          <div class="col-md-6 text-center">
+            <p>{{ etablissements|length }} établissement(s) trouvé(s)</p>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

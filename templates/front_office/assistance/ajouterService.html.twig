@@ -1,0 +1,60 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}{{ titre }}{% endblock %}
+
+{% block body %}
+  <section class="ftco-section bg-light" style="padding-top: 40px; padding-bottom: 40px;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-12 text-center heading-section ftco-animate">
+          <span class="subheading" style="font-size: 40px;">{{ titre }}</span>
+          <h2 class="mb-4" style="padding-bottom: 40px;">Remplissez les informations du service</h2>
+        </div>
+      </div>
+      
+      <!-- Messages flash -->
+      {% for label, messages in app.flashes %}
+        {% for message in messages %}
+          <div class="row justify-content-center mb-4">
+            <div class="col-md-8">
+              <div class="alert alert-{{ label }}" role="alert">
+                {{ message }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endfor %}
+      
+      <div class="row justify-content-center">
+        <div class="col-md-8 ftco-animate">
+          <div class="bg-white p-5 rounded shadow">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+              <div class="mb-4">
+                {{ form_label(form.servicename) }}
+                {{ form_widget(form.servicename) }}
+                <small class="text-danger">{{ form_errors(form.servicename) }}</small>
+              </div>
+              
+              <div class="mb-4">
+                {{ form_label(form.serviceprix) }}
+                {{ form_widget(form.serviceprix) }}
+                <small class="text-danger">{{ form_errors(form.serviceprix) }}</small>
+              </div>
+              
+              <div class="mb-4">
+                {{ form_label(form.etablissement) }}
+                {{ form_widget(form.etablissement) }}
+                <small class="text-danger">{{ form_errors(form.etablissement) }}</small>
+              </div>
+              
+              <div class="text-center mt-4">
+                {{ form_widget(form.submit) }}
+                <a href="{{ path('liste_services', {'id': etablissement.etabid}) }}" class="btn btn-secondary ml-2">Annuler</a>
+              </div>
+            {{ form_end(form) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -7,7 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   {# Fonts and Icons #}
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Arizonia&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -63,17 +62,17 @@
           <a href="#" class="nav-link">Assistance</a>
         </li>
         <li class="nav-item {% if app.request.attributes.get('_route') == 'app_social' %}active{% endif %}">
-          <a href="/post" class="nav-link">Fil Social</a>
+          <a href="#" class="nav-link">Fil Social</a>
         </li>
-          {% if user %}
-              <li class="nav-item">
-                  <a href="#" class="nav-link">Navigation</a>
-              </li>
-          {% else %}
-              <li class="nav-item {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">
-                  <a href="#" class="nav-link">Login/Register</a>
-              </li>
-          {% endif %}
+        {% if user %}
+        <li class="nav-item {% if app.request.attributes.get('_route') starts with 'app_navigation' %}active{% endif %}">
+          <a href="{{ path('app_navigation') }}" class="nav-link">Navigation</a>
+        </li>
+        {% else %}
+        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">
+          <a href="#" class="nav-link">Contactez-Nous</a>
+        </li>
+        {% endif %}
 
 
         {% if user %}
