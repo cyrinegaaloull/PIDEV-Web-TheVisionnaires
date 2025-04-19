@@ -1,127 +1,73 @@
 <?php
 
+// src/Entity/Service.php
 
 namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Service
- *
- * @ORM\Table(name="service", indexes={@ORM\Index(name="etabID", columns={"etabID"})})
- * @ORM\Entity
- */
+#[ORM\Table(name: 'service')]
+#[ORM\Index(name: 'etabID', columns: ['etabID'])]
+#[ORM\Entity]
 class Service
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="serviceID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'serviceID', type: 'integer', nullable: false)]
     private $serviceid;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="serviceName", type="string", length=50, nullable=false)
-     */
+    #[ORM\Column(name: 'serviceName', type: 'string', length: 50, nullable: false)]
     private $servicename;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="servicePrix", type="float", precision=10, scale=0, nullable=false)
-     */
+    #[ORM\Column(name: 'servicePrix', type: 'float', precision: 10, scale: 0, nullable: false)]
     private $serviceprix;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="etabID", type="integer", nullable=false)
-     */
-    private $etabid;
+    #[ORM\ManyToOne(targetEntity: Etablissement::class)]
+    #[ORM\JoinColumn(name: 'etabID', referencedColumnName: 'etabID')]
+    private $etablissement;
 
-
-    /**
-     * Get serviceid.
-     *
-     * @return int
-     */
-    public function getServiceid()
+    public function getServiceid(): ?int
     {
         return $this->serviceid;
     }
 
-    /**
-     * Set servicename.
-     *
-     * @param string $servicename
-     *
-     * @return Service
-     */
-    public function setServicename($servicename)
+    public function setServicename(string $servicename): self
     {
         $this->servicename = $servicename;
 
         return $this;
     }
 
-    /**
-     * Get servicename.
-     *
-     * @return string
-     */
-    public function getServicename()
+    public function getServicename(): ?string
     {
         return $this->servicename;
     }
 
-    /**
-     * Set serviceprix.
-     *
-     * @param float $serviceprix
-     *
-     * @return Service
-     */
-    public function setServiceprix($serviceprix)
+    public function setServiceprix(float $serviceprix): self
     {
         $this->serviceprix = $serviceprix;
 
         return $this;
     }
 
-    /**
-     * Get serviceprix.
-     *
-     * @return float
-     */
-    public function getServiceprix()
+    public function getServiceprix(): ?float
     {
         return $this->serviceprix;
     }
 
-    /**
-     * Set etabid.
-     *
-     * @param int $etabid
-     *
-     * @return Service
-     */
-    public function setEtabid($etabid)
+    public function setEtablissement(?Etablissement $etablissement): self
     {
-        $this->etabid = $etabid;
+        $this->etablissement = $etablissement;
 
         return $this;
     }
 
-    /**
-     * Get etabid.
-     *
-     * @return int
-     */
-    public function getEtabid()
+    public function getEtablissement(): ?Etablissement
     {
-        return $this->etabid;
+        return $this->etablissement;
+    }
+
+    public function getEtabid(): ?int
+    {
+        return $this->etablissement ? $this->etablissement->getEtabid() : null;
     }
 }

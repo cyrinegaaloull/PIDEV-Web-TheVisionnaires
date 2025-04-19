@@ -1,189 +1,98 @@
 <?php
 
-
 namespace App\Entity;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Review
- *
- * @ORM\Table(name="review", indexes={@ORM\Index(name="lieuID", columns={"lieuID"}), @ORM\Index(name="userID", columns={"userID"})})
- * @ORM\Entity
- */
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ORM\Entity]
+#[ORM\Table(name: "review")]
+#[ORM\Index(name: "lieuID", columns: ["lieuID"])]
+#[ORM\Index(name: "userID", columns: ["userID"])]
 class Review
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="reviewID", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $reviewid;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(name: "reviewID", type: "integer")]
+    private ?int $reviewid = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="lieuID", type="integer", nullable=false)
-     */
-    private $lieuid;
+    #[ORM\Column(name: "lieuID", type: "integer")]
+    private ?int $lieuid = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="userID", type="integer", nullable=false)
-     */
-    private $userid;
+    #[ORM\Column(name: "userID", type: "integer")]
+    private ?int $userid = null;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="rating", type="float", precision=10, scale=0, nullable=false)
-     */
-    private $rating;
+    #[ORM\Column(name: "rating", type: "float", precision: 10, scale: 0)]
+    #[Assert\NotBlank(message: 'Veuillez attribuer une note.')]
+    #[Assert\Range(min: 1, max: 5, notInRangeMessage: 'La note doit être entre {{ min }} et {{ max }}.')]
+    private ?float $rating = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="comment", type="string", length=50, nullable=false, options={"default"="aucun commentaire"})
-     */
-    private $comment = 'aucun commentaire';
+    #[ORM\Column(name: "comment", type: "string", length: 50, options: ["default" => "aucun commentaire"])]
+    #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide.')]
+    private string $comment = 'aucun commentaire';
 
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="reviewDate", type="date", nullable=true)
-     */
-    private $reviewdate;
+    #[ORM\Column(name: "reviewDate", type: "date", nullable: true)]
+    private ?\DateTimeInterface $reviewdate = null;
 
+    // --- Getters & Setters ---
 
-    /**
-     * Get reviewid.
-     *
-     * @return int
-     */
-    public function getReviewid()
+    public function getReviewid(): ?int
     {
         return $this->reviewid;
     }
 
-    /**
-     * Set lieuid.
-     *
-     * @param int $lieuid
-     *
-     * @return Review
-     */
-    public function setLieuid($lieuid)
-    {
-        $this->lieuid = $lieuid;
-
-        return $this;
-    }
-
-    /**
-     * Get lieuid.
-     *
-     * @return int
-     */
-    public function getLieuid()
+    public function getLieuid(): ?int
     {
         return $this->lieuid;
     }
 
-    /**
-     * Set userid.
-     *
-     * @param int $userid
-     *
-     * @return Review
-     */
-    public function setUserid($userid)
+    public function setLieuid(?int $lieuid): self
     {
-        $this->userid = $userid;
-
+        $this->lieuid = $lieuid;
         return $this;
     }
 
-    /**
-     * Get userid.
-     *
-     * @return int
-     */
-    public function getUserid()
+    public function getUserid(): ?int
     {
         return $this->userid;
     }
 
-    /**
-     * Set rating.
-     *
-     * @param float $rating
-     *
-     * @return Review
-     */
-    public function setRating($rating)
+    public function setUserid(?int $userid): self
     {
-        $this->rating = $rating;
-
+        $this->userid = $userid;
         return $this;
     }
 
-    /**
-     * Get rating.
-     *
-     * @return float
-     */
-    public function getRating()
+    public function getRating(): ?float
     {
         return $this->rating;
     }
 
-    /**
-     * Set comment.
-     *
-     * @param string $comment
-     *
-     * @return Review
-     */
-    public function setComment($comment)
+    public function setRating(?float $rating): self
     {
-        $this->comment = $comment;
-
+        $this->rating = $rating;
         return $this;
     }
 
-    /**
-     * Get comment.
-     *
-     * @return string
-     */
-    public function getComment()
+    public function getComment(): string
     {
         return $this->comment;
     }
 
-    /**
-     * Set reviewdate.
-     *
-     * @param \DateTime|null $reviewdate
-     *
-     * @return Review
-     */
-    public function setReviewdate($reviewdate = null)
+    public function setComment(string $comment): self
     {
-        $this->reviewdate = $reviewdate;
-
+        $this->comment = $comment;
         return $this;
     }
 
-    /**
-     * Get reviewdate.
-     *
-     * @return \DateTime|null
-     */
-    public function getReviewdate()
+    public function getReviewdate(): ?\DateTimeInterface
     {
         return $this->reviewdate;
+    }
+
+    public function setReviewdate(?\DateTimeInterface $reviewdate): self
+    {
+        $this->reviewdate = $reviewdate;
+        return $this;
     }
 }

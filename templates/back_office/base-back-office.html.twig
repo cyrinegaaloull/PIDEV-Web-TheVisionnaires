@@ -82,126 +82,130 @@
             </li>
           </ul>
         </li>
-      
-        <!-- Clubs -->
-        <li class="menu-item">
-          <a href="#" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ri-group-line"></i>
-            <div>Clubs</div>
-          </a>
-          <ul class="menu-sub">
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 1</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 2</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 3</a>
-            </li>
-          </ul>
-        </li>
-        <!-- Assistance -->
-        <li class="menu-item">
-          <a href="#" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ri-government-line"></i>
-            <div>Assistance</div>
-          </a>
-          <ul class="menu-sub">
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 1</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 2</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 3</a>
-            </li>
-          </ul>
-        </li>
-        <!-- Navigation -->
-        <li class="menu-item">
-          <a href="#" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ri-bus-line"></i>
-            <div>Navigation</div>
-          </a>
-          <ul class="menu-sub">
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 1</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 2</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 3</a>
-            </li>
-          </ul>
-        </li>
-        <!-- Flux Social -->
-        <li class="menu-item">
-          <a href="#" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ri-message-3-line"></i>
-            <div>Flux Social</div>
-          </a>
-          <ul class="menu-sub">
-            <li class="menu-item">
-              <a href="{{ path('admin_flux_social') }}" class="nav-link">
-                <i class="ri-chat-1-line me-2"></i> Flux Social
-              </a>
 
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 2</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 3</a>
-            </li>
-          </ul>
-        </li>
-        <!-- Utilisateur -->
-        <li class="menu-item">
-          <a href="#" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ri-user-3-line"></i>
-            <div>Utilisateur</div>
-          </a>
-          <ul class="menu-sub">
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 1</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 2</a>
-            </li>
-            <li class="menu-item">
-              <a href="#" class="menu-link">Option 3</a>
-            </li>
-          </ul>
-        </li>
-      
-        <!-- Components -->
-        <li class="menu-header mt-7"><span class="menu-header-text">Mon Compte</span></li>
-      
-        <li class="menu-item">
-          <a href="#" class="menu-link">
-            <i class="menu-icon tf-icons ri-profile-line"></i>
-            <div>Profile</div>
-          </a>
-        </li>
-      
-        <li class="menu-item">
-          <a href="javascript:void(0);" class="menu-link">
-            <i class="menu-icon tf-icons ri-settings-3-line"></i>
-            <div>Paramètres</div>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="javascript:void(0);" class="menu-link">
-            <i class="menu-icon tf-icons ri-logout-box-line"></i>
-            <div>Se déconnecter</div>
-          </a>
-        </li>
-      
-    </aside>
-    {# Sidebar - END #}
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle"> {# Use javascript:void(0); #}
+                        <i class="menu-icon tf-icons ri-group-line"></i>
+                        <div>Clubs</div>
+                    </a>
+                     <ul class="menu-sub">
+                         <li class="menu-item">
+                             <a href="#" class="menu-link">Option 1</a>
+                         </li>
+                         <li class="menu-item">
+                             <a href="#" class="menu-link">Option 2</a>
+                         </li>
+                         <li class="menu-item">
+                             <a href="#" class="menu-link">Option 3</a>
+                         </li>
+                     </ul>
+                </li>
+                <!-- Assistance -->
+<li class="menu-item">
+  <a href="#" class="menu-link menu-toggle">
+    <i class="menu-icon tf-icons ri-government-line"></i>
+    <div>Assistance</div>
+  </a>
+  <ul class="menu-sub">
+    <li class="menu-item">
+      <a href="{{ path('admin_assistance_dashboard') }}" class="menu-link">
+        <i class="menu-icon tf-icons ri-dashboard-line"></i>
+        Tableau de bord
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="{{ path('admin_assistance_etablissements_list') }}" class="menu-link">
+        <i class="menu-icon tf-icons ri-store-line"></i>
+        Établissements
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="{{ path('admin_assistance_services_list') }}" class="menu-link">
+        <i class="menu-icon tf-icons ri-service-line"></i>
+        Prestations
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="{{ path('admin_assistance_avis_list') }}" class="menu-link">
+        <i class="menu-icon tf-icons ri-star-line"></i>
+        Évaluations
+      </a>
+    </li>
+  </ul>
+</li>
+
+                     </ul>
+                 </li>
+                    <li class="menu-item {% if app.request.attributes.get('_route') starts with 'admin_transport_modes' %}active open{% endif %}">
+                    <a href="#" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons ri-bus-line"></i>
+                        <div>Navigation</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item {% if app.request.attributes.get('_route') == 'admin_transport_modes' %}active{% endif %}">
+                        <a href="{{ path('admin_transport_modes') }}" class="menu-link">Modes de transport</a>
+                        </li>
+                        <!-- Add other navigation-related admin pages here -->
+                    </ul>
+                    </li>
+                  <li class="menu-item">
+                      <a href="javascript:void(0);" class="menu-link menu-toggle"> {# Use javascript:void(0); #}
+                          <i class="menu-icon tf-icons ri-message-3-line"></i>
+                          <div>Flux Social</div>
+                      </a>
+                      <ul class="menu-sub">
+                          <li class="menu-item">
+                              <a href="#" class="menu-link">Option 1</a>
+                          </li>
+                          <li class="menu-item">
+                              <a href="#" class="menu-link">Option 2</a>
+                          </li>
+                          <li class="menu-item">
+                              <a href="#" class="menu-link">Option 3</a>
+                          </li>
+                      </ul>
+                  </li>
+                  <li class="menu-item">
+                      <a href="javascript:void(0);" class="menu-link menu-toggle"> {# Use javascript:void(0); #}
+                          <i class="menu-icon tf-icons ri-user-3-line"></i>
+                          <div>Utilisateur</div>
+                      </a>
+                      <ul class="menu-sub">
+                          <li class="menu-item"> {# Use request attributes to set 'active' dynamically if needed #}
+                              <a href="{{ path('list_roles') }}" class="menu-link">ROLES</a> {# Link to list roles #}
+                          </li>
+                          <li class="menu-item"> {# Use request attributes to set 'active' dynamically if needed #}
+                              <a href="{{ path('add_user') }}" class="menu-link">USERS</a> {# Assuming you have an add_user route #}
+                          </li>
+
+                      </ul>
+                  </li>
+
+                <li class="menu-header mt-7"><span class="menu-header-text">Mon Compte</span></li>
+
+                <li class="menu-item">
+                    <a href="#" class="menu-link"> {# Add path to profile page #}
+                        <i class="menu-icon tf-icons ri-profile-line"></i>
+                        <div>Profile</div>
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link"> {# Add path to settings page or make it a dropdown #}
+                        <i class="menu-icon tf-icons ri-settings-3-line"></i>
+                        <div>Paramètres</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ path('app_logout') }}" class="menu-link">
+                        <i class="menu-icon tf-icons ri-logout-box-line"></i>
+                        <div>Se déconnecter</div>
+                    </a>
+                </li>
+
+            </ul>
+        </aside>
+        {# Sidebar - END #}
 
     <div class="layout-page">
 
