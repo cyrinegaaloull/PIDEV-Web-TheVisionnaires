@@ -1,0 +1,83 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="fw-bold mb-3 text-primary">
+    <i class="ri-map-pin-line me-1"></i> Détails du lieu
+  </h4>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title text-dark">{{ lieu.lieuname }}</h5>
+      <p class="mb-2"><i class="ri-map-pin-2-line me-1 text-muted"></i> <strong>Adresse:</strong> {{ lieu.lieuaddress }}</p>
+      <p class="mb-2"><i class="ri-information-line me-1 text-muted"></i> <strong>Description:</strong> {{ lieu.lieudescription }}</p>
+      <p class="mb-2"><i class="ri-price-tag-3-line me-1 text-muted"></i> <strong>Catégorie:</strong> {{ lieu.lieucategory }}</p>
+      <p class="mb-2"><i class="ri-map-pin-user-line me-1 text-muted"></i> <strong>Coordonnées:</strong> {{ lieu.latitude }}, {{ lieu.longitude }}</p>
+
+      <a href="{{ path('admin_event_add', { id: lieu.lieuid }) }}" class="btn btn-success mt-3">
+        <i class="ri-calendar-event-line me-1"></i> Ajouter un événement
+      </a>
+    </div>
+  </div>
+
+  <h5 class="fw-bold mb-3"><i class="ri-calendar-line me-1"></i> Événements associés</h5>
+  {% if events %}
+    <div class="row">
+      {% for event in events %}
+        <div class="col-md-6 col-lg-4 mb-3">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h6 class="card-title">{{ event.eventname }}</h6>
+<p class="mb-1 text-muted">
+  <i class="ri-time-line me-1"></i> 
+  {{ event.eventdate ? event.eventdate|date('d/m/Y') : 'Pas de date' }}
+</p>
+<span class="badge bg-label-primary mb-2 d-inline-block">
+  <i class="ri-bookmark-line me-1"></i> {{ event.eventcategory }}
+</span>
+
+<div class="d-flex gap-2 mt-2">
+  <a href="{{ path('admin_event_edit', { id: event.eventid }) }}" class="btn btn-sm btn-outline-primary">
+    <i class="ri-edit-line"></i> Modifier
+  </a>
+  <!-- Delete Button triggers modal -->
+<button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ event.eventid }}">
+  <i class="ri-delete-bin-line"></i> Supprimer
+</button>
+
+<!-- Modal for this specific event -->
+<div class="modal fade" id="deleteModal{{ event.eventid }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ event.eventid }}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-body text-center py-4">
+        <i class="ri-error-warning-line text-danger" style="font-size: 2rem;"></i>
+        <h5 class="mt-3 mb-2">Supprimer l’événement ?</h5>
+        <p class="text-muted mb-3">Cette action est irréversible.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="ri-close-line me-1"></i> Annuler
+          </button>
+          <form method="post" action="{{ path('admin_event_delete', { id: event.eventid }) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete_event_' ~ event.eventid) }}">
+            <button class="btn btn-danger">
+              <i class="ri-delete-bin-2-line me-1"></i> Supprimer
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">Aucun événement lié à ce lieu.</div>
+  {% endif %}
+</div>
+{% endblock %}
