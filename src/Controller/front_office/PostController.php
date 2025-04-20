@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 #[Route('/post')]
 final class PostController extends AbstractController
@@ -17,32 +18,31 @@ final class PostController extends AbstractController
     #[Route(name: 'app_post_index', methods: ['GET'])]
     public function index(EntityManagerInterface $entityManager): Response
     {
-        // Simulate a logged-in user (optional)
-        $simulateUser = false;
-        $user = $this->getSimulatedUser($simulateUser);
-
-        $posts = $entityManager
-            ->getRepository(Post::class)
-            ->findAll();
+        // Fetch all posts
+        $posts = $entityManager->getRepository(Post::class)->findAll();
 
         return $this->render('front_office/post/index.html.twig', [
             'posts' => $posts,
-            'user' => $user, // Pass the user to the template
         ]);
     }
 
     #[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        // Simulate a logged-in user (optional)
-        $simulateUser = false;
-        $user = $this->getSimulatedUser($simulateUser);
+        // Ensure the user is logged in
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        // Get the currently authenticated user
+        $user = $this->getUser();
 
         $post = new Post();
         $form = $this->createForm(\App\Form\PostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Set the user ID for the post (assuming your User entity has an `id` field)
+            $post->setUserId($user->getUserId());
+
             $entityManager->persist($post);
             $entityManager->flush();
 
@@ -52,7 +52,6 @@ final class PostController extends AbstractController
         return $this->render('front_office/post/new.html.twig', [
             'post' => $post,
             'form' => $form->createView(),
-            'user' => $user, // Pass the user to the template
         ]);
     }
 
@@ -66,19 +65,16 @@ final class PostController extends AbstractController
             throw $this->createNotFoundException('Publication non trouvée.');
         }
 
-        // Simulate a logged-in user (optional)
-        $simulateUser = false;
-        $user = $this->getSimulatedUser($simulateUser);
+        // Ensure the user is logged in
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        // Get the currently authenticated user
+        $user = $this->getUser();
 
         // Handle Comment Creation
         $newComment = new Comment();
         $newComment->setPost($post); // Link the comment to the post
-
-        if ($user) {
-            $newComment->setUserId($user['id']); // Example user ID
-        } else {
-            $newComment->setUserId(1); // Default user ID for simulation
-        }
+        $newComment->setUserId($user->getUserId()); // Set the user ID for the comment
 
         $form = $this->createFormBuilder($newComment)
             ->add('content', TextareaType::class, [
@@ -103,16 +99,22 @@ final class PostController extends AbstractController
         return $this->render('front_office/post/show.html.twig', [
             'post' => $post,
             'form' => $form->createView(),
-            'user' => $user, // Pass the user to the template
         ]);
     }
 
     #[Route('/{postId}/edit', name: 'app_post_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Post $post, EntityManagerInterface $entityManager): Response
     {
-        // Simulate a logged-in user (optional)
-        $simulateUser = false;
-        $user = $this->getSimulatedUser($simulateUser);
+        // Ensure the user is logged in
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        // Get the currently authenticated user
+        $user = $this->getUser();
+
+        // Check if the authenticated user is the owner of the post
+        if ($post->getUserId() !== $user->getUserId()) {
+            throw new AccessDeniedException('Vous n\'êtes pas autorisé à modifier cette publication.');
+        }
 
         $form = $this->createForm(\App\Form\PostType::class, $post);
         $form->handleRequest($request);
@@ -126,16 +128,22 @@ final class PostController extends AbstractController
         return $this->render('front_office/post/edit.html.twig', [
             'post' => $post,
             'form' => $form->createView(),
-            'user' => $user, // Pass the user to the template
         ]);
     }
 
     #[Route('/{postId}/delete', name: 'app_post_delete', methods: ['POST'])]
     public function delete(Request $request, Post $post, EntityManagerInterface $entityManager): Response
     {
-        // Simulate a logged-in user (optional)
-        $simulateUser = false;
-        $user = $this->getSimulatedUser($simulateUser);
+        // Ensure the user is logged in
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        // Get the currently authenticated user
+        $user = $this->getUser();
+
+        // Check if the authenticated user is the owner of the post
+        if ($post->getUserId() !== $user->getUserId()) {
+            throw new AccessDeniedException('Vous n\'êtes pas autorisé à supprimer cette publication.');
+        }
 
         if ($this->isCsrfTokenValid('delete' . $post->getPostId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($post);
@@ -148,6 +156,17 @@ final class PostController extends AbstractController
     #[Route('/comment/{commentId}/edit', name: 'app_comment_edit', methods: ['POST'])]
     public function editComment(Request $request, Comment $comment, EntityManagerInterface $entityManager): Response
     {
+        // Ensure the user is logged in
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        // Get the currently authenticated user
+        $user = $this->getUser();
+
+        // Check if the authenticated user is the owner of the comment
+        if ($comment->getUserId() !== $user->getUserId()) {
+            return $this->json(['error' => 'Vous n\'êtes pas autorisé à modifier ce commentaire.'], Response::HTTP_FORBIDDEN);
+        }
+
         // Validate CSRF token
         if (!$this->isCsrfTokenValid('edit-comment' . $comment->getCommentId(), $request->headers->get('X-CSRF-TOKEN'))) {
             return $this->json(['error' => 'Invalid CSRF token.'], Response::HTTP_FORBIDDEN);
@@ -166,24 +185,5 @@ final class PostController extends AbstractController
         $entityManager->flush();
 
         return $this->json(['success' => true]);
-    }
-
-    /**
-     * Helper method to simulate a logged-in user.
-     *
-     * @param bool $simulateUser Whether to simulate a user or not
-     * @return array|null Simulated user data or null
-     */
-    private function getSimulatedUser(bool $simulateUser): ?array
-    {
-        if ($simulateUser) {
-            return [
-                'id' => 1, // Simulated user ID
-                'username' => 'John Doe',
-                'profile_picture' => 'default_profile_pic.jpg',
-            ];
-        }
-
-        return null; // No user logged in
     }
 }
