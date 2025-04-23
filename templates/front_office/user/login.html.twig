@@ -270,6 +270,10 @@
                         </button>
                     </form>
 
+                     <button id="face-recognition-button">Log in with Face Recognition</button>
+
+    <div id="face-recognition-status" style="margin-top: 10px;"></div>
+
                     <p><b>Forgot password?</b></p>
                     <p>
                         <span>Don't have an account?</span>
@@ -303,6 +307,33 @@
     // Variables
     let container = document.getElementById('container');
 
+
+  document.addEventListener('DOMContentLoaded', function() {
+            const faceRecognitionButton = document.getElementById('face-recognition-button');
+            const faceRecognitionStatus = document.getElementById('face-recognition-status');
+
+            faceRecognitionButton.addEventListener('click', function() {
+                faceRecognitionStatus.innerText = 'Initiating face recognition...';
+
+                fetch('/face-recognition-login')
+                    .then(response => response.json())
+                    .then(data => {
+                        faceRecognitionStatus.innerText = data.message;
+                        if (data.success) {
+                            // Redirect to the success URL (e.g., homepage)
+                            window.location.href = data.redirect_url || '/';
+                        } else {
+                            // Optionally handle the failure (e.g., display an error message)
+                        }
+                    })
+                    .catch(error => {
+                        faceRecognitionStatus.innerText = 'Error communicating with the server.';
+                        console.error('Error:', error);
+                    });
+            });
+        });
+
+        
     // Check URL parameters and initial state
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
