@@ -75,15 +75,20 @@ class FaceRecognitionLoginController extends AbstractController
                 // Dispatch the interactive login event
                 $event = new InteractiveLoginEvent($request, $token);
                 $this->eventDispatcher->dispatch($event);
-                
-                
+            
+                // Determine redirect URL based on roles
+                $roles = $user->getRoles();
+                if (in_array('ROLE_ADMIN', $roles)) {
+                    $redirectUrl = $this->generateUrl('admin_dashboard');
+                } else {
+                    $redirectUrl = $this->generateUrl('app_home');
+                }
+            
                 return new JsonResponse([
                     'success' => true, 
                     'message' => 'Face recognized. Logging in...', 
-                    'redirect_url' => $this->generateUrl('app_home')
+                    'redirect_url' => $redirectUrl
                 ]);
-            } else {
-                return new JsonResponse(['success' => false, 'message' => 'Face recognized, but user not found.']);
             }}
     }
 }
