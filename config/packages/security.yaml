@@ -33,3 +33,4 @@ security:
         - { path: ^/face-recognition-login, roles: PUBLIC_ACCESS } # Add this line
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+

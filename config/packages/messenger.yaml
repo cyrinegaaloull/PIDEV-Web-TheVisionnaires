@@ -27,3 +27,9 @@ framework:
 
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
+
+
+
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+        message_bus: false  # This disables asynchronous delivery
