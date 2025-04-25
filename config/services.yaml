@@ -30,12 +30,4 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    App\Service\NotificationService:
-        arguments:
-            $twilioSid: '%env(TWILIO_ACCOUNT_SID)%'
-            $twilioToken: '%env(TWILIO_AUTH_TOKEN)%'
-            $whatsappNumber: '%env(TWILIO_WHATSAPP_NUMBER)%'
-            $senderEmail: 'cyrinegaaloul6@gmail.com'
 
