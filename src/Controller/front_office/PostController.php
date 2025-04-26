@@ -58,27 +58,22 @@ final class PostController extends AbstractController
     #[Route('/{postId}', name: 'app_post_show', methods: ['GET', 'POST'])]
     public function show(Request $request, EntityManagerInterface $entityManager, int $postId): Response
     {
-        // Fetch the Post entity based on postId
         $post = $entityManager->getRepository(Post::class)->find($postId);
 
         if (!$post) {
             throw $this->createNotFoundException('Publication non trouvée.');
         }
 
-        // Ensure the user is logged in
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        // Get the currently authenticated user
         $user = $this->getUser();
 
-        // Handle Comment Creation
         $newComment = new Comment();
-        $newComment->setPost($post); // Link the comment to the post
-        $newComment->setUserId($user->getUserId()); // Set the user ID for the comment
+        $newComment->setPost($post);
+        $newComment->setUserId($user->getUserId());
 
         $form = $this->createFormBuilder($newComment)
             ->add('content', TextareaType::class, [
-                'label' => false, // No label for the textarea
+                'label' => false,
                 'attr' => [
                     'rows' => 3,
                     'placeholder' => 'Écrivez votre commentaire ici...',
@@ -88,12 +83,25 @@ final class PostController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($newComment);
-            $entityManager->flush();
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $content = $newComment->getContent();
 
-            // Redirect back to the same page to avoid resubmission issues
-            return $this->redirectToRoute('app_post_show', ['postId' => $postId]);
+                // Check if content contains bad words
+                if ($this->containsBadWords($content)) {
+                    $form->addError(new \Symfony\Component\Form\FormError('Votre commentaire contient des mots inappropriés.'));
+
+                    return $this->render('front_office/post/show.html.twig', [
+                        'post' => $post,
+                        'form' => $form->createView(),
+                    ]);
+                }
+
+                $entityManager->persist($newComment);
+                $entityManager->flush();
+
+                return $this->redirectToRoute('app_post_show', ['postId' => $postId]);
+            }
         }
 
         return $this->render('front_office/post/show.html.twig', [
@@ -101,6 +109,8 @@ final class PostController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+
 
     #[Route('/{postId}/edit', name: 'app_post_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Post $post, EntityManagerInterface $entityManager): Response
@@ -186,4 +196,21 @@ final class PostController extends AbstractController
 
         return $this->json(['success' => true]);
     }
+    private function containsBadWords(string $text): bool
+    {
+        try {
+            $client = new \GuzzleHttp\Client();
+            $response = $client->get('https://www.purgomalum.com/service/containsprofanity', [
+                'query' => ['text' => $text],
+            ]);
+
+            $result = trim((string) $response->getBody());
+
+            return $result === 'true';
+        } catch (\Exception $e) {
+            // Log or ignore API failure
+            return false;
+        }
+    }
+
 }

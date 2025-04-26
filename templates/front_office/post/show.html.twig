@@ -152,10 +152,19 @@
                 <!-- Add New Comment -->
                 <div class="comment-form mt-4">
                     <h3>Ajouter un commentaire</h3>
-                    <form method="post">
-                        {{ form_widget(form) }}
-                        <button type="submit" class="btn btn-primary">Publier</button>
-                    </form>
+                    {{ form_start(form) }}
+                    {% if form_errors(form) %}
+                        <div class="alert alert-danger">
+                            {{ form_errors(form) }}
+                        </div>
+                    {% endif %}
+
+                    {{ form_row(form.content) }}
+
+                    <button type="submit" class="btn btn-primary">Publier</button>
+                    {{ form_end(form) }}
+
+
                 </div>
 
                 <!-- Display Existing Comments -->
