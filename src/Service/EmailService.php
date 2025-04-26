@@ -12,7 +12,7 @@ class EmailService
     public function sendLoginNotification(Users $user): void
     {
         $email = (new Email())
-            ->from('your.email@gmail.com')
+            ->from('abderrahmen.deakayr@gmail.com')
             ->to($user->getEmail())
             ->subject('Login Notification')
             ->text('Dear ' . $user->getPrenom() . ' ' . $user->getNom() . ' (' . $user->getUsername() . '), you have successfully logged in to our website.')
@@ -67,10 +67,99 @@ class EmailService
                                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                     <tr>
                                         <td style="padding: 20px; text-align: center; background-color: #f8f8f8; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
-                                            <p style="color: #666666; font-size: 14px; margin: 0 0 10px;">© ' . date('Y') . ' Your Company. All rights reserved.</p>
+                                            <p style="color: #666666; font-size: 14px; margin: 0 0 10px;">© ' . date('Y') . ' Local Lans. All rights reserved.</p>
                                             <p style="color: #666666; font-size: 14px; margin: 0;">
                                                 <a href="" style="color: #3498db; text-decoration: none;">Contact Support</a> | 
                                                 <a href="" style="color: #3498db; text-decoration: none;">Privacy Policy</a>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+                </html>
+            ');
+
+        $this->mailer->send($email);
+    }
+
+    public function sendPasswordResetEmail(Users $user, $resetToken): void
+    {
+        $resetUrl = 'http://127.0.0.1:8000/reset-password/reset/' . $resetToken->getToken();
+        
+        $email = (new Email())
+            ->from('abderrahmen.deakayr@gmail.com')
+            ->to($user->getEmail())
+            ->subject('Reset Your Password')
+            ->html('
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Reset Your Password</title>
+                </head>
+                <body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: 20px auto;">
+                        <tr>
+                            <td style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <!-- Header -->
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td style="padding: 20px; text-align: center; background-color: #2c3e50; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Reset Your Password</h1>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- Content -->
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td style="padding: 30px; color: #333333; font-size: 16px; line-height: 1.5;">
+                                            <p style="margin: 0 0 20px;">Hello ' . htmlspecialchars($user->getPrenom()) . ' ' . htmlspecialchars($user->getNom()) . ',</p>
+                                            <p style="margin: 0 0 20px;">We received a request to reset your password. If you didn\'t make this request, you can safely ignore this email.</p>
+                                            <p style="margin: 0 0 20px;">To reset your password, click the button below:</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- CTA Button -->
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td style="padding: 0 30px 30px; text-align: center;">
+                                            <a href="' . $resetUrl . '" style="background-color: #3498db; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 4px; display: inline-block; font-size: 16px;">Reset Password</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- URL Copy -->
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td style="padding: 0 30px 30px; text-align: center;">
+                                            <p style="margin: 0 0 10px; color: #666666; font-size: 14px;">Or copy and paste this URL into your browser:</p>
+                                            <p style="margin: 0; color: #3498db; word-break: break-all;">' . $resetUrl . '</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- Expiration Notice -->
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td style="padding: 0 30px 30px; text-align: center;">
+                                            <p style="margin: 0; color: #e74c3c; font-size: 14px;">This password reset link will expire in 1 hour.</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- Footer -->
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td style="padding: 20px; text-align: center; background-color: #f8f8f8; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                                            <p style="color: #666666; font-size: 14px; margin: 0 0 10px;">© ' . date('Y') . ' Local Lans. All rights reserved.</p>
+                                            <p style="color: #666666; font-size: 14px; margin: 0;">
+                                                If you did not request this password reset, please contact support.
                                             </p>
                                         </td>
                                     </tr>

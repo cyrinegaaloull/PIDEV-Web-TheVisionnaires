@@ -30,7 +30,8 @@ security:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/login_check, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/face-recognition-login, roles: PUBLIC_ACCESS } # Add this line
+        - { path: ^/face-recognition-login, roles: PUBLIC_ACCESS }
+        - { path: ^/reset-password, roles: PUBLIC_ACCESS }  # Add this line
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 

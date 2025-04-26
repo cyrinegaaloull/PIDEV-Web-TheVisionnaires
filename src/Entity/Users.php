@@ -6,6 +6,8 @@ use App\Entity\Roles;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordRequestInterface;
+use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordRequestTrait;
 
 #[ORM\Entity]
 #[ORM\Table(name: "users")]
