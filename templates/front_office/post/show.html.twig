@@ -140,6 +140,9 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="post-details glass-card">
+                    <form method="get" action="{{ path('report_post', {'postId': post.postId}) }}" style="display: inline-block;">
+                        <button type="submit" class="btn btn-warning btn-sm">Report Post</button>
+                    </form>
                     <h2>{{ post.title }}</h2>
                     <p><strong>Contenu:</strong> {{ post.content }}</p>
                     <p><strong>Catégorie:</strong> {{ post.category }}</p>

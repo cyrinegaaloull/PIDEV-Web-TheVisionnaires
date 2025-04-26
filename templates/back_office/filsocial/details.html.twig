@@ -1,0 +1,30 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Détails de la réclamation{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Détails de la réclamation</h1>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Contenu de la réclamation</h5>
+                <p class="card-text">{{ reclamation.content }}</p>
+                <p><strong>Statut :</strong> {{ reclamation.status }}</p>
+                <p><strong>ID de la publication :</strong> {{ reclamation.postId }}</p>
+            </div>
+        </div>
+
+        <form method="post" style="display: inline;">
+            <input type="hidden" name="_token" value="{{ csrf_token('resolve-reclamation' ~ reclamation.reclamationId) }}">
+            <input type="hidden" name="action" value="resolve">
+            <button type="submit" class="btn btn-success">Résoudre</button>
+        </form>
+
+        <form method="post" style="display: inline;">
+            <input type="hidden" name="_token" value="{{ csrf_token('decline-reclamation' ~ reclamation.reclamationId) }}">
+            <input type="hidden" name="action" value="decline">
+            <button type="submit" class="btn btn-danger">Refuser</button>
+        </form>
+    </div>
+{% endblock %}
