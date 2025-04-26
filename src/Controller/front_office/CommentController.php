@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use GuzzleHttp\Client;
 
 #[Route('/comment')]
 final class CommentController extends AbstractController
@@ -50,9 +51,44 @@ final class CommentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Check for bad words using an external API
+            $content = $comment->getContent();
+            try {
+                $apiKey = 'YOUR_BADWORDS_IO_OPEN_KEY'; // Replace with your open API key
+                $client = new Client();
+                $response = $client->post('https://api.badwords.io/filter', [
+                    'headers' => ['Content-Type' => 'application/json'],
+                    'json' => [
+                        'text' => $content,
+                        'key' => $apiKey,
+                    ],
+                ]);
+
+                $data = json_decode($response->getBody(), true);
+
+                // Check if the response contains bad words
+                if ($data['hasBadWords']) {
+                    $this->addFlash('error', 'Votre commentaire contient des mots inappropriés et ne peut pas être publié.');
+                    return $this->render('front_office/comment/new.html.twig', [
+                        'form' => $form->createView(),
+                        'post' => $post,
+                        'user' => $user, // Pass the user to the template
+                    ]);
+                }
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la vérification du contenu.');
+                return $this->render('front_office/comment/new.html.twig', [
+                    'form' => $form->createView(),
+                    'post' => $post,
+                    'user' => $user, // Pass the user to the template
+                ]);
+            }
+
+            // Save the comment if no bad words are detected
             $entityManager->persist($comment);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Votre commentaire a été ajouté avec succès.');
             return $this->redirectToRoute('app_post_show', ['postId' => $post->getPostId()]);
         }
 
@@ -77,6 +113,31 @@ final class CommentController extends AbstractController
 
         // Update the comment content
         $newContent = trim($request->get('content'));
+
+        // Check for bad words using an external API
+        try {
+            $apiKey = 'YOUR_BADWORDS_IO_OPEN_KEY'; // Replace with your open API key
+            $client = new Client();
+            $response = $client->post('https://api.badwords.io/filter', [
+                'headers' => ['Content-Type' => 'application/json'],
+                'json' => [
+                    'text' => $newContent,
+                    'key' => $apiKey,
+                ],
+            ]);
+
+            $data = json_decode($response->getBody(), true);
+
+            // Check if the response contains bad words
+            if ($data['hasBadWords']) {
+                $this->addFlash('error', 'Votre commentaire contient des mots inappropriés et ne peut pas être modifié.');
+                return $this->redirectToRoute('app_post_show', ['postId' => $comment->getPost()->getPostId()]);
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue lors de la vérification du contenu.');
+            return $this->redirectToRoute('app_post_show', ['postId' => $comment->getPost()->getPostId()]);
+        }
+
         if (empty($newContent)) {
             $this->addFlash('error', 'Le contenu du commentaire ne peut pas être vide.');
         } else {
