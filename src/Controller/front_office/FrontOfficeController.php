@@ -12,11 +12,7 @@ class FrontOfficeController extends AbstractController
     public function home(Request $request): Response
     {
         // false pour user déconnecté true pour connecté
-<<<<<<< HEAD
         $simulateUser = true;
-=======
-        $simulateUser = false;
->>>>>>> 7c16b87b36b875f5d423aa782ded344eab7cf24e
 
         $user = null;
         if ($simulateUser) {
