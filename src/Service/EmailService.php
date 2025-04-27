@@ -173,13 +173,8 @@ class EmailService
 
         $this->mailer->send($email);
     }
-}
-    private MailerInterface $mailer;
 
-    public function __construct(MailerInterface $mailer)
-    {
-        $this->mailer = $mailer;
-    }
+
 
     public function sendEmail(string $to, string $subject, string $content): void
     {
