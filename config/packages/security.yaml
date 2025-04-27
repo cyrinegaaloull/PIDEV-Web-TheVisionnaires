@@ -1,37 +1,46 @@
 security:
     password_hashers:
         App\Entity\Users: 'plaintext'
-    
+
     providers:
         app_user_provider:
             entity:
                 class: App\Entity\Users
-                property: username
-    
+                property: username  # or email if you switch to login by email
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        
+
         main:
             lazy: true
             provider: app_user_provider
+
+            # your existing form_login
             form_login:
                 login_path: app_login
                 check_path: app_login_check
                 enable_csrf: true
                 success_handler: App\Security\AuthenticationSuccessHandler
+
+            # <-- add this section -->
+            custom_authenticators:
+                - App\Security\GoogleAuthenticator
+
             logout:
-                path: app_logout
+                path:   app_logout
                 target: app_login
                 invalidate_session: true
-    
-    access_control:
-        - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/login_check, roles: PUBLIC_ACCESS }
-        - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/face-recognition-login, roles: PUBLIC_ACCESS }
-        - { path: ^/reset-password, roles: PUBLIC_ACCESS }  # Add this line
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
+    access_control:
+        # allow anonymous access to your login/register/reset and OAuth connect routes
+        - { path: ^/login,                roles: PUBLIC_ACCESS }
+        - { path: ^/login_check,          roles: PUBLIC_ACCESS }
+        - { path: ^/register,             roles: PUBLIC_ACCESS }
+        - { path: ^/face-recognition-login, roles: PUBLIC_ACCESS }
+        - { path: ^/reset-password,       roles: PUBLIC_ACCESS }
+        - { path: ^/connect/google,       roles: PUBLIC_ACCESS }   # <-- add this
+        - { path: ^/connect/google/check, roles: PUBLIC_ACCESS }   # <-- add this
+        - { path: ^/admin,                roles: ROLE_ADMIN }
+        - { path: ^/,                     roles: IS_AUTHENTICATED_FULLY }
