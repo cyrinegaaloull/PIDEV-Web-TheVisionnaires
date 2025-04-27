@@ -1,0 +1,404 @@
+/* Enhanced Navigation Styling for Local Lens */
+
+/* General Layout Improvements */
+.navigation-container {
+    padding-top: 20px;
+    padding-bottom: 40px;
+  }
+  
+  /* Hero Section */
+  .hero-wrap {
+    position: relative;
+    background-position: center center !important;
+    background-size: cover !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .hero-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
+    z-index: 1;
+  }
+  
+  .hero-wrap .overlay {
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+  }
+  
+  .hero-wrap .text {
+    z-index: 2;
+    position: relative;
+  }
+  
+  .hero-wrap h1 {
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+  }
+  
+  .hero-wrap p.caps {
+    font-size: 18px;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Cards */
+  .card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    margin-bottom: 25px;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  .card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 15px 20px;
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+  }
+  
+  .card-header h5 {
+    font-weight: 600;
+    color: #333;
+    font-size: 18px;
+    margin: 0;
+  }
+  
+  .card-body {
+    padding: 20px;
+  }
+  
+  /* Form Elements */
+  .form-label {
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  }
+  
+  .form-control:focus {
+    border-color: #f15d30;
+    box-shadow: 0 0 0 3px rgba(241, 93, 48, 0.1);
+  }
+  
+  .form-select {
+    border-radius: 8px;
+    height: auto;
+    padding: 10px 15px;
+  }
+  
+  .input-group .btn {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding: 0 15px;
+  }
+  
+  /* Buttons */
+  .btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary {
+    background-color: #f15d30 !important;
+    border-color: #f15d30 !important;
+    box-shadow: 0 4px 8px rgba(241, 93, 48, 0.2);
+  }
+  
+  .btn-primary:hover {
+    background-color: #e04d20 !important;
+    border-color: #e04d20 !important;
+    box-shadow: 0 6px 12px rgba(241, 93, 48, 0.3);
+    transform: translateY(-1px);
+  }
+  
+  .btn-outline-secondary {
+    color: #6c757d;
+    border-color: #d8dbe0;
+    background-color: white;
+  }
+  
+  .btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    color: #5a6268;
+    border-color: #c8cfd6;
+  }
+  
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+  }
+  
+  .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+  }
+  
+  /* Map Container */
+  #navigationMap {
+    height: 720px !important;
+    width: 100%;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  /* Location Suggestions */
+  .location-suggestions {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border: none;
+    border-radius: 10px;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .suggestion-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    transition: all 0.2s;
+    color: #444;
+  }
+  
+  .suggestion-item:last-child {
+    border-bottom: none;
+  }
+  
+  .suggestion-item:hover,
+  .suggestion-item.selected {
+    background-color: #f8f9fa;
+    color: #f15d30;
+  }
+  
+  /* Loading Indicator */
+  .loading-spinner {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .loading-spinner .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: #f15d30 !important;
+  }
+  
+  /* Route Information */
+  .alert-info {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+    color: #495057;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #f15d30;
+  }
+  
+  /* Public Transport Panel */
+  #publicTransportOptionsPanel {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #eaeaea;
+    margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  #publicTransportOptionsPanel h5 {
+    color: #333;
+    margin-bottom: 15px;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  #publicTransportComboBox {
+    padding: 12px 15px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  }
+  
+  #publicTransportComboBox option {
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  /* Saved Routes */
+  #savedRoutesComboBox {
+    margin-bottom: 15px;
+  }
+  
+  /* History Table */
+  .table {
+    width: 100%;
+    margin-bottom: 0;
+    color: #212529;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #495057;
+    border-top: none;
+    padding: 15px 12px;
+  }
+  
+  .table td {
+    padding: 15px 12px;
+    vertical-align: middle;
+  }
+  
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: rgba(241, 93, 48, 0.03);
+  }
+  
+  /* Modal */
+  .modal-content {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-header {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 20px 25px;
+    background-color: #f8f9fa;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+  }
+  
+  .modal-body {
+    padding: 25px;
+  }
+  
+  .modal-footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 15px 25px;
+  }
+  
+  .close {
+    font-size: 1.5rem;
+    color: #aaa;
+    transition: color 0.15s;
+  }
+  
+  .close:hover {
+    color: #666;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .card {
+      margin-bottom: 20px;
+    }
+    
+    #navigationMap {
+      height: 400px !important;
+    }
+    
+    .hero-wrap h1 {
+      font-size: 28px;
+    }
+    
+    .hero-wrap p.caps {
+      font-size: 16px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+    }
+    
+    .form-control, .form-select {
+      padding: 8px 12px;
+    }
+    
+    .table th, .table td {
+      padding: 12px 8px;
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    #navigationMap {
+      height: 350px !important;
+    }
+    
+    .hero-wrap {
+      height: 250px !important;
+    }
+    
+    .hero-wrap h1 {
+      font-size: 24px;
+    }
+    
+    .table {
+      font-size: 13px;
+    }
+    
+    .table th, .table td {
+      padding: 10px 5px;
+    }
+    
+    .alert-info {
+      font-size: 14px;
+      padding: 12px;
+    }
+  }
+  
+  /* Input Loading State */
+  .input-loading {
+    background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"%3E%3Ccircle cx="50" cy="50" fill="none" stroke="%23f15d30" stroke-width="8" r="35" stroke-dasharray="164.93361431346415 56.97787143782138"%3E%3CanimateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 50 50;360 50 50" keyTimes="0;1"%3E%3C/animateTransform%3E%3C/circle%3E%3C/svg%3E');
+    background-position: right 15px center;
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    transition: all 0.3s ease;
+  }
