@@ -1,0 +1,93 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}Modifier une publication{% endblock %}
+
+{% block body %}
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <div class="row">
+                <div class="col-md-8">
+                    <h1 class="hero-title">Modifier votre publication</h1>
+                    <p class="hero-subtitle">Apportez les modifications nécessaires à votre publication.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        /* Hero Section Styling */
+        .hero-section {
+            background-image: url('{{ asset('assets/front_office/images/Web-Bg.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            position: relative;
+            margin-bottom: 50px;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Form Validation Error Styling */
+        .form-control.is-invalid {
+            border: 2px solid red !important; /* Red border for invalid fields */
+            background-color: #ffebee; /* Light red background */
+        }
+
+        .invalid-feedback {
+            color: red; /* Red text for error messages */
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* Optional: Add a red circle/icon for invalid fields */
+        .is-invalid::after {
+            content: "❌"; /* Red X icon */
+            color: red;
+            margin-left: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+
+    <!-- Form Section -->
+    <div class="container posts-container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="glass-card">
+                    {{ include('front_office/post/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+
+                    {{ include('front_office/post/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

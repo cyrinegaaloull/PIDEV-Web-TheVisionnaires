@@ -1,127 +1,102 @@
 <?php
 
-
 namespace App\Entity;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Reclamation
- *
- * @ORM\Table(name="reclamation")
- * @ORM\Entity
- */
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'reclamation')]
 class Reclamation
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="reclamation_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $reclamationId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'reclamation_id', type: 'integer')]
+    private ?int $reclamationId = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="user_id", type="integer", nullable=false)
-     */
-    private $userId;
+    #[ORM\Column(name: 'user_id', type: 'integer', nullable: false)]
+    private int $userId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="content", type="text", length=65535, nullable=false)
-     */
-    private $content;
+    #[ORM\Column(name: 'post_id', type: 'integer', nullable: false)]
+    private int $postId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="status", type="string", length=255, nullable=false)
-     */
-    private $status;
+    #[ORM\Column(name: 'content', type: 'text')]
+    #[Assert\NotBlank(message: 'Le contenu de la réclamation est obligatoire.')]
+    #[Assert\Length(
+        min: 10,
+        minMessage: 'Le contenu doit comporter au moins {{ limit }} caractères.'
+    )]
+    private string $content;
 
+    #[ORM\Column(name: 'status', type: 'string', length: 20)]
+    private string $status;
 
-    /**
-     * Get reclamationId.
-     *
-     * @return int
-     */
-    public function getReclamationId()
+    #[ORM\Column(name: 'created_at', type: 'datetime')]
+    private \DateTimeInterface $createdAt;
+
+    public function __construct()
+    {
+        $this->status = 'pending'; // Default status
+        $this->createdAt = new \DateTime();
+    }
+
+    public function getReclamationId(): ?int
     {
         return $this->reclamationId;
     }
 
-    /**
-     * Set userId.
-     *
-     * @param int $userId
-     *
-     * @return Reclamation
-     */
-    public function setUserId($userId)
-    {
-        $this->userId = $userId;
-
-        return $this;
-    }
-
-    /**
-     * Get userId.
-     *
-     * @return int
-     */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    /**
-     * Set content.
-     *
-     * @param string $content
-     *
-     * @return Reclamation
-     */
-    public function setContent($content)
+    public function setUserId(int $userId): self
     {
-        $this->content = $content;
-
+        $this->userId = $userId;
         return $this;
     }
 
-    /**
-     * Get content.
-     *
-     * @return string
-     */
-    public function getContent()
+    public function getPostId(): int
+    {
+        return $this->postId;
+    }
+
+    public function setPostId(int $postId): self
+    {
+        $this->postId = $postId;
+        return $this;
+    }
+
+    public function getContent(): string
     {
         return $this->content;
     }
 
-    /**
-     * Set status.
-     *
-     * @param string $status
-     *
-     * @return Reclamation
-     */
-    public function setStatus($status)
+    public function setContent(string $content): self
     {
-        $this->status = $status;
-
+        $this->content = $content;
         return $this;
     }
 
-    /**
-     * Get status.
-     *
-     * @return string
-     */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getCreatedAt(): \DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
     }
 }

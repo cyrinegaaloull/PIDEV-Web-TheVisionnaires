@@ -2,42 +2,43 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>{% block title %}Local Lens{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>{% block title %}Local Lens{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  {# Fonts and Icons #}
-  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Arizonia&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    {# Fonts and Icons #}
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Arizonia&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-  {# Pacific CSS #}
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/animate.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/owl.carousel.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/owl.theme.default.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/magnific-popup.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/bootstrap-datepicker.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/jquery.timepicker.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/flaticon.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/style.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/navbar.css')}}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/custom-footer.css') }}">
-  <link rel="stylesheet" href="{{ asset('back_office/css/demo.css') }}">
-  <link rel="stylesheet" href="{{ asset('back_office/vendor/css/theme-default.css') }}">
-  <link rel="stylesheet" href="{{ asset('back_office/vendor/css/core.css') }}">
-  <link rel="stylesheet" href="{{ asset('back_office/vendor/fonts/remixicon/remixicon.css') }}">
-
-
+    {# Pacific CSS #}
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/animate.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/owl.theme.default.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/magnific-popup.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/bootstrap-datepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/jquery.timepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/flaticon.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/navbar.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/custom-footer.css') }}">
+    <link rel="stylesheet" href="{{ asset('back_office/css/demo.css') }}">
+    <link rel="stylesheet" href="{{ asset('back_office/vendor/css/theme-default.css') }}">
+    <link rel="stylesheet" href="{{ asset('back_office/vendor/css/core.css') }}">
+    <link rel="stylesheet" href="{{ asset('back_office/vendor/fonts/remixicon/remixicon.css') }}">
 
 
-  <style>
-    html { overflow-y: scroll; } /* Always show scrollbar */
-  </style>
+
+
+    <style>
+        html { overflow-y: scroll; } /* Always show scrollbar */
+    </style>
 </head>
 <body>
 
-  {# NAVBAR #}
+{# NAVBAR #}
 <!-- NAVBAR -->
+
 <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
   <div class="container">
     <a class="navbar-brand" href="{{ path('app_home') }}">
@@ -107,20 +108,19 @@
         {% endif %}
       </ul>
     </div>
-  </div>
 </nav>
 
 
 
-  {# BODY WRAPPED FOR SCROLL BEHAVIOR #}
-  <div class="js-scroll-wrap">
+{# BODY WRAPPED FOR SCROLL BEHAVIOR #}
+<div class="js-scroll-wrap">
     <main>
-      {% block body %}{% endblock %}
+        {% block body %}{% endblock %}
     </main>
-  </div>
+</div>
 
-  {# FOOTER #}
-  <footer class="ftco-footer bg-bottom ftco-no-pt" style="background-image: url('{{ asset('assets/front_office/images/bg_3.jpg') }}');">
+{# FOOTER #}
+<footer class="ftco-footer bg-bottom ftco-no-pt" style="background-image: url('{{ asset('assets/front_office/images/bg_3.jpg') }}');">
     <div class="container">
         <div class="row mb-5">
             <div class="col-md pt-5">
@@ -164,21 +164,21 @@
 </footer>
 
 
-  {# JS FILES #}
-  <script src="{{ asset('assets/front_office/js/jquery.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery-migrate-3.0.1.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery.easing.1.3.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery.waypoints.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery.stellar.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/owl.carousel.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery.magnific-popup.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery.animateNumber.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/bootstrap-datepicker.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/scrollax.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/bootstrap.min.js') }}"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY"></script>
-  <script src="{{ asset('assets/front_office/js/google-map.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/main.js') }}"></script>
+{# JS FILES #}
+<script src="{{ asset('assets/front_office/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery-migrate-3.0.1.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery.easing.1.3.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery.waypoints.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery.stellar.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/owl.carousel.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery.magnific-popup.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery.animateNumber.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/bootstrap-datepicker.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/scrollax.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/bootstrap.min.js') }}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY"></script>
+<script src="{{ asset('assets/front_office/js/google-map.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/main.js') }}"></script>
 
 </body>
 </html>
