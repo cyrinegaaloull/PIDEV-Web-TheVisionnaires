@@ -16,15 +16,30 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 final class PostController extends AbstractController
 {
     #[Route(name: 'app_post_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
-        // Fetch all posts
-        $posts = $entityManager->getRepository(Post::class)->findAll();
+        $search = $request->query->get('search'); // get the 'search' input from URL
+        $postRepository = $entityManager->getRepository(Post::class);
+
+        if ($search) {
+            $queryBuilder = $postRepository->createQueryBuilder('p');
+            $queryBuilder
+                ->where('p.title LIKE :search')
+                ->orWhere('p.content LIKE :search')
+                ->orWhere('p.category LIKE :search')
+                ->setParameter('search', '%' . $search . '%')
+                ->orderBy('p.postId', 'DESC');
+
+            $posts = $queryBuilder->getQuery()->getResult();
+        } else {
+            $posts = $postRepository->findBy([], ['postId' => 'DESC']);
+        }
 
         return $this->render('front_office/post/index.html.twig', [
             'posts' => $posts,
         ]);
     }
+
 
     #[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

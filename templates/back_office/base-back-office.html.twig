@@ -1,4 +1,3 @@
-
 {# templates/back_office/base-back-office.html.twig #}
 <!DOCTYPE html>
 <html lang="en"
@@ -11,7 +10,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Back Office{% endblock %}</title>
-
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.ico') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="{{ asset('assets/back_office/vendor/fonts/remixicon/remixicon.css') }}">
@@ -21,10 +19,8 @@
     <link rel="stylesheet" href="{{ asset('assets/back_office/css/demo.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/back_office/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/back_office/vendor/libs/apex-charts/apex-charts.css') }}" />
-
     <script src="{{ asset('assets/back_office/vendor/js/helpers.js') }}"></script>
     <script src="{{ asset('assets/back_office/js/config.js') }}"></script>
-
     {% block stylesheets %}
         {# Base stylesheets block - Flash message CSS added here #}
         <style>
@@ -66,8 +62,7 @@
                 color: white;
             }
 
-            /* --- Add Modal CSS here if it should be globally available --- */
-            /* --- Otherwise, keep modal CSS in specific child templates --- */
+            /* --- Modal CSS --- */
             .modal {
                 display: none;
                 position: fixed;
@@ -109,16 +104,12 @@
             .close:focus {
                 color: black;
             }
-            /* --- End Modal CSS --- */
-
         </style>
     {% endblock %}
 </head>
-
 <body>
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
-
         {# Sidebar - BEGIN #}
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
             <div class="app-brand demo">
@@ -126,16 +117,13 @@
                     <span class="app-brand-logo demo me-1">
                         <img src="{{ asset('assets/logo/logo1.png') }}" alt="Logo" height="32"/> {# Adjust height as needed #}
                     </span>
-                    {# <span class="app-brand-text demo menu-text fw-bold">YourAppName</span> #} {# Optional App Name #}
                 </a>
                 <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto"> {# Use javascript:void(0); #}
                     <i class="menu-toggle-icon d-xl-block align-middle ri-arrow-left-s-line"></i> {# Use a real icon #}
                     <i class="menu-toggle-icon d-xl-none align-middle ri-menu-line"></i> {# Icon for smaller screens #}
                 </a>
             </div>
-
             <div class="menu-inner-shadow"></div>
-
             <ul class="menu-inner py-1">
                 <li class="menu-item active open"> {# Use request attributes to set 'active' dynamically if needed #}
                     <a href="{{ path('admin_dashboard') }}" class="menu-link">
@@ -143,11 +131,9 @@
                         <div>Dashboard</div>
                     </a>
                 </li>
-
                 <li class="menu-header mt-7">
                     <span class="menu-header-text">Gestion</span>
                 </li>
-
                 <!-- Exploration -->
                 <li class="menu-item">
                     <a href="#" class="menu-link menu-toggle">
@@ -166,7 +152,6 @@
                         </li>
                     </ul>
                 </li>
-
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link menu-toggle"> {# Use javascript:void(0); #}
                         <i class="menu-icon tf-icons ri-group-line"></i>
@@ -184,7 +169,6 @@
                         </li>
                     </ul>
                 </li>
-                <!-- Assistance -->
                 <li class="menu-item">
                     <a href="#" class="menu-link menu-toggle">
                         <i class="menu-icon tf-icons ri-government-line"></i>
@@ -217,85 +201,72 @@
                         </li>
                     </ul>
                 </li>
-
-            </ul>
-            </li>
-            <li class="menu-item {% if app.request.attributes.get('_route') starts with 'admin_transport_modes' %}active open{% endif %}">
-                <a href="#" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons ri-bus-line"></i>
-                    <div>Navigation</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item {% if app.request.attributes.get('_route') == 'admin_transport_modes' %}active{% endif %}">
-                        <a href="{{ path('admin_transport_modes') }}" class="menu-link">Modes de transport</a>
-                    </li>
-                    <!-- Add other navigation-related admin pages here -->
-                </ul>
-            </li>
-            <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle"> {# Use javascript:void(0); #}
-                    <i class="menu-icon tf-icons ri-message-3-line"></i>
-                    <div>Flux Social</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="{{ path('admin_flux_social') }}" class="menu-link">fil social </a>
-                    </li>
-                    <li class="menu-item">
-
+                <li class="menu-item {% if app.request.attributes.get('_route') starts with 'admin_transport_modes' %}active open{% endif %}">
+                    <a href="#" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons ri-bus-line"></i>
+                        <div>Navigation</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item {% if app.request.attributes.get('_route') == 'admin_transport_modes' %}active{% endif %}">
+                            <a href="{{ path('admin_transport_modes') }}" class="menu-link">Modes de transport</a>
+                        </li>
+                        <!-- Add other navigation-related admin pages here -->
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle"> {# Use javascript:void(0); #}
+                        <i class="menu-icon tf-icons ri-message-3-line"></i>
+                        <div>Flux Social</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="{{ path('admin_flux_social') }}" class="menu-link">fil social </a>
+                        </li>
+                        <li class="menu-item">
                             <a href="{{ path('admin_reclamations_list') }}" class="menu-link">reclamation </a>
-
-
-                    </li>
-                    <li class="menu-item">
-                        <a href="#" class="menu-link">Option 3</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle"> {# Use javascript:void(0); #}
-                    <i class="menu-icon tf-icons ri-user-3-line"></i>
-                    <div>Utilisateur</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item"> {# Use request attributes to set 'active' dynamically if needed #}
-                        <a href="{{ path('list_roles') }}" class="menu-link">ROLES</a> {# Link to list roles #}
-                    </li>
-                    <li class="menu-item"> {# Use request attributes to set 'active' dynamically if needed #}
-                        <a href="{{ path('add_user') }}" class="menu-link">USERS</a> {# Assuming you have an add_user route #}
-                    </li>
-
-                </ul>
-            </li>
-
-            <li class="menu-header mt-7"><span class="menu-header-text">Mon Compte</span></li>
-
-            <li class="menu-item">
-                <a href="#" class="menu-link"> {# Add path to profile page #}
-                    <i class="menu-icon tf-icons ri-profile-line"></i>
-                    <div>Profile</div>
-                </a>
-            </li>
-
-            <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link"> {# Add path to settings page or make it a dropdown #}
-                    <i class="menu-icon tf-icons ri-settings-3-line"></i>
-                    <div>Paramètres</div>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="{{ path('app_logout') }}" class="menu-link">
-                    <i class="menu-icon tf-icons ri-logout-box-line"></i>
-                    <div>Se déconnecter</div>
-                </a>
-            </li>
-
+                        </li>
+                        <li class="menu-item">
+                            <a href="#" class="menu-link">Option 3</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle"> {# Use javascript:void(0); #}
+                        <i class="menu-icon tf-icons ri-user-3-line"></i>
+                        <div>Utilisateur</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item"> {# Use request attributes to set 'active' dynamically if needed #}
+                            <a href="{{ path('list_roles') }}" class="menu-link">ROLES</a> {# Link to list roles #}
+                        </li>
+                        <li class="menu-item"> {# Use request attributes to set 'active' dynamically if needed #}
+                            <a href="{{ path('add_user') }}" class="menu-link">USERS</a> {# Assuming you have an add_user route #}
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-header mt-7"><span class="menu-header-text">Mon Compte</span></li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link"> {# Add path to profile page #}
+                        <i class="menu-icon tf-icons ri-profile-line"></i>
+                        <div>Profile</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link"> {# Add path to settings page or make it a dropdown #}
+                        <i class="menu-icon tf-icons ri-settings-3-line"></i>
+                        <div>Paramètres</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ path('app_logout') }}" class="menu-link">
+                        <i class="menu-icon tf-icons ri-logout-box-line"></i>
+                        <div>Se déconnecter</div>
+                    </a>
+                </li>
             </ul>
         </aside>
         {# Sidebar - END #}
-
         <div class="layout-page">
-
             {# Navbar - BEGIN #}
             <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
                  id="layout-navbar">
@@ -304,7 +275,6 @@
                         <i class="ri-menu-fill ri-24px"></i>
                     </a>
                 </div>
-
                 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
                     <div class="navbar-nav align-items-center">
                         <div class="nav-item d-flex align-items-center">
@@ -326,7 +296,6 @@
                                  {% endif %}
                              </span>
                         </li>
-
                         <li class="nav-item navbar-dropdown dropdown-user dropdown">
                             <a class="nav-link dropdown-toggle hide-arrow p-0"
                                href="javascript:void(0);"
@@ -373,7 +342,6 @@
                                         <span class="align-middle">Paramètres</span>
                                     </a>
                                 </li>
-
                                 <li>
                                     <div class="dropdown-divider"></div>
                                 </li>
@@ -391,10 +359,8 @@
                 </div>
             </nav>
             {# Navbar - END #}
-
             <div class="content-wrapper">
                 <div class="container-xxl flex-grow-1 container-p-y">
-
                     {# START: Flash Message Rendering Area #}
                     <div class="flash-container" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1050; width: auto;">
                         {% for label, messages in app.flashes %}
@@ -405,13 +371,9 @@
                         {% endfor %}
                     </div>
                     {# END: Flash Message Rendering Area #}
-
-
                     {# Specific page content goes here #}
                     {% block body %}{% endblock %}
-
                 </div> {# End container-p-y #}
-
                 {# Footer - BEGIN #}
                 <footer class="content-footer footer bg-footer-theme">
                     <div class="container-xxl d-flex justify-content-between py-2">
@@ -425,12 +387,10 @@
                     </div>
                 </footer>
                 {# Footer - END #}
-
                 <div class="content-backdrop fade"></div> {# Usually needed for theme overlays #}
             </div> {# End content-wrapper #}
         </div> {# End layout-page #}
     </div> {# End layout-container #}
-
     {# Overlay for mobile menu toggle #}
     <div class="layout-overlay layout-menu-toggle"></div>
 </div> {# End layout-wrapper #}
@@ -445,8 +405,6 @@
 {# <script src="{{ asset('assets/back_office/vendor/libs/apex-charts/apexcharts.js') }}"></script> #} {# Uncomment if needed #}
 <script src="{{ asset('assets/back_office/js/main.js') }}"></script>
 {# <script src="{{ asset('assets/back_office/js/dashboards-analytics.js') }}"></script> #} {# Example dashboard JS, uncomment if needed #}
-
-
 {% block javascripts %}
     {# Base javascripts block - Flash message and Modal JS added here #}
     <script>
@@ -459,7 +417,6 @@
                     setTimeout(() => {
                         flashMessage.classList.add('show');
                     }, 100 + (index * 150));
-
                     // Set timeout to hide the message
                     setTimeout(() => {
                         flashMessage.classList.remove('show');
@@ -478,10 +435,7 @@
                 });
             }
 
-
             // --- Modal for delete confirmation logic ---
-            // --- Consider moving this JS to a child template block ---
-            // --- if the modal is only used on specific pages ---
             const modal = document.getElementById('deleteModal');
             if (modal) { // Check if modal element exists on the current page
                 let formToSubmit = null;
@@ -536,10 +490,8 @@
                     }
                 });
             }
-            // --- End Modal Logic ---
         });
     </script>
 {% endblock %}
-
 </body>
 </html>
