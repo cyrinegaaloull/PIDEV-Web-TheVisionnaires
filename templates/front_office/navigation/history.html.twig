@@ -16,16 +16,19 @@
   </div>
 </div>
 
-<section class="ftco-section ftco-no-pb ftco-no-pt">
+<section class="ftco-section navigation-container">
   <div class="container">
     <div class="row">
       <div class="col-12">
         {% if routes is empty %}
           <div class="alert alert-info">
-            <p>Vous n'avez pas encore d'itinéraires enregistrés. <a href="{{ path('app_navigation') }}">Trouvez un itinéraire</a> pour l'enregistrer.</p>
+            <p class="mb-0">Vous n'avez pas encore d'itinéraires enregistrés. <a href="{{ path('app_navigation') }}" class="text-primary font-weight-bold">Trouvez un itinéraire</a> pour l'enregistrer.</p>
           </div>
         {% else %}
           <div class="card shadow-sm">
+            <div class="card-header bg-white">
+              <h5 class="card-title mb-0">Vos itinéraires enregistrés</h5>
+            </div>
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-striped table-hover">
@@ -42,10 +45,22 @@
                   <tbody>
                     {% for route in routes %}
                       <tr>
-                        <td>{{ route.name }}</td>
+                        <td><span class="font-weight-medium">{{ route.name }}</span></td>
                         <td>{{ route.departurePlaceName|default('Inconnu') }}</td>
                         <td>{{ route.arrivalPlaceName|default('Inconnu') }}</td>
-                        <td>{{ route.transportMode }}</td>
+                        <td>
+                          {% if route.transportMode == 'driving' %}
+                            <span class="badge badge-light">🚗 Voiture</span>
+                          {% elseif route.transportMode == 'walking' %}
+                            <span class="badge badge-light">🚶 Marche</span>
+                          {% elseif route.transportMode == 'cycling' %}
+                            <span class="badge badge-light">🚲 Vélo</span>
+                          {% elseif route.transportMode == 'public_transport' %}
+                            <span class="badge badge-light">🚍 Transport public</span>
+                          {% else %}
+                            <span class="badge badge-light">{{ route.transportMode }}</span>
+                          {% endif %}
+                        </td>
                         <td>{{ route.timestamp|date('Y-m-d H:i') }}</td>
                         <td>
                           <div class="btn-group" role="group">
@@ -65,28 +80,7 @@
     </div>
   </div>
 </section>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Êtes-vous sûr de vouloir supprimer cet itinéraire ? Cette action ne peut pas être annulée.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-danger" id="confirmDelete">Supprimer</button>
-      </div>
-    </div>
-  </div>
-</div>
-  <script>
+ <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Setup delete route buttons
       const deleteButtons = document.querySelectorAll('.delete-route');
@@ -130,5 +124,5 @@
 
 {% block javascripts %}
   {{ parent() }}
-
+ 
 {% endblock %}
