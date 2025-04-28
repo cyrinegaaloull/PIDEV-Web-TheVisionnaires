@@ -4,7 +4,7 @@ namespace App\Controller\back_office\filsocial;
 
 use App\Entity\Reclamation;
 use App\Entity\Post;
-use App\Entity\Users; // Fixed: Users entity with 's'
+use App\Entity\Users;
 use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,9 +31,17 @@ class ReclamationController extends AbstractController
             $reclamationRepository->findAll() :
             $reclamationRepository->findBy(['status' => $filterStatus]);
 
+        // Count the number of pending reclamations for notification
+        $pendingCount = $entityManager->createQuery(
+            'SELECT COUNT(r) FROM App\Entity\Reclamation r WHERE r.status = :status'
+        )
+            ->setParameter('status', 'pending')
+            ->getSingleScalarResult();
+
         return $this->render('back_office/filsocial/list.html.twig', [
             'reclamations' => $reclamations,
             'filterStatus' => $filterStatus,
+            'pendingCount' => $pendingCount,
         ]);
     }
 

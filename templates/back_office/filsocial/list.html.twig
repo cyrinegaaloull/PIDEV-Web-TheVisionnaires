@@ -6,6 +6,20 @@
     <div class="container">
         <h1>Gestion des Réclamations</h1>
 
+        {% if pendingCount > 0 %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        title: 'Pending Reclamations!',
+                        text: 'You have {{ pendingCount }} pending reclamation(s).',
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            </script>
+        {% endif %}
+
+
         <!-- Filter Section -->
         <div class="mb-4">
             <label for="statusFilter" class="form-label">Filtrer par statut:</label>
