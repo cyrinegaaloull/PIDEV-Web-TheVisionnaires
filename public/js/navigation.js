@@ -41,7 +41,8 @@ function initNavigation() {
         preserveViewport: false
     });
     directionsRenderer.setMap(map);
-    
+    setupMapClickPositioning();
+
     // DOM elements
     const departurePlaceField = document.getElementById('departurePlaceField');
     const departureLatField = document.getElementById('departureLatField');
@@ -409,126 +410,184 @@ function searchLocation(query, isForDeparture) {
     
     // Calculate route
     function calculateRoute(save = true) {
-        console.log("tetsing", save);
+        console.log("testing calculateRoute with save =", save);
         
-        if (!mapInitialized) {
-            showError('Map not ready', 'Please wait for the map to finish loading.');
-            return;
-        }
-    
         try {
-            const depLat = parseFloat(departureLatField.value.trim());
-            const depLon = parseFloat(departureLonField.value.trim());
-            const arrLat = parseFloat(arrivalLatField.value.trim());
-            const arrLon = parseFloat(arrivalLonField.value.trim());
-    
-            if (isNaN(depLat) || isNaN(depLon) || isNaN(arrLat) || isNaN(arrLon)) {
-                showError('Invalid Input', 'Please enter valid coordinates.');
+            // Check map initialization
+            console.log("Map initialized:", mapInitialized);
+            if (!mapInitialized) {
+                showError('Map not ready', 'Please wait for the map to finish loading.');
                 return;
             }
-    
-            if (!isValidCoordinates(depLat, depLon, arrLat, arrLon)) {
-                showError('Invalid Coordinates', 
-                    'Please ensure coordinates are within valid ranges:\n' +
-                    'Latitude: -90 to 90\n' +
-                    'Longitude: -180 to 180');
-                return;
-            }
-    
-            const transportMode = transportModeComboBox.value;
-    
-            if (transportMode === 'public_transport') {
-                findPublicTransport(save);
-                return;
-            }
-    
-            progressIndicator.style.display = 'block';
-    
-            const routeData = {
-                departureLat: depLat,
-                departureLon: depLon,
-                arrivalLat: arrLat,
-                arrivalLon: arrLon,
-                transportMode: transportMode,
-                departurePlaceName: departurePlaceField.value,
-                arrivalPlaceName: arrivalPlaceField.value,
-                routeName: routeNameField.value,
-                saveRoute: save, // <--- Now we pass true/false
-                id: currentRouteId,
-                departureTime: departureTime.toISOString()
-            };
-    
-            showRoute(depLat, depLon, arrLat, arrLon, transportMode);
-    
-            if (save) {                
-                // Only save if save == true
-                fetch('/navigation/calculate-route', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(routeData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        showError('Route Calculation Error', data.error);
-                        progressIndicator.style.display = 'none';
-                        return;
-                    }
-    
-                    let departureTime;
-                    const dateStr = departureDatePicker.value?.trim();
-                    const timeStr = departureTimeComboBox.value?.trim();
-    
-                    if (dateStr && timeStr) {
-                        const departureTimeCandidate = new Date(`${dateStr}T${timeStr}`);
-                        if (!isNaN(departureTimeCandidate.getTime())) {
-                            departureTime = departureTimeCandidate;
+        
+            try {
+                // Debug each value before parsing
+                console.log("Raw field values:");
+                console.log("departureLatField:", departureLatField?.value);
+                console.log("departureLonField:", departureLonField?.value);
+                console.log("arrivalLatField:", arrivalLatField?.value);
+                console.log("arrivalLonField:", arrivalLonField?.value);
+                
+                // Parse values
+                const depLat = parseFloat(departureLatField?.value?.trim());
+                const depLon = parseFloat(departureLonField?.value?.trim());
+                const arrLat = parseFloat(arrivalLatField?.value?.trim());
+                const arrLon = parseFloat(arrivalLonField?.value?.trim());
+                
+                console.log("Parsed values:", {depLat, depLon, arrLat, arrLon});
+        
+                // Check for NaN
+                if (isNaN(depLat) || isNaN(depLon) || isNaN(arrLat) || isNaN(arrLon)) {
+                    console.log("NaN values detected:", {depLat, depLon, arrLat, arrLon});
+                    showError('Invalid Input', 'Please enter valid coordinates.');
+                    return;
+                }
+        
+                // Validate coordinates
+                console.log("Checking coordinate validity:", {depLat, depLon, arrLat, arrLon});
+                console.log("isValidLatitude(depLat):", isValidLatitude(depLat));
+                console.log("isValidLongitude(depLon):", isValidLongitude(depLon));
+                console.log("isValidLatitude(arrLat):", isValidLatitude(arrLat));
+                console.log("isValidLongitude(arrLon):", isValidLongitude(arrLon));
+                
+                const isValid = isValidCoordinates(depLat, depLon, arrLat, arrLon);
+                console.log("Coordinates valid:", isValid);
+                
+                if (!isValid) {
+                    showError('Invalid Coordinates', 
+                        'Please ensure coordinates are within valid ranges:\n' +
+                        'Latitude: -90 to 90\n' +
+                        'Longitude: -180 to 180');
+                    return;
+                }
+        
+                // Check transport mode
+                console.log("Transport mode:", transportModeComboBox?.value);
+                const transportMode = transportModeComboBox?.value;
+        
+                if (transportMode === 'public_transport') {
+                    console.log("Using public transport mode");
+                    findPublicTransport(save);
+                    return;
+                }
+        
+                console.log("Showing progress indicator");
+                progressIndicator.style.display = 'block';
+        
+                console.log("Creating route data");
+                // Check if departureTime is defined
+                if (typeof departureTime === 'undefined') {
+                    console.log("departureTime is undefined, creating new Date");
+                    var departureTime = new Date();
+                }
+                
+                const routeData = {
+                    departureLat: depLat,
+                    departureLon: depLon,
+                    arrivalLat: arrLat,
+                    arrivalLon: arrLon,
+                    transportMode: transportMode,
+                    departurePlaceName: departurePlaceField?.value || "",
+                    arrivalPlaceName: arrivalPlaceField?.value || "",
+                    routeName: routeNameField?.value || "",
+                    saveRoute: save,
+                    id: currentRouteId,
+                    departureTime: departureTime.toISOString()
+                };
+                
+                console.log("Route data created:", routeData);
+        
+                console.log("About to call showRoute");
+                showRoute(depLat, depLon, arrLat, arrLon, transportMode);
+                console.log("showRoute completed");
+        
+                if (save) {               
+                    console.log("Saving route to server");
+                    // Only save if save == true
+                    fetch('/navigation/calculate-route', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(routeData)
+                    })
+                    .then(response => {
+                        console.log("Got response from server");
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Processed server response:", data);
+                        if (data.error) {
+                            showError('Route Calculation Error', data.error);
+                            progressIndicator.style.display = 'none';
+                            return;
+                        }
+        
+                        let departureTime;
+                        const dateStr = departureDatePicker?.value?.trim();
+                        const timeStr = departureTimeComboBox?.value?.trim();
+                        console.log("Date/time strings:", dateStr, timeStr);
+        
+                        if (dateStr && timeStr) {
+                            const departureTimeCandidate = new Date(`${dateStr}T${timeStr}`);
+                            if (!isNaN(departureTimeCandidate.getTime())) {
+                                departureTime = departureTimeCandidate;
+                            } else {
+                                departureTime = new Date();
+                            }
                         } else {
                             departureTime = new Date();
                         }
-                    } else {
-                        departureTime = new Date();
-                    }
-    
-                    let arrivalTime;
-                    const durationInMinutes = Number(data.durationMinutes);
-    
-                    if (!isNaN(durationInMinutes)) {
-                        arrivalTime = new Date(departureTime.getTime() + durationInMinutes * 60000);
-                    } else {
-                        arrivalTime = departureTime;
-                    }
-    
-                    const formatter = new Intl.DateTimeFormat('en-US', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit'
+                        console.log("Departure time:", departureTime);
+        
+                        let arrivalTime;
+                        const durationInMinutes = Number(data.durationMinutes);
+                        console.log("Duration in minutes:", durationInMinutes);
+        
+                        if (!isNaN(durationInMinutes)) {
+                            arrivalTime = new Date(departureTime.getTime() + durationInMinutes * 60000);
+                        } else {
+                            arrivalTime = departureTime;
+                        }
+                        console.log("Arrival time:", arrivalTime);
+        
+                        const formatter = new Intl.DateTimeFormat('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+        
+                        const formattedText = `Distance: ${data.formattedDistance} | Travel time: ${data.formattedDuration} | Arrival: ${formatter.format(arrivalTime)}`;
+                        console.log("Setting arrival time label:", formattedText);
+                        arrivalTimeLabel.textContent = formattedText;
+        
+                        if (data.savedRouteId) {
+                            console.log("Loading saved routes");
+                            loadSavedRoutes();
+                        }
+        
+                        console.log("Hiding progress indicator");
+                        progressIndicator.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error('Error calculating route:', error);
+                        progressIndicator.style.display = 'none';
+                        showError('Routing Error', 'Could not calculate route: ' + error.message);
                     });
-    
-                    arrivalTimeLabel.textContent = `Distance: ${data.formattedDistance} | Travel time: ${data.formattedDuration} | Arrival: ${formatter.format(arrivalTime)}`;
-    
-                    if (data.savedRouteId) {
-                        loadSavedRoutes();
-                    }
-    
+                } else {
+                    console.log("Not saving route, hiding progress indicator");
                     progressIndicator.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Error calculating route:', error);
-                    progressIndicator.style.display = 'none';
-                    showError('Routing Error', 'Could not calculate route: ' + error.message);
-                });
-            } else {
-                progressIndicator.style.display = 'none';
+                }
+        
+            } catch (innerError) {
+                console.error('Inner try/catch error:', innerError);
+                showError('Processing Error', 'Error processing coordinates: ' + (innerError.message || 'Unknown error'));
             }
-    
         } catch (error) {
-            showError('Invalid Input', 'Please enter valid numbers for all coordinates.');
-            console.error(error);
+            console.error('Main try/catch error:', error);
+            showError('Invalid Input', 'Please enter valid numbers for all coordinates: ' + (error.message || 'Unknown error'));
         }
     }
     
@@ -1242,6 +1301,174 @@ function searchLocation(query, isForDeparture) {
     // Initialize
     updateButtonState();
     checkForRouteParam();
+    // Function to handle map clicks for setting departure and arrival points
+function setupMapClickPositioning() {
+    // Variables to track click state
+    let isFirstClick = true;
+    let mapClicksEnabled = false;
+    
+    // Create a toggle button for map clicks mode
+    const mapClickModeButton = document.createElement('button');
+    mapClickModeButton.type = 'button';
+    mapClickModeButton.className = 'map-control-button';
+    mapClickModeButton.innerHTML = '<i class="fas fa-map-marker-alt"></i> Set Locations by Map Click';
+    mapClickModeButton.title = 'Click on map to set departure and arrival points';
+    
+    // Style the button
+    mapClickModeButton.style.position = 'absolute';
+    mapClickModeButton.style.top = '10px';
+    mapClickModeButton.style.left = '250px';
+    mapClickModeButton.style.zIndex = '1000';
+    mapClickModeButton.style.backgroundColor = 'white';
+    mapClickModeButton.style.border = '2px solid rgba(0,0,0,0.2)';
+    mapClickModeButton.style.borderRadius = '4px';
+    mapClickModeButton.style.padding = '6px 10px';
+    mapClickModeButton.style.cursor = 'pointer';
+    mapClickModeButton.style.fontSize = '14px';
+    mapClickModeButton.style.boxShadow = '0 1px 5px rgba(0,0,0,0.4)';
+    
+    // Add hover effect
+    mapClickModeButton.onmouseover = function() {
+        this.style.backgroundColor = '#f4f4f4';
+    };
+    mapClickModeButton.onmouseout = function() {
+        if (!mapClicksEnabled) {
+            this.style.backgroundColor = 'white';
+        }
+    };
+    
+    // Add the button directly to the map container
+    const mapContainer = document.getElementById('navigationMap');
+    mapContainer.appendChild(mapClickModeButton);
+    
+    // Toggle map click mode
+    mapClickModeButton.addEventListener('click', function() {
+        mapClicksEnabled = !mapClicksEnabled;
+        
+        if (mapClicksEnabled) {
+            mapClickModeButton.style.backgroundColor = '#e0f7fa';
+            mapClickModeButton.style.borderColor = '#0288d1';
+            mapClickModeButton.innerHTML = '<i class="fas fa-map-marker-alt"></i> Map Click Mode: ON';
+            isFirstClick = true;
+            
+            // Show instruction toast
+            showToast('Click on the map to set departure point');
+        } else {
+            mapClickModeButton.style.backgroundColor = 'white';
+            mapClickModeButton.style.borderColor = 'rgba(0,0,0,0.2)';
+            mapClickModeButton.innerHTML = '<i class="fas fa-map-marker-alt"></i> Set Locations by Map Click';
+        }
+    });
+    
+    // Add click listener to the map
+    map.addListener('click', function(event) {
+        if (!mapClicksEnabled) return;
+        
+        // Get precise numeric values for coordinates
+        const lat = parseFloat(event.latLng.lat().toFixed(6));
+        const lng = parseFloat(event.latLng.lng().toFixed(6));
+        
+        // Reverse geocode to get address
+        const geocoder = new google.maps.Geocoder();
+        const latlng = {lat: lat, lng: lng};
+        
+        geocoder.geocode({'location': latlng}, function(results, status) {
+            let locationName = 'Selected Location';
+            
+            if (status === 'OK' && results[0]) {
+                locationName = results[0].formatted_address;
+            }
+            
+            if (isFirstClick) {
+                // Set departure location with numeric values
+                departureLatField.value = lat;
+                departureLonField.value = lng;
+                departurePlaceField.value = locationName;
+                
+                // Add marker for departure
+                clearMarkers();
+                const marker = new google.maps.Marker({
+                    position: {lat: lat, lng: lng},
+                    map: map,
+                    title: 'Departure',
+                    animation: google.maps.Animation.DROP,
+                    icon: {
+                        url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
+                    }
+                });
+                markers.push(marker);
+                
+                isFirstClick = false;
+                showToast('Departure point set. Now click for arrival point.');
+            } else {
+                // Set arrival location with numeric values
+                arrivalLatField.value = lat;
+                arrivalLonField.value = lng;
+                arrivalPlaceField.value = locationName;
+                
+                // Add marker for arrival
+                const marker = new google.maps.Marker({
+                    position: {lat: lat, lng: lng},
+                    map: map,
+                    title: 'Arrival',
+                    animation: google.maps.Animation.DROP,
+                    icon: {
+                        url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                    }
+                });
+                markers.push(marker);
+                
+                isFirstClick = true;
+                showToast('Arrival point set. You can now show route or update departure.');
+            }
+            
+            // Update button state
+            updateButtonState();
+        });
+    });
+    
+    // Helper function to show toast notifications
+    function showToast(message) {
+        // Check if toast container exists, if not create it
+        let toastContainer = document.getElementById('map-toast-container');
+        
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'map-toast-container';
+            toastContainer.style.position = 'absolute';
+            toastContainer.style.top = '60px';  // Position below the button
+            toastContainer.style.left = '50%';
+            toastContainer.style.transform = 'translateX(-50%)';
+            toastContainer.style.zIndex = '1000';
+            document.getElementById('navigationMap').appendChild(toastContainer);
+        }
+        
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = 'map-toast';
+        toast.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        toast.style.color = 'white';
+        toast.style.padding = '10px 15px';
+        toast.style.borderRadius = '4px';
+        toast.style.marginBottom = '10px';
+        toast.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+        toast.textContent = message;
+        
+        // Add toast to container
+        toastContainer.appendChild(toast);
+        
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                if (toastContainer.contains(toast)) {
+                    toastContainer.removeChild(toast);
+                }
+            }, 500);
+        }, 3000);
+    }
+}
 }
 
 // Trigger the initialization
