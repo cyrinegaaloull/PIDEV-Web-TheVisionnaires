@@ -1,8 +1,21 @@
 {% extends 'front_office/base-front-office.html.twig' %}
 
-  
 {% block body %}
-<link rel="stylesheet" href="{{ asset('assets/exploration/css/style.css') }}">
+ <link rel="stylesheet" href="{{ asset('assets/exploration/css/style.css') }}">
+{# Hero Section with Background Image #}
+<div class="hero-wrap js-fullheight" style="background-image: url('{{ asset('assets/exploration/images/exploration_bg.jpeg') }}');">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row no-gutters slider-text js-fullheight align-items-center justify-content-center" data-scrollax-parent="true">
+      <div class="col-md-9 text-center ftco-animate">
+        <p class="breadcrumbs"><span class="mr-2"><a href="{{ path('app_home') }}">Home</a></span> <span>Exploration</span></p>
+        <h1 class="mb-3 bread">Découvrez de nouveaux horizons</h1>
+        <p class="caps">Explorez des lieux incroyables près de chez vous</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <section class="ftco-section">
   <div class="container">
     <div class="row justify-content-center pb-4">
@@ -15,15 +28,15 @@
       <div class="col-md-8">
         <form id="live-search-form" method="get" action="{{ path('app_exploration') }}">
           <div class="input-group">
-<input
-  type="text"
-  name="search"
-  id="search-input"
-  class="form-control"
-  placeholder="Rechercher un lieu..."
-  autocomplete="off"
-  value="{{ app.request.get('search') }}"
->
+            <input
+              type="text"
+              name="search"
+              id="search-input"
+              class="form-control"
+              placeholder="Rechercher un lieu..."
+              autocomplete="off"
+              value="{{ app.request.get('search') }}"
+            >
             <div class="input-group-append">
               <button class="btn btn-primary" type="submit">Rechercher</button>
             </div>
@@ -51,16 +64,68 @@
         <p class="mt-2">Chargement des recommandations météo...</p>
       </div>
     </div>
-    
-  </div>
 </section>
+
 <style>
   #weather-recommendations h3 {
     color: #602080;
     border-left: 4px solid #602080;
     padding-left: 10px;
   }
+  
+  /* Hero section styling */
+  .hero-wrap {
+    position: relative;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+  
+  .hero-wrap .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    content: '';
+    opacity: .4;
+    background: #000000;
+  }
+  
+  .hero-wrap .slider-text {
+    color: #fff;
+    height: 650px;
+  }
+  
+  .hero-wrap .slider-text h1 {
+    font-size: 60px;
+    color: #fff;
+    line-height: 1.2;
+    font-weight: 800;
+  }
+  
+  .hero-wrap .slider-text p.caps {
+    font-weight: 300;
+    font-size: 18px;
+  }
+  
+  .hero-wrap .breadcrumbs {
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    z-index: 99;
+  }
+  
+  .hero-wrap .breadcrumbs span {
+    color: white;
+  }
+  
+  .hero-wrap .breadcrumbs span a {
+    color: white;
+  }
 </style>
+
 <script>
   // Reinit animations after AJAX (FTCO-style)
   function reinitAnimations() {
@@ -84,7 +149,7 @@
             }, 100);
           }
         }, { offset: '95%' });
-        $.waypoints('refresh'); // ✨ force refresh
+        $.waypoints('refresh'); //force refresh
       }
     }
 
@@ -93,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function fetchWeatherAndLoadRecommendations() {
     const container = document.getElementById('weather-recommendations');
-    const apiKey = '6a6c2bff6bb599f64dabe16808c8cf58'; // ✅ Your OpenWeatherMap API key
+    const apiKey = '6a6c2bff6bb599f64dabe16808c8cf58'; // Your OpenWeatherMap API key
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async position => {
@@ -105,12 +170,12 @@ document.addEventListener('DOMContentLoaded', function () {
           const weatherData = await weatherRes.json();
           const weatherCondition = weatherData.weather[0].main;
 
-          // ✅ Send lat/lon + weather to Symfony controller
+          // Send lat/lon + weather to Symfony controller
           fetch(`/recommendations?weather=${weatherCondition}&lat=${lat}&lon=${lon}&_ajax=1`)
   .then(res => res.text())
   .then(html => {
     container.innerHTML = html;
-    reinitAnimations(); // ✅ triggers FTCO animation manually
+    reinitAnimations(); // triggers FTCO animation manually
   });
 
 
@@ -167,12 +232,12 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(res => res.text())
       .then(html => {
         resultsContainer.innerHTML = html;
-        console.log('✅ HTML injected from URL:', url);
+        console.log('HTML injected from URL:', url);
         console.log(resultsContainer.innerHTML);
 
         reinitAnimations();
-        window.dispatchEvent(new Event('resize')); // 🔁 fix layout issues
-        window.history.pushState({}, '', url); // 🧭 update URL
+        window.dispatchEvent(new Event('resize')); // fix layout issues
+        window.history.pushState({}, '', url); // update URL
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     }
@@ -242,6 +307,4 @@ document.addEventListener('DOMContentLoaded', function () {
   
 
 </script>
-
-
 {% endblock %}

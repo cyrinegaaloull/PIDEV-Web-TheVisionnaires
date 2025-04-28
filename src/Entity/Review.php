@@ -16,11 +16,13 @@ class Review
     #[ORM\Column(name: "reviewID", type: "integer")]
     private ?int $reviewid = null;
 
-    #[ORM\Column(name: "lieuID", type: "integer")]
-    private ?int $lieuid = null;
+    #[ORM\ManyToOne(inversedBy: 'reviews')]
+#[ORM\JoinColumn(name: "lieuID", referencedColumnName: "lieuID", onDelete: "CASCADE")]
+private ?Lieu $lieuid = null;
 
-    #[ORM\Column(name: "userID", type: "integer")]
-    private ?int $userid = null;
+#[ORM\ManyToOne(targetEntity: Users::class)]
+#[ORM\JoinColumn(name: "userID", referencedColumnName: "user_id", onDelete: "CASCADE")]
+private ?Users $user = null;
 
     #[ORM\Column(name: "rating", type: "float", precision: 10, scale: 0)]
     #[Assert\NotBlank(message: 'Veuillez attribuer une note.')]
@@ -41,27 +43,28 @@ class Review
         return $this->reviewid;
     }
 
-    public function getLieuid(): ?int
-    {
-        return $this->lieuid;
-    }
+    public function getLieuid(): ?Lieu
+{
+    return $this->lieuid;
+}
 
-    public function setLieuid(?int $lieuid): self
-    {
-        $this->lieuid = $lieuid;
-        return $this;
-    }
+public function setLieuid(?Lieu $lieuid): self
+{
+    $this->lieuid = $lieuid;
+    return $this;
+}
 
-    public function getUserid(): ?int
-    {
-        return $this->userid;
-    }
 
-    public function setUserid(?int $userid): self
-    {
-        $this->userid = $userid;
-        return $this;
-    }
+    public function getUser(): ?Users
+{
+    return $this->user;
+}
+
+public function setUser(?Users $user): self
+{
+    $this->user = $user;
+    return $this;
+}
 
     public function getRating(): ?float
     {
