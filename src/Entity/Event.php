@@ -27,7 +27,7 @@ class Event
 
     #[ORM\Column(name: "eventDate", type: "date", nullable: true)]
     #[Assert\NotNull(message: "La date est requise.")]
-    #[Assert\GreaterThan("today", message: "La date doit être dans le futur.")]
+    #[Assert\GreaterThanOrEqual("today", message: "La date doit être aujourd'hui ou dans le futur.")]
     private ?\DateTimeInterface $eventdate = null;
 
     #[ORM\Column(name: "eventCategory", type: "string", length: 30)]
@@ -47,11 +47,6 @@ class Event
     #[ORM\Column(name: "eventImage", type: "string", length: 100, nullable: true)]
     private ?string $eventimage = null;
 
-    #[ORM\Column(name: "notificationMethod", type: "string", length: 20, nullable: true)]
-    private ?string $notificationmethod = null;
-
-    #[ORM\Column(name: "notificationScheduledAt", type: "datetime", nullable: true)]
-    private ?\DateTimeInterface $notificationscheduledat = null;
 
     #[ORM\Column(name: "maxTickets", type: "integer")]
     #[Assert\NotNull(message: "Le nombre de tickets est requis.")]
@@ -86,16 +81,15 @@ class Event
     public function getEventimage(): ?string { return $this->eventimage; }
     public function setEventimage(?string $eventimage): self { $this->eventimage = $eventimage; return $this; }
 
-    public function getNotificationmethod(): ?string { return $this->notificationmethod; }
-    public function setNotificationmethod(?string $method): self { $this->notificationmethod = $method; return $this; }
-
-    public function getNotificationscheduledat(): ?\DateTimeInterface { return $this->notificationscheduledat; }
-    public function setNotificationscheduledat(?\DateTimeInterface $time): self { $this->notificationscheduledat = $time; return $this; }
-
     public function getMaxtickets(): ?int { return $this->maxtickets; }
     public function setMaxtickets(?int $maxtickets): self { $this->maxtickets = $maxtickets; return $this; }
 
     public function getReservedtickets(): ?int { return $this->reservedtickets; }
     public function setReservedtickets(?int $reserved): self { $this->reservedtickets = $reserved; return $this; }
-   
+    public function incrementReservedTickets(): self
+    {
+        $this->reservedtickets = ($this->reservedtickets ?? 0) + 1;
+        return $this;
+    }
+    
 }

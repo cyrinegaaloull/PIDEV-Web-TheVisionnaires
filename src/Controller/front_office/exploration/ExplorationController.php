@@ -6,9 +6,9 @@ use App\Repository\EventRepository;
 use App\Repository\ReviewRepository;
 
 use App\Entity\Review;
-use App\Repository\UsersRepository;
 use App\Service\NeutrinoService;
 use App\Service\NotificationService;
+use App\Repository\ReservationEventRepository;
 
 use App\Repository\LieuRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,28 +18,34 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Dompdf\Dompdf;
+
 
 
 
 class ExplorationController extends AbstractController
 {
     #[Route('/exploration', name: 'app_exploration')]
-    public function index(Request $request, LieuRepository $lieuRepository, ReviewRepository $reviewRepo): Response
-    {
+public function index(
+    Request $request,
+    LieuRepository $lieuRepository,
+    ReviewRepository $reviewRepo,
+): Response{
         $filter = $request->query->get('filter');
         $lat = $request->query->get('lat');
         $lon = $request->query->get('lon');
         $search = trim($request->query->get('search', ''));
-
-        $simulateUser = false;
-        $user = $simulateUser ? ['username' => 'John Doe', 'profile_picture' => 'default_profile_pic.jpg'] : null;
+/** @var \App\Entity\Users $user */
+        $user = $this->getUser();
 
         if ($filter === 'nearest' && $lat && $lon) {
             $favorites = $lieuRepository->findFavorites();
             $lieux = $lieuRepository->findByNearest((float)$lat, (float)$lon);
         } elseif ($filter === 'top-rated') {
             $favorites = $lieuRepository->findFavorites();
-            $lieux = $lieuRepository->findTopRated(); // 🔥 You will create this
+            $lieux = $lieuRepository->findTopRated(); 
         } elseif ($search !== '') {
             $favorites = $lieuRepository->findFavorites();
             $lieux = $lieuRepository->findBySearch($search);
@@ -60,17 +66,18 @@ class ExplorationController extends AbstractController
                 'favorites' => $favorites,
                 'ratings' => $ratings,
                 'search' => $search,
+                'user' => $user,
             ]);
             
         }
-        
         return $this->render('front_office/exploration/exploration.html.twig', [
             'lieux' => $lieux,
             'favorites' => $favorites,
             'ratings' => $ratings,
             'user' => $user,
             'search' => $search,
-        ]);        
+        ]);
+               
         
     }
     #[Route('/toggle-favorite/{id}', name: 'toggle_favorite', methods: ['POST'])]
@@ -85,8 +92,9 @@ public function toggleFavorite(Lieu $lieu, EntityManagerInterface $em): JsonResp
 #[Route('/lieu/{id}', name: 'lieu_details')]
 public function lieuDetails(int $id, LieuRepository $lieuRepository, EventRepository $eventRepo, ReviewRepository $reviewRepo): Response
 {
-    $simulateUser = false;
-    $user = $simulateUser ? ['username' => 'John Doe', 'profile_picture' => 'default_profile_pic.jpg'] : null;
+    /** @var \App\Entity\Users $user */
+    $user = $this->getUser();
+
     $lieu = $lieuRepository->find($id);
     if (!$lieu) {
         throw $this->createNotFoundException('Lieu non trouvé.');
@@ -108,7 +116,6 @@ public function addReview(
     Request $request,
     EntityManagerInterface $em,
     LieuRepository $lieuRepository,
-    UsersRepository $userRepo,
     NeutrinoService $neutrino,
     ValidatorInterface $validator
 ): Response {
@@ -124,14 +131,14 @@ public function addReview(
         $this->addFlash('danger', 'Votre commentaire contient des mots inappropriés.');
         return $this->redirectToRoute('lieu_details', ['id' => $id]);
     }
-
-    $user = $userRepo->findOneBy(['username' => 'cyrine']);
+/** @var \App\Entity\Users $user */
+    $user = $this->getUser();
     $review = new Review();
     $review->setComment($comment);
     $review->setRating($rating);
     $review->setReviewdate(new \DateTime());
-    $review->setUserid($user->getUserId());
-    $review->setLieuid($lieu->getLieuid());
+    $review->setUser($user);
+    $review->setLieuid($lieu);
 
     $errors = $validator->validate($review);
 
@@ -150,49 +157,27 @@ public function addReview(
 }
 
 #[Route('/event/{id}', name: 'event_details')]
-public function eventDetails(int $id, EventRepository $eventRepo, UsersRepository $userRepo): Response
+public function eventDetails(
+    int $id, 
+    EventRepository $eventRepo, 
+    ReservationEventRepository $reservationRepo
+): Response
 {
-    $user = $userRepo->findOneBy(['username' => 'cyrine']);
+    /** @var \App\Entity\Users $user */
+    $user = $this->getUser();
     $event = $eventRepo->find($id);
+
     if (!$event) {
         throw $this->createNotFoundException('Événement introuvable.');
     }
 
+    $userReservations = $reservationRepo->findBy(['user' => $user]);
+
     return $this->render('front_office/exploration/event_details.html.twig', [
-        'event' => $event, 'user' => $user,
+        'event' => $event,
+        'user' => $user,
+        'userReservations' => $userReservations,
     ]);
-}
-#[Route('/event/{id}/notify', name: 'event_notify', methods: ['POST'])]
-public function notifyUser(
-    int $id,
-    EventRepository $eventRepo,
-    NotificationService $notifier,
-    UsersRepository $userRepo 
-): Response {
-    $event = $eventRepo->find($id);
-    if (!$event) {
-        throw $this->createNotFoundException('Event not found');
-    }
-
-    $user = $userRepo->findOneBy(['username' => 'cyrine']);
-    if (!$user) {
-        throw $this->createNotFoundException('Utilisateur introuvable');
-    }
-
-    $userPhone = '+21653968669'; //hardcoded
-    $userEmail = $user->getEmail(); 
-    $notifier->sendWhatsApp($userPhone, "🎉 Rappel: L’événement '{$event->getEventname()}' aura lieu le " . $event->getEventdate()->format('d/m/Y'));
-    $notifier->sendEmail($userEmail, 'Rappel événement', "🎫 Ne manquez pas '{$event->getEventname()}' le " . $event->getEventdate()->format('d/m/Y'));
-
-    try {
-        $notifier->sendWhatsApp($userPhone, "🎉 Rappel: L’événement '{$event->getEventname()}' aura lieu le " . $event->getEventdate()->format('d/m/Y'));
-        $notifier->sendEmail($userEmail, 'Rappel événement', "🎫 Ne manquez pas '{$event->getEventname()}' le " . $event->getEventdate()->format('d/m/Y'));
-        $this->addFlash('success', 'Notification envoyée avec succès.');
-    } catch (\Throwable $e) {
-        $this->addFlash('danger', '❌ Échec de l’envoi de la notification: ' . $e->getMessage());
-    }    
-    
-    return $this->redirectToRoute('lieu_details', ['id' => $event->getLieu()->getLieuid()]);
 }
 #[Route('/recommendations', name: 'weather_recommendations')]
 public function recommendByWeather(
@@ -250,34 +235,147 @@ public function recommendByWeather(
     
 }
 #[Route('/event/{id}/reserve', name: 'event_reserve', methods: ['POST'])]
-public function reserveTicket(int $id, EventRepository $eventRepo, EntityManagerInterface $em): Response
-{
+public function reserveTicket(
+    int $id,
+    EventRepository $eventRepo,
+    NotificationService $notifier,
+    EntityManagerInterface $em
+): Response {
     $event = $eventRepo->find($id);
     if (!$event) {
-        throw $this->createNotFoundException('Événement introuvable');
+        throw $this->createNotFoundException('Événement introuvable.');
     }
 
-    if ($event->getReservedtickets() >= $event->getMaxtickets()) {
-        $this->addFlash('danger', 'Plus de billets disponibles.');
+    /** @var \App\Entity\Users $user */
+    $user = $this->getUser();
+    if (!$user) {
+        throw $this->createNotFoundException('Utilisateur introuvable.');
+    }
+
+    $existingReservation = $em->getRepository(\App\Entity\ReservationEvent::class)
+        ->findOneBy(['user' => $user, 'event' => $event]);
+    if ($existingReservation) {
+        $this->addFlash('info', 'ℹ️ Vous avez déjà réservé cet événement.');
         return $this->redirectToRoute('event_details', ['id' => $id]);
     }
 
-    $event->incrementReservedTickets();
+    $reservation = new \App\Entity\ReservationEvent();
+    $reservation->setUser($user);
+    $reservation->setEvent($event);
+    $reservation->setReservationDate(new \DateTime());
+
+    $em->persist($reservation);
+    $event->setReservedtickets($event->getReservedtickets() + 1);
     $em->flush();
 
-    $this->addFlash('success', '🎫 Réservation réussie !');
+    // --- DEBUG: Create var/log directory if needed
+    $logDir = $this->getParameter('kernel.project_dir') . '/var/log';
+    if (!is_dir($logDir)) {
+        mkdir($logDir, 0775, true);
+    }
+    $debugFile = $logDir . '/qr_debug.log';
+
+    file_put_contents($debugFile, "Event ID: {$event->getEventid()}\n");
+
+    // --- Generate QR Code using Endroid QR Code
+    $eventUrl = 'http://127.0.0.1:8000/event/' . $event->getEventid();
+    $qrCode = QrCode::create($eventUrl)
+        ->setSize(300);
+    $writer = new PngWriter();
+    $result = $writer->write($qrCode);
+    $qrContent = $result->getString();
+
+    // Verify that the content is a valid PNG
+    $pngHeader = "\x89PNG\r\n\x1A\n";
+    if (substr($qrContent, 0, 8) !== $pngHeader) {
+        file_put_contents($debugFile, "QR code content is not a valid PNG\n", FILE_APPEND);
+        throw new \Exception('QR code content is not a valid PNG image.');
+    }
+
+    // Base64 encode the QR code for embedding in the PDF
+    $base64Content = base64_encode($qrContent);
+    $embeddedImage = "data:image/png;base64,{$base64Content}";
+
+    // --- Generate PDF with reservation details and QR code
+    $userEmail = $user->getEmail();
+    $eventName = $event->getEventname();
+    $eventDate = $event->getEventdate()?->format('d/m/Y') ?? 'bientôt';
+    $reservationDate = $reservation->getReservationDate()->format('d/m/Y H:i:s');
+
+    // HTML content for the PDF
+    $html = "
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; }
+            .ticket { max-width: 600px; margin: auto; padding: 20px; border: 2px dashed #4CAF50; border-radius: 15px; background: #f9f9f9; }
+            h1 { color: #4CAF50; }
+            hr { margin: 20px 0; }
+            img { width: 300px; max-width: 100%; height: auto; }
+            .footer { font-size: 0.8em; color: #999; margin-top: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class=\"ticket\">
+            <h1>Billet LocalLens</h1>
+            <p>Merci <strong>{$user->getUsername()}</strong> pour votre réservation !</p>
+            <hr>
+            <p><strong>Événement :</strong> {$eventName}</p>
+            <p><strong>Date de l'événement :</strong> {$eventDate}</p>
+            <p><strong>Date de réservation :</strong> {$reservationDate}</p>
+            <p><strong>Email :</strong> {$userEmail}</p>
+            <p style=\"margin-top:20px;\">Votre QR Code :</p>
+            <img src=\"{$embeddedImage}\" alt=\"QR Code\" />
+            <hr>
+            <p class=\"footer\">Présentez ce billet à l'entrée de l'événement.</p>
+        </div>
+    </body>
+    </html>";
+
+    // Initialize Dompdf
+    $dompdf = new Dompdf();
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+    $pdfContent = $dompdf->output();
+
+    // Save the PDF to disk with a unique filename
+    $ticketDir = $this->getParameter('kernel.project_dir') . '/public/tickets';
+    if (!is_dir($ticketDir)) {
+        mkdir($ticketDir, 0775, true);
+    }
+    $ticketFilename = 'ticket_reservation_' . $reservation->getReservationId() . '.pdf';
+    $ticketFilePath = $ticketDir . '/' . $ticketFilename;
+    file_put_contents($ticketFilePath, $pdfContent);
+    file_put_contents($debugFile, "PDF ticket saved to $ticketFilePath. Size: " . strlen($pdfContent) . " bytes\n", FILE_APPEND);
+
+    // Construct the URL for the PDF
+    $ticketPublicUrl = 'http://127.0.0.1:8000/tickets/' . $ticketFilename;
+
+    // --- Email
+    $subject = 'Votre billet pour ' . $eventName;
+    $message = "
+    <div style=\"max-width:600px;margin:auto;background:#f9f9f9;border:2px dashed #4CAF50;border-radius:15px;padding:20px;font-family:Arial,sans-serif;color:#333;\">
+        <h1 style=\"text-align:center;color:#4CAF50;margin-bottom:10px;\">Billet LocalLens</h1>
+        <p style=\"text-align:center;\">Merci <strong>{$user->getUsername()}</strong> pour votre réservation !</p>
+        <hr style=\"margin:20px 0;\">
+        <p><strong>Événement :</strong> {$eventName}</p>
+        <p><strong>Date :</strong> {$eventDate}</p>
+        <p style=\"text-align:center;margin-top:20px;\">Cliquez ci-dessous pour télécharger votre billet (PDF) :</p>
+        <p style=\"text-align:center;\"><a href=\"{$ticketPublicUrl}\" target=\"_blank\">Télécharger le billet</a></p>
+        <hr style=\"margin:20px 0;\">
+        <p style=\"font-size:0.8em;text-align:center;color:#999;\">Cet email contient votre billet officiel LocalLens.</p>
+    </div>";
+
+    try {
+        $notifier->sendEmail($userEmail, $subject, $message);
+        file_put_contents($debugFile, "Email sent successfully to $userEmail\n", FILE_APPEND);
+    } catch (\Exception $e) {
+        file_put_contents($debugFile, "Email sending error: " . $e->getMessage() . "\n", FILE_APPEND);
+        throw new \Exception('Erreur lors de l\'envoi du billet: ' . $e->getMessage());
+    }
+
+    $this->addFlash('success', '🎫 Billet envoyé avec succès.');
     return $this->redirectToRoute('event_details', ['id' => $id]);
 }
-#[Route('/mail', name: 'test_mail')]
-public function testMail(NotificationService $notifier): Response
-{
-    try {
-        $notifier->sendEmail('cyrinegaaloul29@gmail.com', 'Test Subject', 'Body message here');
-        return new Response('✅ Email sent!');
-    } catch (\Throwable $e) {
-        return new Response('❌ Failed: ' . $e->getMessage());
-    }
 }
-
-}
-

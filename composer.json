@@ -11,11 +11,17 @@
         "doctrine/doctrine-bundle": "^2.14",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^2.15",
+<<<<<<< HEAD
         "guzzlehttp/guzzle": "*",
         "knpuniversity/oauth2-client-bundle": "*",
         "league/oauth2-google": "^4.0",
+=======
+        "dompdf/dompdf": "^3.1",
+        "endroid/qr-code": "^5.1",
+>>>>>>> d603257 (completed work)
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.1",
+        "resend/resend-php": "^0.16.0",
         "sendinblue/api-v3-sdk": "^8.4",
         "symfony/asset": "6.4.*",
         "symfony/asset-mapper": "6.4.*",

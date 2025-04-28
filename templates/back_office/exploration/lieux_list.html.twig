@@ -1,77 +1,209 @@
 {% extends 'back_office/base-back-office.html.twig' %}
 
 {% block body %}
-<h4 class="fw-bold mb-4 text-primary">Table des lieux</h4>
-
-{% for label, messages in app.flashes %}
-  {% for message in messages %}
-    <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }}">
-      {{ message }}
+<div class="container-fluid p-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+      <h4 class="fw-bold m-0 text-primary">Table des lieux</h4>
+      <a href="{{ path('admin_lieu_init') }}" class="btn btn-primary">
+        <i class="ri-add-line"></i> Ajouter un lieu
+      </a>
     </div>
-  {% endfor %}
-{% endfor %}
-
-<table class="table table-bordered table-hover" id="lieuxTable">
-  <thead class="table-light">
-    <tr>
-      <th>ID</th>
-      <th>Nom</th>
-      <th>Adresse</th>
-      <th>Catégorie</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for lieu in lieux %}
-<tr onclick="window.location='{{ path('admin_lieu_show', {'id': lieu.lieuid}) }}'" style="cursor: pointer;">
-        <td>{{ lieu.lieuid }}</td>
-        <td>{{ lieu.lieuname }}</td>
-        <td>{{ lieu.lieuaddress }}</td>
-        <td>{{ lieu.lieucategory }}</td>
-        <td>
-          <a href="{{ path('admin_lieu_edit', {'id': lieu.lieuid}) }}" class="btn btn-sm btn-outline-primary stop-propagation">
-  <i class="ri-edit-line"></i> Modifier
-</a>
-<button class="btn btn-sm btn-outline-danger stop-propagation" data-bs-toggle="modal" data-bs-target="#confirmDelete{{ lieu.lieuid }}">
-  <i class="ri-delete-bin-6-line"></i> Supprimer
-</button>
-
-
-          <!-- Modal -->
-          <div class="modal fade" id="confirmDelete{{ lieu.lieuid }}" tabindex="-1" aria-labelledby="modalLabel{{ lieu.lieuid }}" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirmation</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Êtes-vous sûr de vouloir supprimer ce lieu ?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <a href="{{ path('admin_lieu_delete', {'id': lieu.lieuid}) }}" class="btn btn-danger stop-propagation">Supprimer</a>
+    
+    <div class="card-body">
+      {% for label, messages in app.flashes %}
+        {% for message in messages %}
+          <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }} alert-dismissible fade show" role="alert">
+            <i class="ri-{{ label == 'success' ? 'check-line' : 'error-warning-line' }} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endfor %}
+      
+      <!-- Formulaire de filtres -->
+      <form id="filter-form" method="get" action="{{ path('admin_lieux') }}" class="mb-4">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="input-group">
+              <span class="input-group-text"><i class="ri-search-line"></i></span>
+              <input type="text" name="nom" id="filter-nom" class="form-control" placeholder="Rechercher par nom..." 
+                     value="{{ filters.nom|default('') }}">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select name="categorie" id="filter-categorie" class="form-select">
+              <option value="">Toutes les catégories</option>
+              {% for categorie in categories %}
+                <option value="{{ categorie }}" {{ filters.categorie == categorie ? 'selected' : '' }}>
+                  {{ categorie }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="ri-map-pin-line"></i></span>
+              <input type="text" name="adresse" id="filter-adresse" class="form-control" 
+                     placeholder="Filtrer par adresse..." value="{{ filters.adresse|default('') }}">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary flex-grow-1">
+                <i class="ri-filter-3-line me-1"></i> Filtrer
+              </button>
+              <a href="{{ path('admin_lieux') }}" class="btn btn-outline-secondary">
+                <i class="ri-refresh-line"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </form>
+      
+      <div class="table-responsive">
+        <table class="table table-hover align-middle" id="lieuxTable">
+          <thead class="table-light">
+            <tr>
+              <th class="text-center" style="width: 60px;">ID</th>
+              <th>Nom</th>
+              <th>Adresse</th>
+              <th>Catégorie</th>
+              <th class="text-center" style="width: 200px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for lieu in lieux %}
+              <tr data-href="{{ path('admin_lieu_show', {'id': lieu.lieuid}) }}" class="row-link">
+                <td class="text-center">{{ lieu.lieuid }}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    {% if lieu.lieuimage %}
+                      <div class="me-3">
+                        <img src="{{ asset('assets/exploration/images/' ~ lieu.lieuimage) }}" alt="{{ lieu.lieuname }}" class="rounded-circle" width="40" height="40">
+                      </div>
+                    {% else %}
+                      <div class="me-3">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                          <i class="ri-map-pin-line text-primary"></i>
+                        </div>
+                      </div>
+                    {% endif %}
+                    <div>
+                      <h6 class="mb-0">{{ lieu.lieuname }}</h6>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ lieu.lieuaddress }}</td>
+                <td>
+                  <span class="badge bg-light text-dark">{{ lieu.lieucategory }}</span>
+                </td>
+                <td class="text-center">
+                  <div class="btn-group" role="group">
+                    <a href="{{ path('admin_lieu_show', {'id': lieu.lieuid}) }}" class="btn btn-sm btn-outline-secondary stop-propagation">
+                      <i class="ri-eye-line"></i>
+                    </a>
+                    <a href="{{ path('admin_lieu_edit', {'id': lieu.lieuid}) }}" class="btn btn-sm btn-outline-primary stop-propagation">
+                      <i class="ri-edit-line"></i>
+                    </a>
+                    <button class="btn btn-sm btn-outline-danger stop-propagation" data-bs-toggle="modal" data-bs-target="#confirmDelete{{ lieu.lieuid }}">
+                      <i class="ri-delete-bin-6-line"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- Modal -->
+                  <div class="modal fade" id="confirmDelete{{ lieu.lieuid }}" tabindex="-1" aria-labelledby="modalLabel{{ lieu.lieuid }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Confirmation</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <p class="mb-0">Êtes-vous sûr de vouloir supprimer le lieu <strong>{{ lieu.lieuname }}</strong> ?</p>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                          <a href="{{ path('admin_lieu_delete', {'id': lieu.lieuid}) }}" class="btn btn-danger stop-propagation">Supprimer</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <div class="text-muted">
+                    <i class="ri-map-pin-line d-block mb-2" style="font-size: 2rem;"></i>
+                    <p>Aucun lieu trouvé</p>
+                    <a href="{{ path('admin_lieu_init') }}" class="btn btn-sm btn-primary">
+                      <i class="ri-add-line"></i> Ajouter un lieu
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
 
-        </td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<style>
+  .row-link {
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+  }
+  .row-link:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+  #lieuxTable_wrapper .dataTables_length, 
+  #lieuxTable_wrapper .dataTables_filter {
+    margin-bottom: 1rem;
+  }
+  #lieuxTable_wrapper .dataTables_info, 
+  #lieuxTable_wrapper .dataTables_paginate {
+    margin-top: 1rem;
+  }
+  #lieuxTable_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.375rem 0.75rem;
+    margin-left: 0.2rem;
+    border-radius: 0.25rem;
+  }
+  #lieuxTable_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white !important;
+  }
+</style>
+
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     // Prevent redirect on action buttons
     document.querySelectorAll('.stop-propagation').forEach(el => {
       el.addEventListener('click', e => e.stopPropagation());
     });
-
-    // Init DataTable
-    new simpleDatatables.DataTable("#lieuxTable");
+    
+    // Make rows clickable
+    document.querySelectorAll('.row-link').forEach(row => {
+      row.addEventListener('click', () => {
+        window.location = row.dataset.href;
+      });
+    });
+    
+    // Initialize DataTable with improved options
+    const dataTable = new simpleDatatables.DataTable("#lieuxTable", {
+      perPage: 10,
+      perPageSelect: [5, 10, 15, 20, 25],
+      labels: {
+        placeholder: "Rechercher...",
+        perPage: "Afficher {select} entrées",
+        noRows: "Aucun lieu trouvé",
+        info: "Affichage de {start} à {end} sur {rows} lieux",
+      },
+    });
   });
 </script>
-
-
 {% endblock %}

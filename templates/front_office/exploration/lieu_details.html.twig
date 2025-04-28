@@ -7,33 +7,25 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.css" rel="stylesheet" />
 
-<!-- Custom Styles -->
-<style>
-  .img {
-    border-radius: 12px;
-    background-size: cover;
-    background-position: center;
-  }
-  .star {
-    cursor: pointer;
-  }
-  .star.checked {
-    color: #ffc107;
-  }
-  .carousel-testimony .item {
-    padding: 15px;
-  }
-  .project-wrap {
-    transition: transform 0.3s;
-  }
-  .project-wrap:hover {
-    transform: scale(1.02);
-  }
-</style>
+<!-- Hero Section with Background Image -->
+<div class="hero-wrap js-fullheight" style="background-image: url('{{ asset('assets/exploration/images/' ~ (lieu.lieuImage ?: 'default.jpg')) }}');">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row no-gutters slider-text js-fullheight align-items-center justify-content-center" data-scrollax-parent="true">
+      <div class="col-md-9 text-center ftco-animate">
+        <p class="breadcrumbs"><span class="mr-2"><a href="{{ path('app_home') }}">Home</a></span> <span class="mr-2"><a href="{{ path('app_exploration') }}">Exploration</a></span> <span>Détails</span></p>
+        <h1 class="mb-3 bread">{{ lieu.lieuName }}</h1>
+        <p class="caps"><i class="fa fa-map-marker mr-2"></i> {{ lieu.lieuAddress }}</p>
+        
+        <!-- Category Badge -->
+        <span class="category-badge">{{ lieu.lieuCategory }}</span>
+      </div>
+    </div>
+  </div>
+</div>
 
-<!-- Lieu Details Section -->
-<section class="ftco-section ftco-no-pb">
-  {% for label, messages in app.flashes %}
+<!-- Flash Messages -->
+{% for label, messages in app.flashes %}
   {% for message in messages %}
     <div class="alert alert-{{ label }} alert-dismissible fade show container mt-3" role="alert">
       {{ message }}
@@ -43,20 +35,103 @@
     </div>
   {% endfor %}
 {% endfor %}
+
+<!-- Lieu Details Section -->
+<section class="ftco-section">
   <div class="container">
     <div class="row">
-      <div class="col-md-6 d-flex align-items-stretch">
-        <div class="img w-100" style="background-image: url('{{ asset('assets/exploration/images/' ~ (lieu.lieuImage ?: 'default.jpg')) }}'); height: 100%;"></div>
+      <div class="col-md-7 mb-5">
+        <div class="lieu-details p-4 bg-white rounded shadow-sm">
+          <h3 class="section-title mb-4">À propos de ce lieu</h3>
+          
+          <div class="lieu-description mb-4">
+            <p class="text-muted">{{ lieu.lieuDescription }}</p>
+          </div>
+          
+          <div class="lieu-meta">
+            <div class="meta-item d-flex align-items-center mb-3">
+              <div class="icon mr-3">
+                <span class="fa fa-clock-o text-primary"></span>
+              </div>
+              <div class="text">
+                <h5 class="mb-0">Heures d'ouverture</h5>
+                <p class="mb-0">{{ lieu.lieuOpeningHours }} - {{ lieu.lieuClosingHours }}</p>
+              </div>
+            </div>
+            
+            <div class="meta-item d-flex align-items-center mb-3">
+              <div class="icon mr-3">
+                <span class="fa fa-bookmark text-primary"></span>
+              </div>
+              <div class="text">
+                <h5 class="mb-0">Catégorie</h5>
+                <p class="mb-0">{{ lieu.lieuCategory }}</p>
+              </div>
+            </div>
+            
+            <div class="meta-item d-flex align-items-center">
+              <div class="icon mr-3">
+                <span class="fa fa-map-marker text-primary"></span>
+              </div>
+              <div class="text">
+                <h5 class="mb-0">Adresse</h5>
+                <p class="mb-0">{{ lieu.lieuAddress }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-4">
+            <a href="{{ path('app_exploration') }}" class="btn btn-outline-primary">
+              <i class="fa fa-arrow-left mr-2"></i> Retour à l'exploration
+            </a>
+          </div>
+        </div>
       </div>
-      <div class="col-md-6 pl-md-5 py-5">
-        <div class="heading-section">
-          <h2 class="mb-4">{{ lieu.lieuName }}</h2>
-          <p><strong>Catégorie:</strong> {{ lieu.lieuCategory }}</p>
-          <p><strong>Adresse:</strong> {{ lieu.lieuAddress }}</p>
-          <p><strong>Description:</strong> {{ lieu.lieuDescription }}</p>
-          <p><strong>Ouverture:</strong> {{ lieu.lieuOpeningHours }}</p>
-          <p><strong>Fermeture:</strong> {{ lieu.lieuClosingHours }}</p>
-          <a href="{{ path('app_exploration') }}" class="btn btn-primary mt-3">&larr; Retour</a>
+      
+      <div class="col-md-5">
+        <div class="mb-4 rounded shadow-sm overflow-hidden">
+          <div class="img-gallery">
+            <img src="{{ asset('assets/exploration/images/' ~ (lieu.lieuImage ?: 'default.jpg')) }}" class="img-fluid" alt="{{ lieu.lieuName }}">
+            <div class="img-overlay">
+              <a href="{{ asset('assets/exploration/images/' ~ (lieu.lieuImage ?: 'default.jpg')) }}" class="img-popup">
+                <i class="fa fa-search-plus"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Quick Info Card -->
+        <div class="quick-info p-4 bg-white rounded shadow-sm mb-4">
+          <h4 class="mb-3">Infos pratiques</h4>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <div>
+              <i class="fa fa-check-circle text-success mr-2"></i> Parking
+            </div>
+            <div>
+              <i class="fa fa-wifi text-success mr-2"></i> Wi-Fi
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between">
+            <div>
+              <i class="fa fa-credit-card text-success mr-2"></i> Paiement par carte
+            </div>
+            <div>
+              <i class="fa fa-wheelchair text-success mr-2"></i> Accessible
+            </div>
+          </div>
+          
+          <hr class="my-3">
+          
+          <!-- Social Sharing -->
+          <h5 class="mb-3">Partager</h5>
+          <div class="social-sharing">
+            <a href="#" class="social-icon mr-2"><i class="fa fa-facebook"></i></a>
+            <a href="#" class="social-icon mr-2"><i class="fa fa-twitter"></i></a>
+            <a href="#" class="social-icon mr-2"><i class="fa fa-instagram"></i></a>
+            <a href="#" class="social-icon"><i class="fa fa-envelope"></i></a>
+          </div>
         </div>
       </div>
     </div>
@@ -64,47 +139,69 @@
 </section>
 
 <!-- Map Section -->
-<section class="ftco-section">
+<section class="ftco-section bg-light">
   <div class="container">
-    <h4 class="mb-4">Vue immersive (Google Street View)</h4>
-    <iframe
-      width="100%"
-      height="400"
-      style="border:0; border-radius: 10px;"
-      loading="lazy"
-      allowfullscreen
-      referrerpolicy="no-referrer-when-downgrade"
-      src="https://www.google.com/maps?q=&layer=c&cbll={{ lieu.latitude }},{{ lieu.longitude }}&cbp=11,0,0,0,0&z=18&output=svembed">
-    </iframe>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="map-container p-4 bg-white rounded shadow-sm">
+          <h3 class="section-title mb-4">Localisation</h3>
+          <div id="lieu-map" style="height: 400px; border-radius: 10px;"></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="streetview-container p-4 bg-white rounded shadow-sm">
+          <h3 class="section-title mb-4">Vue de la rue</h3>
+          <div class="rounded overflow-hidden">
+            <iframe
+              width="100%"
+              height="400"
+              style="border:0; border-radius: 10px;"
+              loading="lazy"
+              allowfullscreen
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps?q=&layer=c&cbll={{ lieu.latitude }},{{ lieu.longitude }}&cbp=11,0,0,0,0&z=18&output=svembed">
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
-
 
 <!-- Events Section -->
 {% if events is not empty %}
 <section class="ftco-section">
   <div class="container">
-    <h3 class="mb-4">Événements à venir</h3>
+    <h3 class="section-title mb-4">Événements à venir</h3>
     <div class="row">
       {% for event in events %}
         <div class="col-md-4 mb-4">
-          <a href="{{ path('event_details', { id: event.eventid }) }}" class="project-wrap text-decoration-none text-dark">
-            <div class="img" style="background-image: url('{{ asset('assets/exploration/images/' ~ (event.eventImage ?: 'default.jpg')) }}'); height: 200px;"></div>
-            <div class="text p-4">
-              <span class="days">{{ event.eventDate ? event.eventDate|date('d/m/Y') : 'Non précisée' }}</span>
-              <h3>{{ event.eventName }}</h3>
-              <p class="location"><span class="fa fa-map-marker"></span> {{ lieu.lieuAddress }}</p>
-              <p>{{ event.eventDescription }}</p>
-              <p><strong>Catégorie:</strong> {{ event.eventCategory }}</p>
-              <p><strong>Prix:</strong> {{ event.ticketPrice }} TND</p>
+          <div class="event-card shadow-sm rounded overflow-hidden h-100">
+            <div class="img-container position-relative">
+              <div class="img" style="background-image: url('{{ asset('assets/exploration/images/' ~ (event.eventImage ?: 'default.jpg')) }}'); height: 200px;"></div>
+              <div class="event-date">
+                <span class="day">{{ event.eventDate ? event.eventDate|date('d') : '--' }}</span>
+                <span class="month">{{ event.eventDate ? event.eventDate|date('M') : '' }}</span>
+              </div>
             </div>
-          </a>
+            <div class="text p-4">
+              <h3 class="event-title">{{ event.eventName }}</h3>
+              <p class="location"><i class="fa fa-map-marker mr-2 text-primary"></i> {{ lieu.lieuAddress }}</p>
+              <p class="event-description">{{ event.eventDescription|slice(0, 120) }}{% if event.eventDescription|length > 120 %}...{% endif %}</p>
+              <div class="event-footer d-flex justify-content-between align-items-center">
+                <span class="badge badge-primary">{{ event.eventCategory }}</span>
+                <span class="price">{{ event.ticketPrice }} TND</span>
+              </div>
+              <a href="{{ path('event_details', { id: event.eventid }) }}" class="btn btn-outline-primary btn-sm mt-3 w-100">Voir détails</a>
+            </div>
+          </div>
         </div>
       {% endfor %}
     </div>
   </div>
 </section>
 {% endif %}
+
 <!-- Testimonials Section -->
 <section class="ftco-section testimony-section">
   <div class="overlay"></div>
@@ -112,18 +209,23 @@
     <div class="row justify-content-center pb-4">
       <div class="col-md-7 text-center heading-section heading-section-white">
         <span class="subheading">Avis</span>
-        <h2 class="mb-4">Ce que disent les visiteurs</h2>
+        <h2 class="mb-4">Ce que disent les utilisateur</h2>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
         {% if reviews is empty %}
-          <p class="text-center text-white">Aucun avis pour l'instant.</p>
+          <div class="text-center py-5">
+            <div class="empty-reviews">
+              <i class="fa fa-comments fa-3x mb-3"></i>
+              <p class="text-white">Aucun avis pour l'instant. Soyez le premier à donner votre avis!</p>
+            </div>
+          </div>
         {% else %}
           {% set reviewCount = reviews|length %}
           
           {% if reviewCount >= 3 %}
-            <div class="carousel-testimony owl-carousel" id="review-carousel">
+            <div class="carousel-testimony owl-carousel" id="review-carousel" data-review-count="{{ reviewCount }}" data-carousel="true">
               {% for review in reviews %}
                 <div class="item">
                   <div class="testimony-wrap py-4">
@@ -135,8 +237,11 @@
                       </p>
                       <p class="mb-4">{{ review.comment }}</p>
                       <div class="d-flex align-items-center">
-                        <div class="pl-3">
-                          <p class="name">Anonymous</p>
+                        <div class="user-avatar mr-3">
+                          <img src="{{ asset('assets/exploration/images/default_avatar.jpg') }}" class="rounded-circle" width="50" height="50" alt="User">
+                        </div>
+                        <div>
+                          <p class="name mb-0">{{ review.user.username }}</p>
                           <span class="position">{{ review.reviewDate ? review.reviewDate|date('d/m/Y') : '' }}</span>
                         </div>
                       </div>
@@ -145,25 +250,25 @@
                 </div>
               {% endfor %}
             </div>
-
           {% else %}
             <div class="row justify-content-center">
               {% for review in reviews %}
                 <div class="col-md-{{ reviewCount == 2 ? '5' : '4' }} mx-2 mb-4">
-                  <div class="item">
-                    <div class="testimony-wrap py-4">
-                      <div class="text">
-                        <p class="star">
-                          {% for i in 1..5 %}
-                            <span class="fa {% if i <= review.rating %}fa-star{% else %}fa-star-o{% endif %}"></span>
-                          {% endfor %}
-                        </p>
-                        <p class="mb-4">{{ review.comment }}</p>
-                        <div class="d-flex align-items-center">
-                          <div class="pl-3">
-                            <p class="name">Anonymous</p>
-                            <span class="position">{{ review.reviewDate ? review.reviewDate|date('d/m/Y') : '' }}</span>
-                          </div>
+                  <div class="testimony-wrap py-4">
+                    <div class="text">
+                      <p class="star">
+                        {% for i in 1..5 %}
+                          <span class="fa {% if i <= review.rating %}fa-star{% else %}fa-star-o{% endif %}"></span>
+                        {% endfor %}
+                      </p>
+                      <p class="mb-4">{{ review.comment }}</p>
+                      <div class="d-flex align-items-center">
+                        <div class="user-avatar mr-3">
+                          <img src="{{ asset('assets/exploration/images/default_avatar.jpg') }}" class="rounded-circle" width="50" height="50" alt="User">
+                        </div>
+                        <div>
+                          <p class="name mb-0">{{ review.user.username }}</p>
+                          <span class="position">{{ review.reviewDate ? review.reviewDate|date('d/m/Y') : '' }}</span>
                         </div>
                       </div>
                     </div>
@@ -178,29 +283,37 @@
   </div>
 </section>
 
-
 <!-- Add Review Section -->
-<section class="ftco-section">
+<section class="ftco-section bg-light pt-5 pb-5">
   <div class="container">
-    <h4>Ajouter un avis</h4>
-    <form method="post" action="{{ path('add_review', { id: lieu.lieuid }) }}">
-      <div class="form-group">
-        <label>Note :</label>
-        <div id="star-rating">
-          {% for i in 1..5 %}
-            <i class="fa fa-star-o fa-2x text-warning star" data-value="{{ i }}"></i>
-          {% endfor %}
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="review-form bg-white p-5 rounded shadow-sm">
+          <h3 class="section-title mb-4">Partagez votre expérience</h3>
+          <form method="post" action="{{ path('add_review', { id: lieu.lieuid }) }}">
+            <div class="form-group">
+              <label>Votre note :</label>
+              <div id="star-rating" class="d-flex">
+                {% for i in 1..5 %}
+                  <i class="fa fa-star-o fa-2x text-warning star mr-2" data-value="{{ i }}"></i>
+                {% endfor %}
+              </div>
+              <input type="hidden" name="rating" id="rating">
+            </div>
+            <div class="form-group">
+              <label for="comment">Votre commentaire</label>
+              <textarea class="form-control" name="comment" rows="4" placeholder="Partagez votre expérience à propos de ce lieu..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Soumettre votre avis</button>
+          </form>
         </div>
-        <input type="hidden" name="rating" id="rating">
       </div>
-      <div class="form-group">
-        <label for="comment">Commentaire</label>
-        <textarea class="form-control" name="comment" rows="3"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary">Envoyer</button>
-    </form>
+    </div>
   </div>
 </section>
+
+<!-- Space before footer -->
+<div class="footer-spacing" style="height: 80px;"></div>
 
 <!-- External Scripts -->
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
@@ -210,63 +323,429 @@
 <!-- Custom Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // ⭐ Star rating interaction
+    // Star rating interaction
     const stars = document.querySelectorAll('#star-rating .star');
     const ratingInput = document.getElementById('rating');
+    
     stars.forEach(star => {
+      star.addEventListener('mouseover', function() {
+        const rating = this.dataset.value;
+        
+        stars.forEach((s, index) => {
+          if (index < rating) {
+            s.classList.remove('fa-star-o');
+            s.classList.add('fa-star');
+          } else {
+            s.classList.remove('fa-star');
+            s.classList.add('fa-star-o');
+          }
+        });
+      });
+      
+      star.addEventListener('mouseout', function() {
+        const currentRating = ratingInput.value || 0;
+        
+        stars.forEach((s, index) => {
+          if (index < currentRating) {
+            s.classList.remove('fa-star-o');
+            s.classList.add('fa-star');
+          } else {
+            s.classList.remove('fa-star');
+            s.classList.add('fa-star-o');
+          }
+        });
+      });
+      
       star.addEventListener('click', function () {
         const rating = this.dataset.value;
         ratingInput.value = rating;
-        stars.forEach(s => {
-          s.classList.remove('fa-star');
-          s.classList.add('fa-star-o');
+        
+        stars.forEach((s, index) => {
+          if (index < rating) {
+            s.classList.remove('fa-star-o');
+            s.classList.add('fa-star');
+          } else {
+            s.classList.remove('fa-star');
+            s.classList.add('fa-star-o');
+          }
         });
-        for (let i = 0; i < rating; i++) {
-          stars[i].classList.remove('fa-star-o');
-          stars[i].classList.add('fa-star');
-        }
       });
     });
 
-    // 🗺️ Leaflet Map
+    // Leaflet Map
     const lat = {{ lieu.latitude|default(0) }};
     const lng = {{ lieu.longitude|default(0) }};
     const map = L.map('lieu-map').setView([lat, lng], 15);
+    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
-    L.marker([lat, lng]).addTo(map).bindPopup("{{ lieu.lieuName|e('js') }}").openPopup();
-
-    document.getElementById('lieu-map').addEventListener('click', function () {
-      this.style.height = '500px';
-      setTimeout(() => map.invalidateSize(), 200);
-    });
-
     
-    document.querySelectorAll('.carousel-testimony').forEach(carousel => {
-  const reviewCount = parseInt(carousel.dataset.reviewCount, 10);
-  const mode = carousel.dataset.carousel;
+    const marker = L.marker([lat, lng]).addTo(map);
+    marker.bindPopup("<strong>{{ lieu.lieuName|e('js') }}</strong><br>{{ lieu.lieuAddress|e('js') }}").openPopup();
 
-  $(carousel).owlCarousel({
-    loop: mode === 'true',
-    margin: 30,
-    nav: false,
-    dots: mode === 'true',
-    autoplay: mode === 'true',
-    autoplayTimeout: 4000,
-    responsive: {
-      0: { items: 1 },
-      768: { items: reviewCount === 2 ? 2 : 2 },
-      992: { items: reviewCount === 2 ? 2 : 3 }
+    // Review carousel
+    if (document.getElementById('review-carousel')) {
+      $('#review-carousel').owlCarousel({
+        center: true,
+        loop: true,
+        items: 3,
+        margin: 30,
+        autoplay: true,
+        autoplayTimeout: 4000,
+        responsive: {
+          0: { items: 1 },
+          768: { items: 2 },
+          992: { items: 3 }
+        }
+      });
     }
-  });
-});
-
   });
 </script>
 
 <!-- Owl Carousel Styles -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"/>
+
+<!-- Custom Styles -->
+<style>
+  /* Hero section styling */
+  .hero-wrap {
+    position: relative;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+  
+  .hero-wrap .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    content: '';
+    opacity: .5;
+    background: #000000;
+  }
+  
+  .hero-wrap .slider-text {
+    color: #fff;
+    height: 450px;
+  }
+  
+  .hero-wrap .slider-text h1 {
+    font-size: 48px;
+    color: #fff;
+    line-height: 1.2;
+    font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+  
+  .hero-wrap .slider-text p.caps {
+    font-weight: 400;
+    font-size: 20px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  
+  .hero-wrap .breadcrumbs {
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    z-index: 99;
+  }
+  
+  .hero-wrap .breadcrumbs span {
+    color: white;
+  }
+  
+  .hero-wrap .breadcrumbs span a {
+    color: white;
+  }
+  
+  /* Category badge */
+  .category-badge {
+    display: inline-block;
+    background: #21777F;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 16px;
+    margin-top: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  
+  /* Section title styling */
+  .section-title {
+    position: relative;
+    padding-bottom: 12px;
+    color: #333;
+    font-weight: 600;
+  }
+  
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: #21777F;
+  }
+  
+  /* Lieu meta styling */
+  .lieu-meta .icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(33, 119, 127, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .lieu-meta .icon span {
+    font-size: 20px;
+    color: #21777F;
+  }
+  
+  .meta-item h5 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .meta-item p {
+    font-size: 15px;
+    color: #666;
+  }
+  
+  /* Image gallery */
+  .img-gallery {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+  
+  .img-gallery img {
+    transition: transform 0.5s;
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+  }
+  
+  .img-gallery:hover img {
+    transform: scale(1.05);
+  }
+  
+  .img-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+  }
+  
+  .img-gallery:hover .img-overlay {
+    opacity: 1;
+  }
+  
+  .img-overlay a {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #21777F;
+    font-size: 20px;
+    transition: all 0.3s;
+  }
+  
+  .img-overlay a:hover {
+    background: #21777F;
+    color: white;
+  }
+  
+  /* Social sharing */
+  .social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    color: #333;
+    font-size: 18px;
+    transition: all 0.3s;
+  }
+  
+  .social-icon:hover {
+    background: #21777F;
+    color: white;
+    transform: translateY(-3px);
+  }
+  
+  /* Event card styling */
+  .event-card {
+    background: white;
+    transition: transform 0.3s;
+    height: 100%;
+  }
+  
+  .event-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .event-date {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #21777F;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 1;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+  
+  .event-date .day {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  
+  .event-date .month {
+    display: block;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+  
+  .event-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  
+  .event-description {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 14px;
+    min-height: 60px;
+  }
+  
+  .price {
+    font-weight: 600;
+    color: #21777F;
+  }
+  
+  .badge-primary {
+    background-color: rgba(33, 119, 127, 0.1);
+    color: #21777F;
+    font-weight: 500;
+  }
+  
+  /* Review form */
+  .review-form {
+    background: white;
+  }
+  
+  .star {
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .fa-star {
+    color: #ffc107;
+  }
+  
+  .testimony-section {
+    background: linear-gradient(135deg, #21777F 0%, #56C9E4 100%);
+  }
+  
+  .testimony-wrap {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  }
+  
+  .testimony-wrap .text {
+    padding: 20px;
+  }
+  
+  .testimony-wrap .name {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .testimony-wrap .position {
+    color: #888;
+    font-size: 14px;
+  }
+  
+  .empty-reviews {
+    padding: 30px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    display: inline-block;
+  }
+  
+  /* Footer spacing */
+  .ftco-section {
+    padding: 5rem 0;
+  }
+  
+  /* Button styles */
+  .btn-primary {
+    background: #21777F !important;
+    border-color: #21777F !important;
+  }
+  
+  .btn-outline-primary {
+    color: #21777F !important;
+    border-color: #21777F !important;
+  }
+  
+  .btn-outline-primary:hover {
+    background-color: #21777F !important;
+    color: white !important;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 767px) {
+    .hero-wrap .slider-text {
+      height: 350px;
+    }
+    
+    .hero-wrap .slider-text h1 {
+      font-size: 32px;
+    }
+    
+    .hero-wrap .slider-text p.caps {
+      font-size: 16px;
+    }
+    
+    .ftco-section {
+      padding: 3rem 0;
+    }
+  }
+  .lieu-description {
+  margin-bottom: 20px;
+  line-height: 1.6;
+  word-wrap: break-word; /* Prevents text from overflowing horizontally */
+}
+</style>
 
 {% endblock %}

@@ -1,0 +1,328 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4">
+        <i class="ri-line-chart-line me-1"></i> Tableau de bord statistiques: Lieux
+    </h4>
+    
+    <!-- Statistiques générales -->
+    <div class="row gy-6">
+        <!-- Info Cards -->
+        <div class="col-md-3 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial bg-label-primary rounded"><i class="ri-map-pin-line"></i></span>
+                        </div>
+                        <div>
+                            <p class="mb-0">Total des lieux</p>
+                            <h5 class="mb-0">{{ totalLieux }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial bg-label-success rounded"><i class="ri-calendar-event-line"></i></span>
+                        </div>
+                        <div>
+                            <p class="mb-0">Total des événements</p>
+                            <h5 class="mb-0">{{ totalEvents }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial bg-label-warning rounded"><i class="ri-ticket-line"></i></span>
+                        </div>
+                        <div>
+                            <p class="mb-0">Total des réservations</p>
+                            <h5 class="mb-0">{{ totalReservations }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial bg-label-info rounded"><i class="ri-star-line"></i></span>
+                        </div>
+                        <div>
+                            <p class="mb-0">Total des avis</p>
+                            <h5 class="mb-0">{{ totalReviews }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Graphiques -->
+    <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="mb-0">Réservations par mois</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="reservationsChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="mb-0">Catégories de lieux</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="lieuxCategoriesChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top événements -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Top 5 des événements les plus réservés</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Événement</th>
+                                <th>Lieu</th>
+                                <th>Catégorie</th>
+                                <th>Date</th>
+                                <th>Réservations</th>
+                                <th>Taux d'occupation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in topEvents %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if event.0.eventimage %}
+                                                <div class="avatar me-2">
+                                                    <img src="{{ asset('assets/exploration/images/' ~ event.0.eventimage) }}" alt="{{ event.0.eventname }}" class="rounded">
+                                                </div>
+                                            {% else %}
+                                                <div class="avatar me-2">
+                                                    <span class="avatar-initial rounded bg-label-primary"><i class="ri-calendar-event-line"></i></span>
+                                                </div>
+                                            {% endif %}
+                                            <span>{{ event.0.eventname }}</span>
+                                        </div>
+                                    </td>
+<td>
+    {% if event.0.lieu %}
+        {{ event.0.lieu.lieuname }}
+    {% else %}
+        <em>Lieu supprimé</em>
+    {% endif %}
+</td>                                    <td><span class="badge bg-label-primary">{{ event.0.eventcategory }}</span></td>
+                                    <td>{{ event.0.eventdate ? event.0.eventdate|date('d/m/Y') : 'Non défini' }}</td>
+                                    <td>{{ event.reservationCount }}</td>
+                                    <td>
+                                        {% set occupancyRate = (event.0.reservedtickets / event.0.maxtickets) * 100 %}
+                                        <div class="progress" style="height: 6px">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ occupancyRate }}%" aria-valuenow="{{ occupancyRate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <small>{{ event.0.reservedtickets }}/{{ event.0.maxtickets }} ({{ occupancyRate|round(1) }}%)</small>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top lieux -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Top 5 des lieux les mieux notés</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Lieu</th>
+                                <th>Adresse</th>
+                                <th>Catégorie</th>
+                                <th>Note moyenne</th>
+                                <th>Nombre d'avis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lieu in topLieux %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if lieu.0.lieuimage %}
+                                                <div class="avatar me-2">
+                                                    <img src="{{ asset('assets/exploration/images/' ~ lieu.0.lieuimage) }}" alt="{{ lieu.0.lieuname }}" class="rounded">
+                                                </div>
+                                            {% else %}
+                                                <div class="avatar me-2">
+                                                    <span class="avatar-initial rounded bg-label-success"><i class="ri-map-pin-line"></i></span>
+                                                </div>
+                                            {% endif %}
+                                            <span>{{ lieu.0.lieuname }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ lieu.0.lieuaddress }}</td>
+                                    <td><span class="badge bg-label-success">{{ lieu.0.lieucategory }}</span></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="text-warning">
+                                                {% set avgRating = lieu.avgRating|round(1) %}
+                                                {% for i in 1..5 %}
+                                                    <i class="{{ i <= avgRating ? 'ri-star-fill' : (i <= avgRating + 0.5 ? 'ri-star-half-line' : 'ri-star-line') }}"></i>
+                                                {% endfor %}
+                                            </div>
+                                            <span class="ms-1">{{ avgRating }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ lieu.reviewCount }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Derniers commentaires -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="mb-0">Derniers commentaires</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Utilisateur</th>
+                                <th>Lieu</th>
+                                <th>Note</th>
+                                <th>Commentaire</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for review in latestReviews %}
+                                <tr>
+                                    <td>{{ review.reviewdate ? review.reviewdate|date('d/m/Y') : 'Non défini' }}</td>
+                                    <td>{{ review.user.username }}</td>
+                                    <td>{{ review.lieuid.lieuname }}</td>
+                                    <td>
+                                        <div class="text-warning">
+                                            {% for i in 1..5 %}
+                                                <i class="{{ i <= review.rating ? 'ri-star-fill' : 'ri-star-line' }}"></i>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td>{{ review.comment }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Réservations par mois
+            const reservationsCtx = document.getElementById('reservationsChart').getContext('2d');
+            new Chart(reservationsCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ reservationsByMonth.labels|json_encode|raw }},
+                    datasets: [{
+                        label: 'Nombre de réservations',
+                        data: {{ reservationsByMonth.data|json_encode|raw }},
+                        backgroundColor: 'rgba(105, 108, 255, 0.5)',
+                        borderColor: 'rgba(105, 108, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Catégories de lieux
+            const lieuxCategoriesCtx = document.getElementById('lieuxCategoriesChart').getContext('2d');
+            new Chart(lieuxCategoriesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: {{ lieuxByCategory.labels|json_encode|raw }},
+                    datasets: [{
+                        data: {{ lieuxByCategory.data|json_encode|raw }},
+                        backgroundColor: [
+                            'rgba(105, 108, 255, 0.7)',
+                            'rgba(0, 214, 180, 0.7)',
+                            'rgba(255, 171, 0, 0.7)',
+                            'rgba(255, 62, 29, 0.7)',
+                            'rgba(113, 221, 55, 0.7)',
+                            'rgba(3, 195, 236, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

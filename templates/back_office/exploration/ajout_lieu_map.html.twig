@@ -1,21 +1,28 @@
 {% extends 'back_office/base-back-office.html.twig' %}
 
 {% block body %}
-<h4>Étape 1 : Sélectionnez un lieu sur la carte</h4>
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="fw-bold mb-4 text-primary">
+    <i class="ri-map-pin-add-line me-1"></i> Étape 1 : Sélectionnez un lieu sur la carte
+  </h4>
 
-<div class="mb-3">
-  <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un lieu (ex: Paris)">
-  <ul id="suggestions" class="list-group mt-2"></ul>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un lieu (ex: Paris)">
+        <ul id="suggestions" class="list-group mt-2"></ul>
+      </div>
+
+      <div id="map" style="height: 500px; border-radius: 12px;"></div>
+    </div>
+  </div>
 </div>
 
-<div id="map" style="height: 500px; border-radius: 12px;"></div>
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
 
 <script>
   const map = L.map('map').setView([36.8065, 10.1815], 6); // Tunisia center
-
-  // ✅ High-performance CartoDB tiles (no proxy needed)
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
     subdomains: 'abcd',
@@ -51,25 +58,23 @@
           li.textContent = feature.properties.name + ' - ' + (feature.properties.city || '');
 
           li.onclick = () => {
-  const [lon, lat] = feature.geometry.coordinates;
-  const name = feature.properties.name +
-    (feature.properties.city ? `, ${feature.properties.city}` : '') +
-    (feature.properties.country ? `, ${feature.properties.country}` : '');
+            const [lon, lat] = feature.geometry.coordinates;
+            const name = feature.properties.name +
+              (feature.properties.city ? `, ${feature.properties.city}` : '') +
+              (feature.properties.country ? `, ${feature.properties.country}` : '');
 
-  // ✅ Confirmation dialog
-  if (confirm(`Voulez-vous ajouter "${name}" comme lieu ?`)) {
-    map.setView([lat, lon], 14);
-    if (marker) map.removeLayer(marker);
-    marker = L.marker([lat, lon]).addTo(map);
-    
-    window.location.href = `/admin/lieu/complete/${lat}/${lon}/${encodeURIComponent(name)}`;
-  }
-};
+            if (confirm(`Voulez-vous ajouter "${name}" comme lieu ?`)) {
+              map.setView([lat, lon], 14);
+              if (marker) map.removeLayer(marker);
+              marker = L.marker([lat, lon]).addTo(map);
+
+              window.location.href = `/admin/lieu/complete/${lat}/${lon}/${encodeURIComponent(name)}`;
+            }
+          };
 
           suggestions.appendChild(li);
         });
       });
   });
 </script>
-
 {% endblock %}

@@ -16,7 +16,8 @@ services:
     Doctrine\Common\Annotations\AnnotationReader:
         class: Doctrine\Common\Annotations\AnnotationReader
         public: true
-
+    App\Service\NotificationService:
+        public: true
     annotation_reader:
         alias: Doctrine\Common\Annotations\AnnotationReader
 
@@ -29,6 +30,7 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+<<<<<<< HEAD
 # Define the login listener service explicitly
     App\EventListener\LoginSuccessListener:
         tags:
@@ -37,6 +39,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+=======
+>>>>>>> d603257 (completed work)
 
 
 symfonycasts_reset_password:
