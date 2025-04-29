@@ -5,7 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 
 parameters:
-    avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+    avatars_directory: '%kernel.project_dir%/public/scripts'
+
     # Add the OpenRouter API key parameter
     openrouter_api_key: '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'
 

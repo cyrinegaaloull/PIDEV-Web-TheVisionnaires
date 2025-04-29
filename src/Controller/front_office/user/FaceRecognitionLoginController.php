@@ -40,8 +40,8 @@ class FaceRecognitionLoginController extends AbstractController
     {
 
         $this->logger->info('FaceRecognitionLoginController: Action started.');
-        $pythonScriptPath = $this->getParameter('kernel.project_dir') . '/scripts/face_recognition_script.py'; // Adjust the path
-        $photosFolderPath = $this->getParameter('kernel.project_dir') . '/scripts/'; // Assuming photos are in the same folder
+        $pythonScriptPath = $this->getParameter('kernel.project_dir') . '/public/scripts/face_recognition_script.py'; // Adjust the path
+        $photosFolderPath = $this->getParameter('kernel.project_dir') . '/public/scripts/'; // Assuming photos are in the same folder
 
         // Ensure the Python script exists
         if (!file_exists($pythonScriptPath)) {

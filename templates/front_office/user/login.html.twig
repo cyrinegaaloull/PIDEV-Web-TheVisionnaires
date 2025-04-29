@@ -242,7 +242,11 @@
                                 <input type="file" name="avatar" accept="image/*" onchange="updateFileName(this)">
                             </label>
                         </div>
+
+                        
                         <button type="submit">Sign up</button>
+
+                        
                     </form>
 
                     <p>
@@ -269,8 +273,12 @@
 
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-                          {# Add reCAPTCHA widget here #}
-                         <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                         {# ---- MODIFICATION START ---- #}
+                {# Only render reCAPTCHA if the key is provided by the controller #}
+                {% if recaptcha_site_key is defined %}
+                    <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                {% endif %}
+                {# ---- MODIFICATION END ---- #}
 
                         <button type="submit">
                             Sign in
