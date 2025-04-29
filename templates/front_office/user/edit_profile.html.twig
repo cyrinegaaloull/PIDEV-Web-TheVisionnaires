@@ -608,7 +608,7 @@
         <div class="profile-avatar-container">
             {# Display existing or default avatar logic remains the same #}
             {% if user.avatar %}
-                <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="Current Profile Picture" class="img-display">
+                <img src="{{ asset('scripts/' ~ user.avatar) }}" alt="Current Profile Picture" class="img-display">
             {% else %}
                 <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Default Profile Picture" class="img-display">
             {% endif %}
