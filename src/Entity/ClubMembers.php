@@ -19,7 +19,7 @@ class ClubMembers
 
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Users::class)]
-    #[ORM\JoinColumn(name: 'userID', referencedColumnName: 'userId', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'userID', referencedColumnName: 'user_id', nullable: false, onDelete: 'CASCADE')]
     private Users $userid;
 
     #[ORM\Column(name: 'joinDate', type: 'date', nullable: true, options: ['default' => 'CURRENT_DATE'])]
