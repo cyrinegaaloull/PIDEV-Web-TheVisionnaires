@@ -147,4 +147,22 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return null;
     }
+
+
+    #[ORM\OneToMany(mappedBy: "memberid", targetEntity: Membership::class)]
+    private Collection $memberships;
+
+    public function getMemberships(): Collection
+    {
+        return $this->memberships;
+    }
+
+    public function __construct()
+    {
+        $this->memberships = new ArrayCollection();
+    }
+
+
+
+
 }

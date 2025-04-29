@@ -15,10 +15,8 @@ class ActiviteController extends AbstractController
     #[Route('/activites', name: 'app_activites')]
     public function index(Request $request, ActiviteRepository $activiteRepository, PaginatorInterface $paginator): Response
     {
-        $user = [
-            'username' => 'John Doe',
-            'profile_picture' => 'default_profile_pic.jpg',
-        ];
+        $user = $this->getUser();
+
 
         $search = $request->query->get('search');
 
@@ -48,10 +46,8 @@ public function show(int $id, ActiviteRepository $activiteRepository): Response
 {
     $activite = $activiteRepository->find($id);
 
-    $user = [
-        'username' => 'John Doe',
-        'profile_picture' => 'default_profile_pic.jpg',
-    ];
+    $user = $this->getUser();
+
 
     if (!$activite) {
         throw $this->createNotFoundException('Activité non trouvée.');
