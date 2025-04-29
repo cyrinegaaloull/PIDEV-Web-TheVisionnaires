@@ -27,6 +27,9 @@ services:
         public: true
     App\Service\NotificationService:
         public: true
+    Symfony\Contracts\HttpClient\HttpClientInterface: '@http_client'
+
+
     annotation_reader:
         alias: Doctrine\Common\Annotations\AnnotationReader
   
