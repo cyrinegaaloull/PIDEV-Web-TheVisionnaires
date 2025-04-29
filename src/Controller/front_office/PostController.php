@@ -18,6 +18,8 @@ final class PostController extends AbstractController
     #[Route(name: 'app_post_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
+        /** @var \App\Entity\Users $user */
+        $user = $this->getUser();
         $search = $request->query->get('search'); // get the 'search' input from URL
         $postRepository = $entityManager->getRepository(Post::class);
 
@@ -37,6 +39,8 @@ final class PostController extends AbstractController
 
         return $this->render('front_office/post/index.html.twig', [
             'posts' => $posts,
+            'user' => $user,
+
         ]);
     }
 
@@ -67,6 +71,8 @@ final class PostController extends AbstractController
         return $this->render('front_office/post/new.html.twig', [
             'post' => $post,
             'form' => $form->createView(),
+            'user' => $user,
+
         ]);
     }
 
@@ -109,6 +115,8 @@ final class PostController extends AbstractController
                     return $this->render('front_office/post/show.html.twig', [
                         'post' => $post,
                         'form' => $form->createView(),
+                        'user' => $user,
+
                     ]);
                 }
 
@@ -122,6 +130,8 @@ final class PostController extends AbstractController
         return $this->render('front_office/post/show.html.twig', [
             'post' => $post,
             'form' => $form->createView(),
+            'user' => $user,
+
         ]);
     }
 
@@ -153,6 +163,8 @@ final class PostController extends AbstractController
         return $this->render('front_office/post/edit.html.twig', [
             'post' => $post,
             'form' => $form->createView(),
+            'user' => $user,
+
         ]);
     }
 
@@ -181,23 +193,17 @@ final class PostController extends AbstractController
     #[Route('/comment/{commentId}/edit', name: 'app_comment_edit', methods: ['POST'])]
     public function editComment(Request $request, Comment $comment, EntityManagerInterface $entityManager): Response
     {
-        // Ensure the user is logged in
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        // Get the currently authenticated user
         $user = $this->getUser();
 
-        // Check if the authenticated user is the owner of the comment
         if ($comment->getUserId() !== $user->getUserId()) {
             return $this->json(['error' => 'Vous n\'êtes pas autorisé à modifier ce commentaire.'], Response::HTTP_FORBIDDEN);
         }
 
-        // Validate CSRF token
         if (!$this->isCsrfTokenValid('edit-comment' . $comment->getCommentId(), $request->headers->get('X-CSRF-TOKEN'))) {
             return $this->json(['error' => 'Invalid CSRF token.'], Response::HTTP_FORBIDDEN);
         }
 
-        // Get the new content from the request body
         $data = json_decode($request->getContent(), true);
         $newContent = trim($data['content'] ?? '');
 
@@ -205,12 +211,50 @@ final class PostController extends AbstractController
             return $this->json(['error' => 'Le contenu du commentaire ne peut pas être vide.'], Response::HTTP_BAD_REQUEST);
         }
 
-        // Update the comment content
+        // 🚨 Check if the new content contains bad words
+        if ($this->containsBadWords($newContent)) {
+            return $this->json(['error' => 'Votre commentaire modifié contient des mots inappropriés.'], Response::HTTP_BAD_REQUEST);
+        }
+
         $comment->setContent($newContent);
         $entityManager->flush();
 
         return $this->json(['success' => true]);
     }
+    #[Route('/search', name: 'app_post_search', methods: ['GET'])]
+    public function search(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $search = $request->query->get('search');
+        $postRepository = $entityManager->getRepository(Post::class);
+
+        $queryBuilder = $postRepository->createQueryBuilder('p');
+
+        if ($search) {
+            $queryBuilder
+                ->where('p.title LIKE :search')
+                ->orWhere('p.content LIKE :search')
+                ->orWhere('p.category LIKE :search')
+                ->setParameter('search', '%' . $search . '%')
+                ->orderBy('p.postId', 'DESC');
+        }
+
+        $posts = $queryBuilder->getQuery()->getResult();
+
+        $postsArray = [];
+        foreach ($posts as $post) {
+            $postsArray[] = [
+                'id' => $post->getPostId(),
+                'title' => $post->getTitle(),
+                'content' => $post->getContent(),
+                'category' => $post->getCategory(),
+                // add other fields if needed
+            ];
+        }
+
+        return $this->json($postsArray);
+    }
+
+
     private function containsBadWords(string $text): bool
     {
         try {

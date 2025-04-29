@@ -1,0 +1,438 @@
+{# templates/your_path/chatbot.html.twig - Adjust path as needed #}
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Chatbot{% endblock %}
+
+{% block stylesheets %}
+    {# Include stylesheets from the base back-office template #}
+    {{ parent() }}
+
+    {# Add chatbot-specific styles #}
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --chat-bg: #f8f9fa;
+            --user-bubble: #e6f2ff;
+            --user-bubble-border: #cce4ff;
+            --bot-bubble: #f0f2f5;
+            --bot-bubble-border: #e4e6eb;
+            --error-bubble: #ffebee;
+            --error-text: #c62828;
+            --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+            --transition: all 0.2s ease;
+        }
+
+        .chat-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .chat-card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-card-header h5 {
+            margin: 0;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .chat-card-header .status-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .chat-container {
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-bg);
+            margin: 0;
+            border-radius: 0;
+            border: none;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .message-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 22px;
+            position: relative;
+        }
+
+        .message {
+            margin-bottom: 2px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            line-height: 1.5;
+            box-shadow: var(--shadow-sm);
+            animation: fadeIn 0.3s ease-out forwards;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .user-message {
+            background-color: var(--user-bubble);
+            color: #1a1a1a;
+            margin-left: auto;
+            text-align: left;
+            border-bottom-right-radius: 4px;
+            border: 1px solid var(--user-bubble-border);
+        }
+        
+        .bot-message {
+            background-color: var(--bot-bubble);
+            color: #1a1a1a;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--bot-bubble-border);
+        }
+        
+        .error-message {
+            background-color: var(--error-bubble);
+            color: var(--error-text);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #ffe0e0;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            margin-left: 8px;
+            margin-right: 8px;
+            align-self: flex-end;
+        }
+
+        .user-time {
+            margin-left: auto;
+        }
+
+        .bot-time {
+            margin-right: auto;
+        }
+
+        .chat-input-container {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            background-color: #fff;
+        }
+        
+        .chat-input {
+            display: flex;
+            align-items: center;
+            background-color: var(--chat-bg);
+            border-radius: 24px;
+            padding: 4px 6px 4px 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+        
+        .chat-input:focus-within {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 0;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        
+        .chat-input button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chat-input button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .chat-input button:active {
+            transform: translateY(1px);
+        }
+
+        .chat-input button svg {
+            margin-left: 6px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .typing-indicator {
+            display: inline-block;
+            padding: 12px 16px;
+            background-color: var(--bot-bubble);
+            border-radius: 18px;
+            margin-bottom: 15px;
+            margin-left: 0;
+            display: none;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--bot-bubble-border);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #888;
+            margin-right: 4px;
+            animation: typing 1.5s infinite ease-in-out;
+        }
+        
+        .dot:last-child {
+            margin-right: 0;
+        }
+        
+        .dot:nth-child(1) { animation-delay: 0s; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); opacity: 0.4; }
+            50% { transform: translateY(-5px); opacity: 1; }
+        }
+    </style>
+{% endblock %}
+
+{% block body %} {# Or use {% block content %} if that's what base-back-office.html.twig uses #}
+    <div class="container-fluid flex-grow-1 container-p-y">
+        <h4 class="py-3 mb-4">
+            <span class="text-muted fw-light">Tools /</span> 
+            <span class="fw-semibold">Chatbot Assistant</span>
+        </h4>
+
+        <div class="card chat-card">
+            <div class="chat-card-header">
+                <div class="status-indicator"></div>
+                <h5>Chat Interface</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        {# Initial bot message #}
+                        <div class="message-group">
+                            <div class="message bot-message">
+                                Hello! How can I assist you within the back office today?
+                            </div>
+                            <div class="message-time bot-time">Just now</div>
+                        </div>
+                    </div>
+
+                    {# Typing indicator container #}
+                    <div id="typingIndicatorContainer" style="padding-left: 20px; padding-bottom: 5px;">
+                        <div class="typing-indicator" id="typingIndicator">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <div class="chat-input">
+                            <input type="text" id="userInput" placeholder="Type your message..." class="form-control">
+                            <button id="sendButton" class="btn">
+                                Send
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {# Include javascripts from the base back-office template #}
+    {{ parent() }}
+
+    {# Add chatbot-specific JavaScript #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chatMessages');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const chatContainer = document.querySelector('.chat-container');
+
+            // Function to get current time
+            function getCurrentTime() {
+                const now = new Date();
+                return now.getHours().toString().padStart(2, '0') + ':' + 
+                       now.getMinutes().toString().padStart(2, '0');
+            }
+
+            // Function to scroll chat to the bottom
+            function scrollToBottom() {
+                // Use timeout to ensure DOM update before scrolling
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 0);
+            }
+
+            // Function to add a message to the chat
+            function addMessage(message, type) {
+                const messageGroup = document.createElement('div');
+                messageGroup.classList.add('message-group');
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', type);
+
+                // Simple check to add "You:" prefix only to user messages text content
+                const messagePrefix = type === 'user-message' ? 'You: ' : '';
+                messageDiv.textContent = messagePrefix + message; // Set text content directly
+
+                // Create time element
+                const timeDiv = document.createElement('div');
+                timeDiv.classList.add('message-time');
+                if (type === 'user-message') {
+                    timeDiv.classList.add('user-time');
+                } else {
+                    timeDiv.classList.add('bot-time');
+                }
+                timeDiv.textContent = getCurrentTime();
+
+                // Hide typing indicator *before* adding new message
+                typingIndicator.style.display = 'none';
+
+                // Add message and time to message group
+                messageGroup.appendChild(messageDiv);
+                messageGroup.appendChild(timeDiv);
+                
+                // Add message group to chat
+                chatMessages.appendChild(messageGroup);
+                scrollToBottom();
+            }
+
+            // Function to handle sending a message
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (!message) return;
+
+                // Add user message to chat (pass only the message content)
+                addMessage(message, 'user-message');
+
+                // Clear input
+                userInput.value = '';
+                userInput.focus(); // Keep focus on input
+
+                // Show typing indicator immediately
+                typingIndicator.style.display = 'inline-block';
+                scrollToBottom(); // Scroll down to show indicator if needed
+
+                // Send message to server
+                fetch('{{ path('app_chatbot_message') }}', { // Ensure this route is correctly defined
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest' // Important for Symfony Request::isXmlHttpRequest()
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // Handle HTTP errors (like 404, 500)
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Typing indicator is hidden inside addMessage now
+                    if (data.success) {
+                        // Add bot message to chat
+                        addMessage(data.message, 'bot-message');
+                    } else {
+                        // Add error message to chat (use data.message for error detail)
+                        addMessage(data.message || 'An unknown error occurred.', 'error-message');
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch Error:', error);
+                    // Hide typing indicator on error
+                    typingIndicator.style.display = 'none';
+
+                    // Add technical error message to chat
+                    addMessage('Error connecting to the chatbot service: ' + error.message, 'error-message');
+                });
+            }
+
+            // --- Event listeners ---
+            sendButton.addEventListener('click', sendMessage);
+
+            userInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Prevent default form submission if it's inside a form
+                    sendMessage();
+                }
+            });
+
+            // Initial scroll to bottom if there's content already
+            scrollToBottom();
+        });
+    </script>
+{% endblock %}

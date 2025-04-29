@@ -17,6 +17,8 @@ class ReclamationController extends AbstractController
     #[Route('/post/{postId}/report', name: 'report_post', methods: ['GET', 'POST'])]
     public function reportPost(Request $request, EntityManagerInterface $entityManager, int $postId): Response
     {
+        /** @var \App\Entity\Users $user */
+        $user = $this->getUser();
         // Fetch the Post entity based on postId
         $post = $entityManager->getRepository(Post::class)->find($postId);
 
@@ -49,6 +51,8 @@ class ReclamationController extends AbstractController
         return $this->render('front_office/reclamation/report_post.html.twig', [
             'form' => $form->createView(),
             'postId' => $postId,
+            'user' => $user,
+
         ]);
     }
 }

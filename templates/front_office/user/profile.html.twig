@@ -13,7 +13,7 @@
                         <div class="profile-image">
                             <div class="avatar-online">
                                 {% if user and user.avatar %}
-                                    <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="{{ user.username }}" class="rounded-circle">
+                                    <img src="{{ asset('scripts/' ~ user.avatar) }}" alt="{{ user.username }}" class="rounded-circle">
                                 {% else %}
                                     <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Profile" class="rounded-circle">
                                 {% endif %}

@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use App\Repository\ReservationEventRepository;
 use App\Repository\ReviewRepository;
+use App\Service\GeocodingService;
 
 class BackExplorationController extends AbstractController
 {
@@ -32,24 +33,52 @@ class BackExplorationController extends AbstractController
     }
 
     #[Route('/admin/lieu/complete/{lat}/{lon}/{name}', name: 'admin_lieu_finalize')]
-    public function finalizeLieu(Request $request, EntityManagerInterface $em, float $lat, float $lon, string $name, AIDescriptionService $aiService): Response
+    public function finalizeLieu(
+        Request $request, 
+        EntityManagerInterface $em, 
+        float $lat, 
+        float $lon, 
+        string $name, 
+        AIDescriptionService $aiService,
+        GeocodingService $geocodingService
+    ): Response
     {
         $lieu = new Lieu();
         $lieu->setLatitude($lat);
         $lieu->setLongitude($lon);
         $lieu->setLieuname($name);
-
+    
+        // Génération de la description par IA
         $generatedDescription = $aiService->generateDescription($name);
         if ($generatedDescription) {
             $lieu->setLieudescription($generatedDescription);
         }
-
+    
+        // Récupération de l'adresse depuis les coordonnées
+        try {
+            $results = $geocodingService->reverseGeocode($lat, $lon);
+            if (!$results->isEmpty()) {
+                $addressObj = $results->first();
+                $components = array_filter([
+                    $addressObj->getStreetName(),
+                    $addressObj->getStreetNumber(),
+                    $addressObj->getPostalCode(),
+                    $addressObj->getLocality(),
+                    $addressObj->getCountry()?->getName(),
+                ]);
+                $formattedAddress = implode(', ', $components);
+                $lieu->setLieuaddress($formattedAddress);
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('warning', 'Impossible de récupérer l\'adresse automatiquement.');
+        }
+    
+        // Création du formulaire
         $form = $this->createForm(LieuType::class, $lieu, [
             'disabled_name' => true,
         ]);
-
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
             $file = $form->get('lieuimage')->getData();
             if ($file) {
@@ -57,18 +86,18 @@ class BackExplorationController extends AbstractController
                 $file->move($this->getParameter('your_upload_directory'), $filename);
                 $lieu->setLieuimage($filename);
             }
-
+    
             $em->persist($lieu);
             $em->flush();
-
             $this->addFlash('success', 'Lieu ajouté avec succès.');
             return $this->redirectToRoute('admin_lieux');
         }
-
+    
         return $this->render('back_office/exploration/ajout_lieu_finalize.html.twig', [
             'form' => $form->createView(),
         ]);
     }
+
 
     #[Route('/admin/lieux', name: 'admin_lieux')]
     public function listLieux(Request $request, LieuRepository $lieuRepository): Response

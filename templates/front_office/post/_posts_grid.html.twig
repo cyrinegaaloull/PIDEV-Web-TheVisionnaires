@@ -1,0 +1,29 @@
+{% for post in posts %}
+    <div class="col-md-4 d-flex mb-4">
+        <div class="glass-card w-100">
+            <div>
+                <div class="card-title">{{ post.title }}</div>
+                <div class="card-category">
+                    <span class="badge bg-primary">📂 {{ post.category }}</span>
+                </div>
+                <div class="card-content">{{ post.content|length > 100 ? post.content|slice(0, 100) ~ '...' : post.content }}</div>
+            </div>
+            <div class="card-actions">
+                <a href="{{ path('app_post_show', {'postId': post.postId}) }}" class="btn btn-outline-info btn-sm">
+                    <i class="fa fa-eye mr-1"></i> View
+                </a>
+                <a href="{{ path('app_post_edit', {'postId': post.postId}) }}" class="btn btn-outline-warning btn-sm">
+                    <i class="fa fa-edit mr-1"></i> Edit
+                </a>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="col-12">
+        <div class="alert alert-info text-center py-4">
+            <i class="fa fa-info-circle fa-2x mb-3"></i>
+            <h4>No posts found</h4>
+            <p class="mb-0">Try adjusting your search.</p>
+        </div>
+    </div>
+{% endfor %}

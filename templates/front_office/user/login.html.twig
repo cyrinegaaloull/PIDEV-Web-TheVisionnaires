@@ -162,6 +162,10 @@
         }
     </style>
 </head>
+{% block javascripts %}
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock %}
+
 <body>
 <div id="container" class="container {% if show_signup is defined and show_signup %}sign-up{% else %}sign-in{% endif %}">
 
@@ -238,7 +242,11 @@
                                 <input type="file" name="avatar" accept="image/*" onchange="updateFileName(this)">
                             </label>
                         </div>
+
+                        
                         <button type="submit">Sign up</button>
+
+                        
                     </form>
 
                     <p>
@@ -264,6 +272,13 @@
                         </div>
 
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                         {# ---- MODIFICATION START ---- #}
+                {# Only render reCAPTCHA if the key is provided by the controller #}
+                {% if recaptcha_site_key is defined %}
+                    <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                {% endif %}
+                {# ---- MODIFICATION END ---- #}
 
                         <button type="submit">
                             Sign in

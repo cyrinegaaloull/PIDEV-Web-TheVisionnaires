@@ -11,8 +11,6 @@
                 <div class="col-md-8">
                     <h1 class="hero-title">{{ post.title }}</h1>
                     <p class="hero-subtitle">Publié dans la catégorie: {{ post.category }}</p>
-
-
                 </div>
             </div>
         </div>
@@ -29,89 +27,49 @@
             position: relative;
             margin-bottom: 50px;
         }
-
         .hero-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0, 0, 0, 0.5);
         }
-
         .hero-content {
             position: relative;
             z-index: 1;
         }
-
         .hero-title {
             font-size: 2.5rem;
             font-weight: bold;
             margin-bottom: 20px;
-            color: white;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
-
         .hero-subtitle {
             font-size: 1.2rem;
             margin-bottom: 30px;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
-
-        /* Post Details Styling */
-        .post-details {
+        /* Post and Comment Styling */
+        .post-details, .comments-section {
             background: #ffffff;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             padding: 20px;
             margin-bottom: 30px;
         }
-
-        .post-details h2 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .post-details p {
-            font-size: 1rem;
-            color: #555;
-            line-height: 1.6;
-        }
-
-        /* Comments Section */
-        .comments-section {
-            background: #f9f9f9;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-
         .comment {
             border-bottom: 1px solid #ddd;
             padding: 10px 0;
         }
-
         .comment:last-child {
             border-bottom: none;
         }
-
         .comment-author {
             font-weight: bold;
             color: #333;
         }
-
         .comment-content {
             margin-top: 5px;
             color: #555;
         }
-
-        /* Comment Form Styling */
-        .comment-form {
-            margin-top: 20px;
-        }
-
         .comment-form textarea {
             width: 100%;
             height: 100px;
@@ -120,7 +78,6 @@
             padding: 10px;
             margin-bottom: 10px;
         }
-
         .comment-form button {
             background: #007bff;
             color: white;
@@ -129,9 +86,33 @@
             border-radius: 5px;
             cursor: pointer;
         }
-
         .comment-form button:hover {
             background: #0056b3;
+        }
+        .emoji-picker span {
+            font-size: 24px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        /* Reaction Buttons Styling */
+        .reaction-btn {
+            font-size: 18px;
+            margin-right: 8px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            color: #333;
+            transition: all 0.2s;
+        }
+        .reaction-btn.active {
+            background-color: #ffc107;
+            color: white;
+            border-color: #ffc107;
+        }
+        .reaction-count {
+            margin-left: 5px;
+            font-weight: bold;
+            color: #555;
+            font-size: 0.9rem;
         }
     </style>
 
@@ -141,13 +122,23 @@
             <div class="col-md-8">
                 <div class="post-details glass-card">
                     <form method="get" action="{{ path('report_post', {'postId': post.postId}) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-warning btn-sm">Report Post</button>
+                        <button type="submit" class="btn btn-warning btn-sm">Signaler la publication</button>
                     </form>
                     <h2>{{ post.title }}</h2>
                     <p><strong>Contenu:</strong> {{ post.content }}</p>
                     <p><strong>Catégorie:</strong> {{ post.category }}</p>
                     <p><strong>ID de l'utilisateur:</strong> {{ post.userId }}</p>
                 </div>
+                <!-- Post Reaction Buttons -->
+                <div class="mt-3 d-flex align-items-center">
+                    <button class="btn btn-outline-success me-2" id="post-upvote-btn">
+                        👍 <span id="post-upvote-count">0</span>
+                    </button>
+                    <button class="btn btn-outline-danger" id="post-downvote-btn">
+                        👎 <span id="post-downvote-count">0</span>
+                    </button>
+                </div>
+
 
                 <!-- Add New Comment -->
                 <div class="comment-form mt-4">
@@ -158,16 +149,19 @@
                             {{ form_errors(form) }}
                         </div>
                     {% endif %}
-
                     {{ form_row(form.content) }}
-
-                    <button type="submit" class="btn btn-primary">Publier</button>
+                    <!-- Emoji Picker -->
+                    <div class="emoji-picker mt-2">
+                        <span>😊</span>
+                        <span>😂</span>
+                        <span>❤️</span>
+                        <span>👍</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Publier</button>
                     {{ form_end(form) }}
-
-
                 </div>
 
-                <!-- Display Existing Comments -->
+                <!-- Existing Comments -->
                 <div class="comments-section glass-card mt-4">
                     <h3>Commentaires</h3>
 
@@ -176,8 +170,8 @@
                             <div class="comment" id="comment-{{ comment.commentId }}">
                                 <div class="comment-author">Utilisateur ID: {{ comment.userId }}</div>
                                 <div class="comment-content" id="content-{{ comment.commentId }}">{{ comment.content }}</div>
+
                                 <div class="comment-actions mt-2">
-                                    <!-- Edit Button -->
                                     <a href="#" class="btn btn-sm btn-primary me-2 edit-btn"
                                        data-comment-id="{{ comment.commentId }}"
                                        data-original-content="{{ comment.content|e('js') }}"
@@ -185,11 +179,23 @@
                                         Modifier
                                     </a>
 
-                                    <!-- Delete Button -->
                                     <form action="{{ path('app_comment_delete', {'commentId': comment.commentId}) }}" method="post" style="display: inline-block;">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete-comment' ~ comment.commentId) }}">
                                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Voulez-vous vraiment supprimer ce commentaire ?')">Supprimer</button>
                                     </form>
+                                </div>
+
+                                <!-- Reaction Buttons -->
+                                <div class="mt-3">
+                                    <button class="btn btn-light btn-sm reaction-btn" data-comment-id="{{ comment.commentId }}" data-emoji="❤️">
+                                        ❤️ <span class="reaction-count">0</span>
+                                    </button>
+                                    <button class="btn btn-light btn-sm reaction-btn" data-comment-id="{{ comment.commentId }}" data-emoji="😂">
+                                        😂 <span class="reaction-count">0</span>
+                                    </button>
+                                    <button class="btn btn-light btn-sm reaction-btn" data-comment-id="{{ comment.commentId }}" data-emoji="👍">
+                                        👍 <span class="reaction-count">0</span>
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
@@ -203,22 +209,30 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const editButtons = document.querySelectorAll('.edit-btn');
+            // === Emoji Picker for New Comment ===
+            const emojiSpans = document.querySelectorAll('.emoji-picker span');
+            const commentTextarea = document.querySelector('textarea');
 
+            emojiSpans.forEach(span => {
+                span.addEventListener('click', () => {
+                    commentTextarea.value += span.textContent;
+                    commentTextarea.focus();
+                });
+            });
+
+            // === Edit Comment Handling ===
+            const editButtons = document.querySelectorAll('.edit-btn');
             editButtons.forEach(button => {
                 button.addEventListener('click', function (event) {
                     event.preventDefault();
-
                     const commentId = this.dataset.commentId;
                     const commentContentDiv = document.getElementById(`content-${commentId}`);
                     const actionsDiv = this.parentElement;
                     const csrfToken = this.dataset.csrfToken;
                     const originalContent = this.dataset.originalContent;
 
-                    // Prevent double editing
                     if (commentContentDiv.querySelector('textarea')) return;
 
-                    // Create textarea
                     const textarea = document.createElement('textarea');
                     textarea.value = originalContent;
                     textarea.style.width = '100%';
@@ -231,7 +245,19 @@
                     commentContentDiv.innerHTML = '';
                     commentContentDiv.appendChild(textarea);
 
-                    // Create confirm and cancel buttons
+                    // Add Emoji Picker inside edit mode
+                    const emojiPicker = document.createElement('div');
+                    emojiPicker.className = 'emoji-picker mt-2';
+                    emojiPicker.innerHTML = `<span>😊</span><span>😂</span><span>❤️</span><span>👍</span>`;
+                    commentContentDiv.appendChild(emojiPicker);
+
+                    emojiPicker.querySelectorAll('span').forEach(span => {
+                        span.addEventListener('click', () => {
+                            textarea.value += span.textContent;
+                            textarea.focus();
+                        });
+                    });
+
                     const confirmButton = document.createElement('button');
                     confirmButton.textContent = 'Confirmer';
                     confirmButton.className = 'btn btn-sm btn-success me-2';
@@ -288,6 +314,82 @@
                     });
                 });
             });
+// === Post Upvote / Downvote Buttons (Toggle) ===
+            let postUpvoteActive = false;
+            let postDownvoteActive = false;
+            let postUpvoteCount = 0;
+            let postDownvoteCount = 0;
+
+            const upvoteBtn = document.getElementById('post-upvote-btn');
+            const downvoteBtn = document.getElementById('post-downvote-btn');
+
+            upvoteBtn.addEventListener('click', function () {
+                if (!postUpvoteActive) {
+                    postUpvoteCount++;
+                    upvoteBtn.classList.remove('btn-outline-success');
+                    upvoteBtn.classList.add('btn-success');
+
+                    // If downvote was active, remove it
+                    if (postDownvoteActive) {
+                        postDownvoteCount--;
+                        downvoteBtn.classList.remove('btn-danger');
+                        downvoteBtn.classList.add('btn-outline-danger');
+                        postDownvoteActive = false;
+                        document.getElementById('post-downvote-count').textContent = postDownvoteCount;
+                    }
+
+                    postUpvoteActive = true;
+                } else {
+                    postUpvoteCount--;
+                    upvoteBtn.classList.remove('btn-success');
+                    upvoteBtn.classList.add('btn-outline-success');
+                    postUpvoteActive = false;
+                }
+                document.getElementById('post-upvote-count').textContent = postUpvoteCount;
+            });
+
+            downvoteBtn.addEventListener('click', function () {
+                if (!postDownvoteActive) {
+                    postDownvoteCount++;
+                    downvoteBtn.classList.remove('btn-outline-danger');
+                    downvoteBtn.classList.add('btn-danger');
+
+                    // If upvote was active, remove it
+                    if (postUpvoteActive) {
+                        postUpvoteCount--;
+                        upvoteBtn.classList.remove('btn-success');
+                        upvoteBtn.classList.add('btn-outline-success');
+                        postUpvoteActive = false;
+                        document.getElementById('post-upvote-count').textContent = postUpvoteCount;
+                    }
+
+                    postDownvoteActive = true;
+                } else {
+                    postDownvoteCount--;
+                    downvoteBtn.classList.remove('btn-danger');
+                    downvoteBtn.classList.add('btn-outline-danger');
+                    postDownvoteActive = false;
+                }
+                document.getElementById('post-downvote-count').textContent = postDownvoteCount;
+            });
+
+            // === Reaction Buttons ===
+            document.querySelectorAll('.reaction-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const span = this.querySelector('.reaction-count');
+                    let count = parseInt(span.textContent);
+
+                    if (!this.classList.contains('active')) {
+                        count += 1;
+                        this.classList.add('active');
+                    } else {
+                        count -= 1;
+                        this.classList.remove('active');
+                    }
+                    span.textContent = count;
+                });
+            });
         });
     </script>
+
 {% endblock %}
