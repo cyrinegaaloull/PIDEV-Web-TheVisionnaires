@@ -9,99 +9,247 @@
 
     {# Add chatbot-specific styles #}
     <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --chat-bg: #f8f9fa;
+            --user-bubble: #e6f2ff;
+            --user-bubble-border: #cce4ff;
+            --bot-bubble: #f0f2f5;
+            --bot-bubble-border: #e4e6eb;
+            --error-bubble: #ffebee;
+            --error-text: #c62828;
+            --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+            --transition: all 0.2s ease;
+        }
+
+        .chat-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .chat-card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-card-header h5 {
+            margin: 0;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .chat-card-header .status-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
         .chat-container {
-            height: 500px; /* Adjust as needed within the back-office layout */
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            height: 600px;
             display: flex;
             flex-direction: column;
-            background-color: #fff; /* Ensure background for visibility */
-            margin-top: 20px; /* Add some margin if needed */
+            background-color: var(--chat-bg);
+            margin: 0;
+            border-radius: 0;
+            border: none;
         }
+        
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 20px;
+            scroll-behavior: smooth;
         }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .message-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 22px;
+            position: relative;
+        }
+
+        .message {
+            margin-bottom: 2px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            line-height: 1.5;
+            box-shadow: var(--shadow-sm);
+            animation: fadeIn 0.3s ease-out forwards;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .user-message {
+            background-color: var(--user-bubble);
+            color: #1a1a1a;
+            margin-left: auto;
+            text-align: left;
+            border-bottom-right-radius: 4px;
+            border: 1px solid var(--user-bubble-border);
+        }
+        
+        .bot-message {
+            background-color: var(--bot-bubble);
+            color: #1a1a1a;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--bot-bubble-border);
+        }
+        
+        .error-message {
+            background-color: var(--error-bubble);
+            color: var(--error-text);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #ffe0e0;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            margin-left: 8px;
+            margin-right: 8px;
+            align-self: flex-end;
+        }
+
+        .user-time {
+            margin-left: auto;
+        }
+
+        .bot-time {
+            margin-right: auto;
+        }
+
+        .chat-input-container {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            background-color: #fff;
+        }
+        
         .chat-input {
             display: flex;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-            background-color: #f8f9fa; /* Optional background for input area */
+            align-items: center;
+            background-color: var(--chat-bg);
+            border-radius: 24px;
+            padding: 4px 6px 4px 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
         }
+        
+        .chat-input:focus-within {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        
         .chat-input input {
             flex: 1;
-            padding: 10px;
-            /* Use back-office form-control styles if available, or define custom */
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-right: 10px; /* Adjust spacing */
+            padding: 12px 0;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            outline: none !important;
+            box-shadow: none !important;
         }
+        
         .chat-input button {
-            /* Use back-office button styles (e.g., btn btn-primary) or define custom */
             padding: 10px 20px;
-            background-color: #4CAF50; /* Example color, adjust to match theme */
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 20px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        
         .chat-input button:hover {
-            background-color: #45a049; /* Darker shade on hover */
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
         }
-        .message {
-            margin-bottom: 15px;
-            padding: 10px 15px; /* Adjusted padding */
-            border-radius: 8px; /* Slightly more rounded */
-            max-width: 80%;
-            word-wrap: break-word; /* Ensure long words wrap */
-            line-height: 1.4;
+
+        .chat-input button:active {
+            transform: translateY(1px);
         }
-        .user-message {
-            background-color: #e6f7ff; /* Light blue for user */
-            /* Consider using theme primary color's light variant */
-            margin-left: auto;
-            text-align: left; /* Keep text left-aligned even if bubble is right */
-            border-bottom-right-radius: 0; /* Chat bubble effect */
+
+        .chat-input button svg {
+            margin-left: 6px;
+            width: 16px;
+            height: 16px;
         }
-        .bot-message {
-            background-color: #f1f1f1; /* Light grey for bot */
-            margin-right: auto;
-            border-bottom-left-radius: 0; /* Chat bubble effect */
-        }
-        .error-message {
-            background-color: #ffebee; /* Light red for error */
-            color: #c62828; /* Darker red text */
-            margin-right: auto;
-            border-bottom-left-radius: 0;
-        }
+        
         .typing-indicator {
             display: inline-block;
-            padding: 10px 15px;
-            background-color: #f1f1f1;
-            border-radius: 8px;
+            padding: 12px 16px;
+            background-color: var(--bot-bubble);
+            border-radius: 18px;
             margin-bottom: 15px;
-            margin-left: 15px; /* Align with bot messages */
-            display: none; /* Initially hidden */
-             border-bottom-left-radius: 0;
+            margin-left: 0;
+            display: none;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--bot-bubble-border);
+            box-shadow: var(--shadow-sm);
         }
+        
         .dot {
             display: inline-block;
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: #888; /* Grey dots */
-            margin-right: 4px; /* Spacing between dots */
+            background-color: #888;
+            margin-right: 4px;
             animation: typing 1.5s infinite ease-in-out;
         }
+        
         .dot:last-child {
-             margin-right: 0;
+            margin-right: 0;
         }
+        
         .dot:nth-child(1) { animation-delay: 0s; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
-
+        
         @keyframes typing {
             0%, 100% { transform: translateY(0); opacity: 0.4; }
             50% { transform: translateY(-5px); opacity: 1; }
@@ -110,43 +258,53 @@
 {% endblock %}
 
 {% block body %} {# Or use {% block content %} if that's what base-back-office.html.twig uses #}
-    {# You might want to wrap this in the standard back-office content containers/rows/columns #}
-    {# Example: <div class="container-fluid flex-grow-1 container-p-y"> #}
+    <div class="container-fluid flex-grow-1 container-p-y">
+        <h4 class="py-3 mb-4">
+            <span class="text-muted fw-light">Tools /</span> 
+            <span class="fw-semibold">Chatbot Assistant</span>
+        </h4>
 
-    <h4 class="py-3 mb-4"> {/* Use appropriate heading level for back-office */}
-      <span class="text-muted fw-light">Tools /</span> Chatbot
-    </h4>
-
-    <div class="card"> {/* Wrap in a card for standard back-office styling */}
-        <h5 class="card-header">Chat Interface</h5>
-        <div class="card-body">
-            <div class="chat-container">
-                <div class="chat-messages" id="chatMessages">
-                    {# Initial bot message #}
-                    <div class="message bot-message">
-                        Hello! How can I assist you within the back office today?
+        <div class="card chat-card">
+            <div class="chat-card-header">
+                <div class="status-indicator"></div>
+                <h5>Chat Interface</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        {# Initial bot message #}
+                        <div class="message-group">
+                            <div class="message bot-message">
+                                Hello! How can I assist you within the back office today?
+                            </div>
+                            <div class="message-time bot-time">Just now</div>
+                        </div>
                     </div>
-                </div>
 
-                {# Typing indicator container (placed before input) #}
-                 <div id="typingIndicatorContainer" style="padding-left: 15px;">
-                    <div class="typing-indicator" id="typingIndicator">
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                        <span class="dot"></span>
+                    {# Typing indicator container #}
+                    <div id="typingIndicatorContainer" style="padding-left: 20px; padding-bottom: 5px;">
+                        <div class="typing-indicator" id="typingIndicator">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
                     </div>
-                 </div>
 
-
-                <div class="chat-input">
-                    <input type="text" id="userInput" placeholder="Type your message..." class="form-control"> {# Leverage back-office form-control class #}
-                    <button id="sendButton" class="btn btn-primary">Send</button> {# Leverage back-office button classes #}
+                    <div class="chat-input-container">
+                        <div class="chat-input">
+                            <input type="text" id="userInput" placeholder="Type your message..." class="form-control">
+                            <button id="sendButton" class="btn">
+                                Send
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    {# Example: </div> #}
 {% endblock %}
 
 {% block javascripts %}
@@ -160,7 +318,14 @@
             const userInput = document.getElementById('userInput');
             const sendButton = document.getElementById('sendButton');
             const typingIndicator = document.getElementById('typingIndicator');
-            const chatContainer = document.querySelector('.chat-container'); // Get container for scrolling
+            const chatContainer = document.querySelector('.chat-container');
+
+            // Function to get current time
+            function getCurrentTime() {
+                const now = new Date();
+                return now.getHours().toString().padStart(2, '0') + ':' + 
+                       now.getMinutes().toString().padStart(2, '0');
+            }
 
             // Function to scroll chat to the bottom
             function scrollToBottom() {
@@ -172,6 +337,9 @@
 
             // Function to add a message to the chat
             function addMessage(message, type) {
+                const messageGroup = document.createElement('div');
+                messageGroup.classList.add('message-group');
+                
                 const messageDiv = document.createElement('div');
                 messageDiv.classList.add('message', type);
 
@@ -179,10 +347,25 @@
                 const messagePrefix = type === 'user-message' ? 'You: ' : '';
                 messageDiv.textContent = messagePrefix + message; // Set text content directly
 
+                // Create time element
+                const timeDiv = document.createElement('div');
+                timeDiv.classList.add('message-time');
+                if (type === 'user-message') {
+                    timeDiv.classList.add('user-time');
+                } else {
+                    timeDiv.classList.add('bot-time');
+                }
+                timeDiv.textContent = getCurrentTime();
+
                 // Hide typing indicator *before* adding new message
                 typingIndicator.style.display = 'none';
 
-                chatMessages.appendChild(messageDiv);
+                // Add message and time to message group
+                messageGroup.appendChild(messageDiv);
+                messageGroup.appendChild(timeDiv);
+                
+                // Add message group to chat
+                chatMessages.appendChild(messageGroup);
                 scrollToBottom();
             }
 
@@ -249,7 +432,7 @@
             });
 
             // Initial scroll to bottom if there's content already
-             scrollToBottom();
+            scrollToBottom();
         });
     </script>
 {% endblock %}
