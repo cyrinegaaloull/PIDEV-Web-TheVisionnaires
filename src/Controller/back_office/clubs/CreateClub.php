@@ -16,47 +16,67 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use App\Service\SightengineService;
+
 
 class CreateClub extends AbstractController
 {
+
+
+    private SightengineService $vision;
+
+public function __construct(SightengineService $vision)
+{
+    $this->vision = $vision;
+}
+
+
+
     #[Route('/admin/clubs/new', name: 'admin_club_new')]
-    public function new(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        SluggerInterface $slugger,
-        ValidatorInterface $validator
-    ): Response {
-        $club = new Club();
-        $form = $this->createForm(ClubType::class, $club);
-        $form->handleRequest($request);
+public function new(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    SluggerInterface $slugger,
+    ValidatorInterface $validator
+): Response {
+    $club = new Club();
+    $form = $this->createForm(ClubType::class, $club);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            // Handle AJAX request
-            if ($request->isXmlHttpRequest()) {
-                return $this->handleAjaxFormSubmission($form, $club, $entityManager, $slugger);
-            }
+    if ($form->isSubmitted()) {
+        // Handle AJAX request
+        if ($request->isXmlHttpRequest()) {
+            return $this->handleAjaxFormSubmission($form, $club, $entityManager, $slugger);
+        }
 
-            // Handle regular form submission
-            if ($form->isValid()) {
+        // Handle regular form submission
+        if ($form->isValid()) {
+            try {
                 $this->handleFileUploads($form, $club, $slugger);
                 $club->setMemberscount(0);
 
-                try {
-                    $entityManager->persist($club);
-                    $entityManager->flush();
-                    
-                    $this->addFlash('success', 'Club créé avec succès !');
-                    return $this->redirectToRoute('admin_club_list');
-                } catch (UniqueConstraintViolationException $e) {
-                    $form->get('clubName')->addError(new \Symfony\Component\Form\FormError('Ce nom de club est déjà utilisé.'));
-                }
+                $entityManager->persist($club);
+                $entityManager->flush();
+                
+                $this->addFlash('success', 'Club créé avec succès !');
+                return $this->redirectToRoute('admin_club_list');
+            } catch (UniqueConstraintViolationException $e) {
+                $form->get('clubName')->addError(new \Symfony\Component\Form\FormError('Ce nom de club est déjà utilisé.'));
+            } catch (\RuntimeException $e) {
+                // Catch the RuntimeException thrown by handleFileUploads
+                $this->addFlash('error', $e->getMessage());
+            } catch (\Exception $e) {
+                // Log any other exceptions
+                error_log('Error creating club: ' . $e->getMessage());
+                $this->addFlash('error', 'Une erreur est survenue lors de la création du club.');
             }
         }
-
-        return $this->render('back_office/clubs/create-club.html.twig', [
-            'form' => $form->createView(),
-        ]);
     }
+
+    return $this->render('back_office/clubs/create-club.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
 
     #[Route('/admin/clubs/edit/{id}', name: 'admin_club_edit')]
     public function edit(
@@ -127,56 +147,65 @@ class CreateClub extends AbstractController
     }
 
     #[Route('/admin/clubs/delete/{id}', name: 'admin_club_delete', methods: ['POST'])]
-public function delete(Request $request, Club $club, EntityManagerInterface $em): JsonResponse
-{
-    if (!$this->isCsrfTokenValid('delete'.$club->getClubid(), $request->request->get('_token'))) {
-        return new JsonResponse(['success' => false, 'message' => 'Jeton CSRF invalide.'], 400);
-    }
+    public function delete(Request $request, Club $club, EntityManagerInterface $em): JsonResponse
+    {
+        if (!$this->isCsrfTokenValid('delete'.$club->getClubid(), $request->request->get('_token'))) {
+            return new JsonResponse(['success' => false, 'message' => 'Jeton CSRF invalide.'], 400);
+        }
 
-    try {
-        $em->remove($club);
-        $em->flush();
-        return new JsonResponse(['success' => true]);
-    } catch (\Exception $e) {
-        return new JsonResponse([
-            'success' => false,
-            'message' => 'La suppression a échoué : ' . $e->getMessage()
-        ], 500);
+        try {
+            $em->remove($club);
+            $em->flush();
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'La suppression a échoué : ' . $e->getMessage()
+            ], 500);
+        }
     }
-}
 
 
     /**
      * Handles AJAX form submission for creating clubs
      */
     private function handleAjaxFormSubmission($form, $club, $entityManager, $slugger): JsonResponse
-    {
-        $response = ['success' => false, 'errors' => []];
-        
-        if ($form->isValid()) {
-            $this->handleFileUploads($form, $club, $slugger);
-            $club->setMemberscount(0);
-            
-            try {
-                $entityManager->persist($club);
-                $entityManager->flush();
-                
-                $response['success'] = true;
-                $response['message'] = 'Club créé avec succès !';
-                $response['redirect'] = $this->generateUrl('admin_club_list');
-            } catch (UniqueConstraintViolationException $e) {
-                $response['errors']['clubName'] = 'Ce nom de club est déjà utilisé.';
-            }
-        } else {
-            // Collect all form errors
+{
+    $response = ['success' => false, 'errors' => []];
+    
+    if ($form->isValid()) {
+        $this->handleFileUploads($form, $club, $slugger);
+
+        // Vérifie après upload si le formulaire a maintenant des erreurs
+        if (count($form->getErrors(true)) > 0) {
             foreach ($form->getErrors(true) as $error) {
                 $field = $error->getOrigin()->getName();
                 $response['errors'][$field] = $error->getMessage();
             }
+            return new JsonResponse($response, 400);
         }
-        
-        return new JsonResponse($response);
+
+        try {
+            $club->setMemberscount(0);
+            $entityManager->persist($club);
+            $entityManager->flush();
+            
+            $response['success'] = true;
+            $response['message'] = 'Club créé avec succès !';
+            $response['redirect'] = $this->generateUrl('admin_club_list');
+        } catch (UniqueConstraintViolationException $e) {
+            $response['errors']['clubName'] = 'Ce nom de club est déjà utilisé.';
+        }
+    } else {
+        foreach ($form->getErrors(true) as $error) {
+            $field = $error->getOrigin()->getName();
+            $response['errors'][$field] = $error->getMessage();
+        }
     }
+    
+    return new JsonResponse($response);
+}
+
 
     /**
      * Handles AJAX form submission for editing clubs
@@ -240,24 +269,49 @@ public function delete(Request $request, Club $club, EntityManagerInterface $em)
         return new JsonResponse($response, 400);
     }
 
-    /**
-     * Handles file uploads for both forms
-     */
     private function handleFileUploads($form, $club, $slugger): void
     {
+        /** @var UploadedFile|null $logoFile */
         $logoFile = $form->get('clubLogo')->getData();
+        /** @var UploadedFile|null $bannerFile */
         $bannerFile = $form->get('bannerImage')->getData();
-    
+
         if ($logoFile instanceof UploadedFile) {
             $logoFilename = $this->uploadImage($logoFile, $slugger);
-            $club->setClublogo($logoFilename);
+            $fullPath = $this->getParameter('uploads_directory') . '/' . $logoFilename;
+
+            try {
+                if (!$this->vision->isImageSafe($fullPath)) {
+                    unlink($fullPath);
+                    $form->get('clubLogo')->addError(new \Symfony\Component\Form\FormError('Le logo contient un contenu inapproprié.'));
+                } else {
+                    $club->setClublogo($logoFilename);
+                }
+            } catch (\Exception $e) {
+                unlink($fullPath);
+                $form->get('clubLogo')->addError(new \Symfony\Component\Form\FormError('Erreur lors de l’analyse du logo.'));
+            }
         }
-    
+
         if ($bannerFile instanceof UploadedFile) {
             $bannerFilename = $this->uploadImage($bannerFile, $slugger);
-            $club->setBannerimage($bannerFilename);
+            $fullPath = $this->getParameter('uploads_directory') . '/' . $bannerFilename;
+
+            try {
+                if (!$this->vision->isImageSafe($fullPath)) {
+                    unlink($fullPath);
+                    $form->get('bannerImage')->addError(new \Symfony\Component\Form\FormError('La bannière contient un contenu inapproprié.'));
+                } else {
+                    $club->setBannerimage($bannerFilename);
+                }
+            } catch (\Exception $e) {
+                unlink($fullPath);
+                $form->get('bannerImage')->addError(new \Symfony\Component\Form\FormError('Erreur lors de l’analyse de la bannière.'));
+            }
         }
     }
+
+
 
     private function uploadImage(UploadedFile $file, SluggerInterface $slugger): string
     {
@@ -266,9 +320,13 @@ public function delete(Request $request, Club $club, EntityManagerInterface $em)
         $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
 
         try {
-            $file->move($this->getParameter('uploads_directory'), $newFilename);
+            $file->move(
+                $this->getParameter('uploads_directory'),
+                $newFilename
+            );
         } catch (FileException $e) {
-            throw new \Exception("Erreur lors de l'envoi de l'image.");
+            error_log('File upload error: ' . $e->getMessage());
+            throw new \RuntimeException('Une erreur est survenue lors du téléchargement du fichier.');
         }
 
         return $newFilename;

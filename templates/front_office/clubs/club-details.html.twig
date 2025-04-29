@@ -15,7 +15,7 @@
           <span>{{ club.clubName }}</span>
         </p>
         <h1 class="mb-3 text-white">{{ club.clubName }}</h1>
-        <span class="badge badge-pill bg-info px-3 py-2 text-white">{{ club.clubCategory }}</span>
+        <span class="badge-pill bg-info px-3 py-2 text-white">{{ club.clubCategory }}</span>
       </div>
     </div>
   </div>
@@ -48,8 +48,22 @@
           </div>
           
           <div class="mt-4">
-            <a href="#" class="btn btn-secondary btn-block"><i class="fa fa-plus-circle"></i> Rejoindre le club</a>
+            {% if app.user %}
+              {% set alreadyRequested = club.memberships|filter(m => m.memberid == app.user) %}
+              <button id="join-club-btn"
+                      class="btn btn-info btn-block"
+                      data-club-id="{{ club.clubid }}"
+                      {% if alreadyRequested|length > 0 %} disabled {% endif %}>
+                <i class="fa fa-plus-circle"></i>
+                {% if alreadyRequested|length > 0 %}Demande envoyée{% else %}Rejoindre le club{% endif %}
+              </button>
+            {% else %}
+              <a href="{{ path('app_login') }}" class="btn btn-secondary btn-block">
+                <i class="fa fa-sign-in"></i> Connectez-vous pour rejoindre
+              </a>
+            {% endif %}
           </div>
+
         </div>
       </div>
       
@@ -97,7 +111,7 @@
         <div class="activities-timeline">
             {% if upcomingActivities is defined and upcomingActivities|length > 0 %}
             {% for activity in upcomingActivities %}
-                <div class="activity-item">
+                <div class="border rounded p-3 mb-3 d-flex text-center activity-item">
                 <div class="activity-date">
                     <span class="day">{{ activity.activitedate|date('d') }}</span>
                     <span class="month">{{ activity.activitedate|date('M') }}</span>
@@ -148,12 +162,14 @@
               </div>
               
               <div class="col-md-6">
-                <form class="contact-form">
+                <form class="contact-form" method="post" action="{{ path('club_contact', { id: club.clubid }) }}">
                   <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Votre nom">
+                    <input type="text" class="form-control" placeholder="Votre nom"
+                          value="{{ app.user ? app.user.nom ~ ' ' ~ app.user.prenom : '' }}" {% if not app.user %}disabled{% endif %}>
                   </div>
                   <div class="form-group">
-                    <input type="email" class="form-control" placeholder="Votre email">
+                    <input type="email" class="form-control" placeholder="Votre email"
+                          value="{{ app.user ? app.user.email : '' }}" {% if not app.user %}disabled{% endif %}>
                   </div>
                   <div class="form-group">
                     <input type="text" class="form-control" placeholder="Sujet">
@@ -162,7 +178,7 @@
                     <textarea class="form-control" rows="4" placeholder="Votre message"></textarea>
                   </div>
                   <div class="form-group">
-                    <button type="submit" class="btn btn-secondary btn-block">Envoyer</button>
+                    <button type="submit" class="btn btn-outline-info btn-block">Envoyer</button>
                   </div>
                 </form>
               </div>
@@ -205,6 +221,34 @@
     </div>
   </div>
 </section>
+
+<div class="toast-container position-fixed top-50 start-50 translate-middle" style="z-index: 1055;">
+  <div id="successToast" class="toast bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000">
+    <div class="toast-header bg-success text-white">
+      <i class="ri-check-line me-2"></i>
+      <strong class="me-auto">Succès</strong>
+      <button type="button" class="btn-close btn-close-white ms-2 mb-1" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Votre demande a été envoyée !
+    </div>
+  </div>
+</div>
+
+
+<div class="toast-container position-fixed top-50 start-50 translate-middle" style="z-index: 1055;">
+  <div id="contactToast" class="toast bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+    <div class="toast-header bg-success text-white">
+      <i class="ri-check-line me-2"></i>
+      <strong class="me-auto">Message envoyé</strong>
+      <button type="button" class="btn-close btn-close-white ms-2 mb-1" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Votre message a été transmis au club avec succès !
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block stylesheets %}
@@ -416,4 +460,92 @@
       history.pushState(null, null, $(this).attr('href'));
     });
 </script>
+
+<script>
+console.log("Join Club script loaded");
+document.addEventListener('DOMContentLoaded', function () {
+  const joinBtn = document.getElementById('join-club-btn');
+  if (joinBtn) {
+    joinBtn.addEventListener('click', function () {
+      const clubId = this.dataset.clubId;
+
+      fetch('/join-club/' + clubId, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          this.textContent = 'Demande envoyée';
+          this.classList.add('btn-success');
+          this.classList.remove('btn-info');
+          this.disabled = true;
+          
+          // ✅ Show Materio toast
+          const toastEl = document.getElementById('successToast');
+          const toast = new bootstrap.Toast(toastEl);
+          toast.show();
+        } else {
+          alert(data.message || 'Une erreur est survenue.');
+        }
+      });
+    });
+  }
+
+  const contactForm = document.querySelector('.contact-form');
+if (contactForm) {
+  contactForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    console.log("📤 Contact form submitted"); // DEBUG: Tap detected
+    alert("Sending message..."); // Optional: Alert to confirm trigger
+
+    const inputs = contactForm.querySelectorAll('input, textarea');
+    const data = {};
+
+    inputs.forEach(input => {
+      data[input.placeholder.toLowerCase()] = input.value;
+    });
+
+    fetch('/clubs/contact/{{ club.clubid }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Reset and show success toast
+        contactForm.reset();
+        const toastEl = document.getElementById('successToast');
+        if (toastEl) new bootstrap.Toast(toastEl).show();
+      } else {
+        alert(data.message || 'Erreur lors de l\'envoi du message.');
+      }
+    });
+  });
+}
+});
+</script>
+
+{% if app.session.get('show_contact_toast') %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toastEl = document.getElementById('contactToast');
+    if (toastEl) {
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    }
+  });
+</script>
+{% do app.session.remove('show_contact_toast') %}
+{% endif %}
+
 {% endblock %}

@@ -52,6 +52,10 @@ class Club
     #[ORM\OneToMany(targetEntity: Activite::class, mappedBy: "clubid", orphanRemoval: true)]
     private $activities;
 
+    #[ORM\OneToMany(mappedBy: "clubid", targetEntity: Membership::class)]
+    private Collection $memberships;
+
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
@@ -315,6 +319,15 @@ class Club
     {
         return $this->activities;
     }
+
+    /**
+ * @return Collection<int, Membership>
+ */
+public function getMemberships(): Collection
+{
+    return $this->memberships;
+}
+
 
     public function addActivity(Activite $activity): self
     {
