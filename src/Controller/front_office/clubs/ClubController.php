@@ -16,6 +16,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use App\Form\ContactFormType;
+use Symfony\Component\Mime\Email as SymfonyEmail;
 
 
 class ClubController extends AbstractController
@@ -157,63 +159,48 @@ public function joinClubAjax(int $id, Request $request, EntityManagerInterface $
 }
 
 #[Route('/clubs/contact/{id}', name: 'club_contact', methods: ['POST'])]
-public function contactClub(Request $request, MailerInterface $mailer, int $id, ClubRepository $clubRepo): RedirectResponse
+public function contactClub(Request $request, MailerInterface $mailer, ClubRepository $clubRepo, int $id): JsonResponse
 {
     $club = $clubRepo->find($id);
+    
     if (!$club) {
-        throw $this->createNotFoundException('Club non trouvé.');
+        return new JsonResponse(['success' => false, 'message' => 'Club introuvable.'], 404);
     }
 
-    $nom     = $request->request->get('nom') ?? 'Utilisateur';
-    $email   = $request->request->get('email');
-    $subject = $request->request->get('subject') ?? 'Message sans sujet';
-    $message = $request->request->get('message') ?? '';
-
-    if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        // fallback or redirect with error flash
-        $this->addFlash('error', 'Adresse email invalide.');
-        return $this->redirectToRoute('app_club_details', [
-            'id' => $id,
-            '_fragment' => 'contact'
-        ]);
+    // Get data directly from the request for AJAX submission
+    $data = json_decode($request->getContent(), true);
+    
+    // Manual validation since we're not using the form component for AJAX
+    if (empty($data['votre nom']) || empty($data['votre email']) || empty($data['votre message'])) {
+        return new JsonResponse(['success' => false, 'message' => 'Tous les champs sont obligatoires.'], 400);
+    }
+    
+    if (!filter_var($data['votre email'], FILTER_VALIDATE_EMAIL)) {
+        return new JsonResponse(['success' => false, 'message' => 'Email invalide.'], 400);
     }
 
-    $emailMessage = (new Email())
-        ->from($email)
-        ->to($club->getClubcontact()) // ✅ send to club's email
-        ->subject('[Contact Club] ' . $subject)
-        ->text("Message de: $nom <$email>\n\n$message");
+    try {
+        $email = (new SymfonyEmail())
+            ->from($data['votre email'])
+            ->to($club->getClubcontact())
+            ->subject('[Contact Club] ' . ($data['sujet'] ?? $club->getClubname()))
+            ->text(
+                "Nom: {$data['votre nom']}\n" .
+                "Email: {$data['votre email']}\n\n" .
+                "Message:\n{$data['votre message']}"
+            );
 
-    $mailer->send($emailMessage);
-    $this->addFlash('success', 'Email was sent.');
-
-
-    // ✅ use this to trigger the toast on reload
-    $request->getSession()->set('show_contact_toast', true);
-
-    return $this->redirectToRoute('app_club_details', [
-        'id' => $id,
-        '_fragment' => 'contact'
-    ]);
+        $mailer->send($email);
+        
+        // Set the session variable for the toast
+        $request->getSession()->set('show_contact_toast', true);
+        
+        return new JsonResponse(['success' => true]);
+    } catch (\Exception $e) {
+        // Log the error for debugging
+        error_log('Error sending email: ' . $e->getMessage());
+        return new JsonResponse(['success' => false, 'message' => 'Erreur lors de l\'envoi de l\'email.'], 500);
+    }
 }
-
-// test
-
-#[Route('/test-email', name: 'test_email')]
-public function testEmail(MailerInterface $mailer): Response
-{
-    $email = (new Email())
-        ->from('malakmzghi@gmail.com')
-        ->to('malaak.mzoughiii@gmail.com') // change this to your real email
-        ->subject('✅ Test Email from Symfony')
-        ->text('This is a test.');
-
-    $mailer->send($email);
-
-    return new Response('✅ Email sent successfully');
-}
-
-
-
 
 }
