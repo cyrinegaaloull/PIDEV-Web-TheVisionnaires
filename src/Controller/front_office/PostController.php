@@ -247,7 +247,6 @@ final class PostController extends AbstractController
                 'title' => $post->getTitle(),
                 'content' => $post->getContent(),
                 'category' => $post->getCategory(),
-                
                 // add other fields if needed
             ];
         }
