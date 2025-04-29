@@ -23,11 +23,11 @@ class Membership
     #[ORM\Column(name: 'requestDate', type: 'date', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private DateTime $requestdate;
 
-    #[ORM\ManyToOne(targetEntity: Club::class)]
+    #[ORM\ManyToOne(targetEntity: Club::class, inversedBy: "memberships")]
     #[ORM\JoinColumn(name: 'clubID', referencedColumnName: 'clubID', nullable: false, onDelete: 'CASCADE')]
     private ?Club $clubid = null;
 
-    #[ORM\ManyToOne(targetEntity: Users::class)]
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "memberships")]
     #[ORM\JoinColumn(name: 'memberID', referencedColumnName: 'user_id', nullable: false, onDelete: 'CASCADE')]
     private ?Users $memberid = null;
 

@@ -9,10 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 
-namespace App\Controller\back_office;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 class BackOfficeController extends AbstractController
 {
@@ -54,10 +50,6 @@ class BackOfficeController extends AbstractController
             'upcomingEvents' => $upcomingEvents,
             'monthlyData' => array_values($monthlyData),
         ]);
-    }
-    public function dashboard(): Response
-    {
-        return $this->render('/back_office/dashboard.html.twig');
     }
 
 

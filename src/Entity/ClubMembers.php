@@ -14,7 +14,7 @@ class ClubMembers
 {
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Club::class)]
-    #[ORM\JoinColumn(name: 'clubID', referencedColumnName: 'clubid', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'clubID', referencedColumnName: 'clubID', nullable: false, onDelete: 'CASCADE')]
     private Club $clubid;
 
     #[ORM\Id]

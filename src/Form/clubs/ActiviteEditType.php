@@ -20,37 +20,55 @@ class ActiviteEditType extends AbstractType
         $builder
             ->add('activitename', null, [
                 'label' => 'Nom de l’activité',
-                'disabled' => true,                
+                'disabled' => true,
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez saisir le nom de l\'activité'])
+                ]                
             ])
             ->add('activitedescription', TextareaType::class, [
                 'label' => 'Description',
                 'attr' => ['rows' => 4],
                 'disabled' => true,
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez saisir la description de l\'activité'])
+                ]
             ])
             ->add('activitedate', null, [
                 'label' => 'Date de l’activité',
                 'widget' => 'single_text',
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Veuillez saisir la date de l\'activité'])
+                    new Assert\NotBlank(['message' => 'Veuillez choisir la date de l\'activité'])
                 ]
             ])
             ->add('activitelocation', null, [
                 'label' => 'Lieu',
-                'disabled' => true,                
+                'disabled' => true,
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez saisir l\'adresse de l\'activité'])
+                ]                
             ])
             ->add('activitetype', null, [
                 'label' => 'Type d’activité',
-                'disabled' => true,                
+                'disabled' => true,
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez saisir le type de l\'activité'])
+                ]                
             ])
             ->add('starttime', null, [
                 'label' => 'Heure de début',
                 'widget' => 'single_text',
-                'disabled' => true,                
+                'disabled' => true,
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez choisir l\'horaire de début de l\'activité'])
+                ]                
             ])
             ->add('endtime', null, [
                 'label' => 'Heure de fin',
                 'widget' => 'single_text',
-                'disabled' => true,                
+                'disabled' => true,
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez saisir l\'horaire de fin de l\'activité'])
+                ]                
             ])
             ->add('activitestatus', ChoiceType::class, [
                 'label' => 'Statut',
@@ -61,6 +79,9 @@ class ActiviteEditType extends AbstractType
                     'Reporté' => 'Reporte',
                     'Annulé' => 'Annule',
                 ],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez choisir la status de l\'activité'])
+                ]
             ])
             ->add('clubid', EntityType::class, [
                 'class' => Club::class,
@@ -77,7 +98,9 @@ class ActiviteEditType extends AbstractType
                         'maxSize' => '2M',
                         'maxSizeMessage' => 'Le fichier est trop grand ({{ size }} {{ suffix }}). La taille maximale autorisée est {{ limit }} {{ suffix }}.',
                         'mimeTypesMessage' => 'Format d\'image invalide.'
-                    ])
+                    ]),
+                    new Assert\NotBlank(['message' => 'Veuillez téléchargez une image de l\'activité'])
+                    
                 ]
             ]);            
     }

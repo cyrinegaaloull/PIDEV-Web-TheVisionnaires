@@ -58,6 +58,7 @@
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
+      // Clear previous errors
       document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
       document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
       const messageBox = document.getElementById('form-messages');
@@ -75,30 +76,51 @@
       .then(res => res.json())
       .then(data => {
         if (data.success) {
+          // Show success message
           const success = document.createElement('div');
           success.className = 'alert alert-success';
           success.innerHTML = `<i class="ri-check-line"></i> ${data.message}`;
           messageBox.appendChild(success);
 
-          setTimeout(() => {
-            window.location.href = data.redirect;
-          }, 1500);
-        } else if (data.errors) {
-          for (const [field, message] of Object.entries(data.errors)) {
-            const input = form.querySelector(`[name="activite[${field}]"]`);
-            const errorContainer = document.querySelector(`[data-error-for="${field}"]`);
-
-            if (input) input.classList.add('is-invalid');
-            if (errorContainer) errorContainer.textContent = message;
+          // Redirect if needed
+          if (data.redirect) {
+            setTimeout(() => {
+              window.location.href = data.redirect;
+            }, 1500);
+          }
+        } else {
+          // Display field-specific errors
+          if (data.errors) {
+            for (const field in data.errors) {
+              const input = form.querySelector(`[name="activite[${field}]"]`);
+              const errorContainer = document.querySelector(`[data-error-for="${field}"]`);
+              
+              if (input) {
+                input.classList.add('is-invalid');
+              }
+              
+              if (errorContainer) {
+                errorContainer.textContent = data.errors[field];
+              }
+            }
+          }
+          
+          // Show general error message if needed
+          if (data.message && (!data.errors || Object.keys(data.errors).length === 0)) {
+            const error = document.createElement('div');
+            error.className = 'alert alert-danger';
+            error.innerHTML = `<i class="ri-error-warning-line"></i> ${data.message}`;
+            messageBox.appendChild(error);
           }
         }
       })
       .catch(err => {
+        // Handle connection errors
         const error = document.createElement('div');
         error.className = 'alert alert-danger';
-        error.innerHTML = `<i class="ri-error-warning-line"></i> Une erreur est survenue.`;
+        error.innerHTML = `<i class="ri-error-warning-line"></i> Une erreur est survenue lors de la communication avec le serveur.`;
         messageBox.appendChild(error);
-        console.error(err);
+        console.error('Fetch error:', err);
       });
     });
   });
