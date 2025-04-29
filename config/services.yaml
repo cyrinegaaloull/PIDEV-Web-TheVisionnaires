@@ -6,7 +6,7 @@
 
 parameters:
     avatars_directory: '%kernel.project_dir%/public/scripts'
-
+    your_upload_directory: '%kernel.project_dir%/public/assets/exploration/images'
     # Add the OpenRouter API key parameter
     openrouter_api_key: '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'
 
@@ -25,6 +25,10 @@ services:
     annotation_reader:
         alias: Doctrine\Common\Annotations\AnnotationReader
   
+    App\Service\GeocodingService:
+        arguments:
+            $providerAggregator: '@bazinga_geocoder.geocoder'
+
     App\EventListener\RecaptchaValidationListener:
         arguments:
             $secretKey: '%env(EWZ_RECAPTCHA_SECRET_KEY)%'
