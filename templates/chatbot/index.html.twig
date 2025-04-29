@@ -1,0 +1,255 @@
+{# templates/your_path/chatbot.html.twig - Adjust path as needed #}
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Chatbot{% endblock %}
+
+{% block stylesheets %}
+    {# Include stylesheets from the base back-office template #}
+    {{ parent() }}
+
+    {# Add chatbot-specific styles #}
+    <style>
+        .chat-container {
+            height: 500px; /* Adjust as needed within the back-office layout */
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff; /* Ensure background for visibility */
+            margin-top: 20px; /* Add some margin if needed */
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: #f8f9fa; /* Optional background for input area */
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            /* Use back-office form-control styles if available, or define custom */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px; /* Adjust spacing */
+        }
+        .chat-input button {
+            /* Use back-office button styles (e.g., btn btn-primary) or define custom */
+            padding: 10px 20px;
+            background-color: #4CAF50; /* Example color, adjust to match theme */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .chat-input button:hover {
+            background-color: #45a049; /* Darker shade on hover */
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px; /* Adjusted padding */
+            border-radius: 8px; /* Slightly more rounded */
+            max-width: 80%;
+            word-wrap: break-word; /* Ensure long words wrap */
+            line-height: 1.4;
+        }
+        .user-message {
+            background-color: #e6f7ff; /* Light blue for user */
+            /* Consider using theme primary color's light variant */
+            margin-left: auto;
+            text-align: left; /* Keep text left-aligned even if bubble is right */
+            border-bottom-right-radius: 0; /* Chat bubble effect */
+        }
+        .bot-message {
+            background-color: #f1f1f1; /* Light grey for bot */
+            margin-right: auto;
+            border-bottom-left-radius: 0; /* Chat bubble effect */
+        }
+        .error-message {
+            background-color: #ffebee; /* Light red for error */
+            color: #c62828; /* Darker red text */
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+        }
+        .typing-indicator {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #f1f1f1;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            margin-left: 15px; /* Align with bot messages */
+            display: none; /* Initially hidden */
+             border-bottom-left-radius: 0;
+        }
+        .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #888; /* Grey dots */
+            margin-right: 4px; /* Spacing between dots */
+            animation: typing 1.5s infinite ease-in-out;
+        }
+        .dot:last-child {
+             margin-right: 0;
+        }
+        .dot:nth-child(1) { animation-delay: 0s; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); opacity: 0.4; }
+            50% { transform: translateY(-5px); opacity: 1; }
+        }
+    </style>
+{% endblock %}
+
+{% block body %} {# Or use {% block content %} if that's what base-back-office.html.twig uses #}
+    {# You might want to wrap this in the standard back-office content containers/rows/columns #}
+    {# Example: <div class="container-fluid flex-grow-1 container-p-y"> #}
+
+    <h4 class="py-3 mb-4"> {/* Use appropriate heading level for back-office */}
+      <span class="text-muted fw-light">Tools /</span> Chatbot
+    </h4>
+
+    <div class="card"> {/* Wrap in a card for standard back-office styling */}
+        <h5 class="card-header">Chat Interface</h5>
+        <div class="card-body">
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    {# Initial bot message #}
+                    <div class="message bot-message">
+                        Hello! How can I assist you within the back office today?
+                    </div>
+                </div>
+
+                {# Typing indicator container (placed before input) #}
+                 <div id="typingIndicatorContainer" style="padding-left: 15px;">
+                    <div class="typing-indicator" id="typingIndicator">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                 </div>
+
+
+                <div class="chat-input">
+                    <input type="text" id="userInput" placeholder="Type your message..." class="form-control"> {# Leverage back-office form-control class #}
+                    <button id="sendButton" class="btn btn-primary">Send</button> {# Leverage back-office button classes #}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Example: </div> #}
+{% endblock %}
+
+{% block javascripts %}
+    {# Include javascripts from the base back-office template #}
+    {{ parent() }}
+
+    {# Add chatbot-specific JavaScript #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chatMessages');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const chatContainer = document.querySelector('.chat-container'); // Get container for scrolling
+
+            // Function to scroll chat to the bottom
+            function scrollToBottom() {
+                // Use timeout to ensure DOM update before scrolling
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 0);
+            }
+
+            // Function to add a message to the chat
+            function addMessage(message, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', type);
+
+                // Simple check to add "You:" prefix only to user messages text content
+                const messagePrefix = type === 'user-message' ? 'You: ' : '';
+                messageDiv.textContent = messagePrefix + message; // Set text content directly
+
+                // Hide typing indicator *before* adding new message
+                typingIndicator.style.display = 'none';
+
+                chatMessages.appendChild(messageDiv);
+                scrollToBottom();
+            }
+
+            // Function to handle sending a message
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (!message) return;
+
+                // Add user message to chat (pass only the message content)
+                addMessage(message, 'user-message');
+
+                // Clear input
+                userInput.value = '';
+                userInput.focus(); // Keep focus on input
+
+                // Show typing indicator immediately
+                typingIndicator.style.display = 'inline-block';
+                scrollToBottom(); // Scroll down to show indicator if needed
+
+                // Send message to server
+                fetch('{{ path('app_chatbot_message') }}', { // Ensure this route is correctly defined
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest' // Important for Symfony Request::isXmlHttpRequest()
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // Handle HTTP errors (like 404, 500)
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Typing indicator is hidden inside addMessage now
+                    if (data.success) {
+                        // Add bot message to chat
+                        addMessage(data.message, 'bot-message');
+                    } else {
+                        // Add error message to chat (use data.message for error detail)
+                        addMessage(data.message || 'An unknown error occurred.', 'error-message');
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch Error:', error);
+                    // Hide typing indicator on error
+                    typingIndicator.style.display = 'none';
+
+                    // Add technical error message to chat
+                    addMessage('Error connecting to the chatbot service: ' + error.message, 'error-message');
+                });
+            }
+
+            // --- Event listeners ---
+            sendButton.addEventListener('click', sendMessage);
+
+            userInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Prevent default form submission if it's inside a form
+                    sendMessage();
+                }
+            });
+
+            // Initial scroll to bottom if there's content already
+             scrollToBottom();
+        });
+    </script>
+{% endblock %}

@@ -6,6 +6,8 @@
 
 parameters:
     avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+    # Add the OpenRouter API key parameter
+    openrouter_api_key: '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'
 
 services:
     _defaults:
@@ -13,9 +15,6 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             string $secretKey: '%env(EWZ_RECAPTCHA_SECRET_KEY)%'
-
-    
-
 
     Doctrine\Common\Annotations\AnnotationReader:
         class: Doctrine\Common\Annotations\AnnotationReader
@@ -30,6 +29,10 @@ services:
         tags:
             - { name: 'kernel.event_subscriber' }
 
+    # Updated ChatbotService definition to use the parameter directly
+    App\Service\ChatbotService:
+
+            
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
