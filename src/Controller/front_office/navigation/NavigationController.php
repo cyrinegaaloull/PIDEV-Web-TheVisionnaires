@@ -25,7 +25,7 @@ class NavigationController extends AbstractController
         $savedRoutes = $routeHistoryService->getAllRoutes();
         
         // false pour user déconnecté true pour connecté
-        $simulateUser = true;
+        $simulateUser = false;
 
         $user = null;
         if ($simulateUser) {
@@ -34,7 +34,8 @@ class NavigationController extends AbstractController
                 'profile_picture' => 'default_profile_pic.jpg',
             ];
         }
-        
+        /** @var \App\Entity\Users $user */
+        $user = $this->getUser();
         return $this->render('front_office/navigation/index.html.twig', [
             'transportModes' => $transportModes,
             'savedRoutes' => $savedRoutes,
