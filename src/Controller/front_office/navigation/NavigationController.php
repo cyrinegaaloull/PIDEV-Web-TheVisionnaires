@@ -25,7 +25,7 @@ class NavigationController extends AbstractController
         $savedRoutes = $routeHistoryService->getAllRoutes();
         
         // false pour user déconnecté true pour connecté
-        $simulateUser = true;
+        $simulateUser = false;
 
         $user = null;
         if ($simulateUser) {
@@ -34,7 +34,8 @@ class NavigationController extends AbstractController
                 'profile_picture' => 'default_profile_pic.jpg',
             ];
         }
-        
+        /** @var \App\Entity\Users $user */
+        $user = $this->getUser();
         return $this->render('front_office/navigation/index.html.twig', [
             'transportModes' => $transportModes,
             'savedRoutes' => $savedRoutes,
@@ -73,7 +74,7 @@ class NavigationController extends AbstractController
         RouteHistoryService $routeHistoryService
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
-        
+
         // Validate required fields
         $requiredFields = ['departureLat', 'departureLon', 'arrivalLat', 'arrivalLon', 'transportMode'];
         foreach ($requiredFields as $field) {
@@ -93,9 +94,18 @@ class NavigationController extends AbstractController
         
         // Save route to history if requested
         if (isset($data['saveRoute']) && $data['saveRoute']) {
-            $route = new RouteHistory();
-            
-            // Use custom name if provided, otherwise generate
+            if (isset($data['id']) && !empty($data['id'])) {
+                // Try to find existing route
+                $route = $routeHistoryService->getRoute($data['id']);
+                if (!$route) {
+                    return $this->json(['error' => 'Route not found for update'], 404);
+                }
+            } else {
+                // Create new route
+                $route = new RouteHistory();
+            }
+    
+            // Set fields (common for both create or update)
             if (isset($data['routeName']) && !empty($data['routeName'])) {
                 $routeName = $data['routeName'];
             } else {
@@ -104,7 +114,7 @@ class NavigationController extends AbstractController
                     $data['arrivalPlaceName'] ?? 'Destination'
                 );
             }
-            
+    
             $route->setName($routeName);
             $route->setDeparturePlaceName($data['departurePlaceName'] ?? 'Origin');
             $route->setDepartureLat($data['departureLat']);
@@ -113,19 +123,36 @@ class NavigationController extends AbstractController
             $route->setArrivalLat($data['arrivalLat']);
             $route->setArrivalLon($data['arrivalLon']);
             $route->setTransportMode($data['transportMode']);
-            $route->setTimestamp(new DateTime());
+            //$route->setTimestamp((new DateTime())->format('Y-m-d H:i:s'));
+            // If a specific departure time is provided, use it
+            
+            if (isset($data['departureTime']) && !empty($data['departureTime'])) {
+               $departureTime = new DateTime($data['departureTime']);
+                if ($departureTime) {
+                    // Format the departure time to string before setting it
+                    $route->setTimestamp($departureTime->format('Y-m-d H:i:s'));
+                } else {
+                    // If the departure time is invalid, set the current time
+                    $route->setTimestamp((new DateTime())->format('Y-m-d H:i:s'));
+                }
+            } else {
+                // If no departure time is provided, set the current time as timestamp
+                $route->setTimestamp((new DateTime())->format('Y-m-d H:i:s'));
+            }
+
             $route->setDescription(
-                "Route from " . ($data['departurePlaceName'] ?? 'Origin') . 
-                " to " . ($data['arrivalPlaceName'] ?? 'Destination') . 
+                "Route from " . ($data['departurePlaceName'] ?? 'Origin') .
+                " to " . ($data['arrivalPlaceName'] ?? 'Destination') .
                 " via " . $data['transportMode']
             );
-            
+    
             $routeHistoryService->saveRoute($route);
             $routeEstimate['savedRouteId'] = $route->getId();
         }
-        
+    
         return $this->json($routeEstimate);
     }
+    
 
     #[Route('/public-transport', name: 'app_navigation_public_transport', methods: ['POST'])]
     public function getPublicTransport(
@@ -144,15 +171,46 @@ class NavigationController extends AbstractController
         
         $departureTime = $data['departureTime'] ?? 'now';
         
-        $transportOptions = $routingService->getPublicTransportOptions(
-            $data['fromLat'],
-            $data['fromLon'],
-            $data['toLat'],
-            $data['toLon'],
-            $departureTime
-        );
-        
-        return $this->json($transportOptions);
+        try {
+            $transportOptions = $routingService->getPublicTransportOptions(
+                $data['fromLat'],
+                $data['fromLon'],
+                $data['toLat'],
+                $data['toLon'],
+                $departureTime
+            );
+            
+            return $this->json($transportOptions);
+        } catch (\Exception $e) {
+            // For demo purposes, since we don't have a real API key, provide mock data
+            return $this->json([
+                'status' => 'OK',
+                'routes' => [
+                    [
+                        'legs' => [
+                            [
+                                'departure_time' => ['text' => '08:30'],
+                                'arrival_time' => ['text' => '09:15'],
+                                'duration' => ['text' => '45 min'],
+                                'distance' => ['text' => '5.2 km', 'value' => 5200]
+                            ]
+                        ],
+                        'overview_polyline' => ['points' => '']
+                    ],
+                    [
+                        'legs' => [
+                            [
+                                'departure_time' => ['text' => '08:45'],
+                                'arrival_time' => ['text' => '09:20'],
+                                'duration' => ['text' => '35 min'],
+                                'distance' => ['text' => '4.8 km', 'value' => 4800]
+                            ]
+                        ],
+                        'overview_polyline' => ['points' => '']
+                    ]
+                ]
+            ]);
+        }
     }
     
     #[Route('/history', name: 'app_navigation_history')]
@@ -199,5 +257,25 @@ class NavigationController extends AbstractController
         }
         
         return $this->json(['success' => true]);
+    }
+    #[Route('/get-routes', name: 'app_navigation_get_routes', methods: ['GET'])]
+    public function getRoutes(RouteHistoryService $routeHistoryService): JsonResponse
+    {
+        $routes = $routeHistoryService->getAllRoutes();
+        
+        // Convert the routes to a simple array format for JSON response
+        $routesArray = [];
+        foreach ($routes as $route) {
+            $routesArray[] = [
+                'id' => $route->getId(),
+                'name' => $route->getName(),
+                'departurePlaceName' => $route->getDeparturePlaceName(),
+                'arrivalPlaceName' => $route->getArrivalPlaceName(),
+                'transportMode' => $route->getTransportMode(),
+                'timestamp' => $route->getTimestamp()
+            ];
+        }
+        
+        return $this->json($routesArray);
     }
 }

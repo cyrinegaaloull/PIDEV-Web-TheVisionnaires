@@ -41,6 +41,10 @@ function init() {
     var mapElement = document.getElementById('map');
 
     // Create the Google Map using out element and options defined above
+    if (!mapElement) {
+    console.warn('Google Map container not found - skipping map initialization.');
+    return;
+    }
     var map = new google.maps.Map(mapElement, mapOptions);
     
     var addresses = ['New York'];

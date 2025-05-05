@@ -5,12 +5,12 @@
 
 {% block stylesheets %}
   {{ parent() }}
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <style>
-    #map { 
+<style>
+    #navigationMap { 
       height: 500px; 
       width: 100%;
-      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
     }
     .location-suggestions {
       position: absolute;
@@ -22,14 +22,31 @@
       border: 1px solid #ced4da;
       border-radius: 0.25rem;
       display: none;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
+
     .suggestion-item {
       padding: 8px 10px;
       cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background-color 0.2s;
     }
-    .suggestion-item:hover {
+
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+
+    .suggestion-item:hover,
+    .suggestion-item.selected {
       background-color: #f8f9fa;
+    }
+
+    /* Add loading indicator for the input fields */
+    .input-loading {
+      background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"%3E%3Ccircle cx="50" cy="50" fill="none" stroke="%23f15d30" stroke-width="10" r="35" stroke-dasharray="164.93361431346415 56.97787143782138"%3E%3CanimateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 50 50;360 50 50" keyTimes="0;1"%3E%3C/animateTransform%3E%3C/circle%3E%3C/svg%3E');
+      background-position: right 10px center;
+      background-repeat: no-repeat;
+      background-size: 20px 20px;
     }
     .loading-spinner {
       display: none;
@@ -63,6 +80,60 @@
       background-color: #f8f9fa;
       font-weight: bold;
     }
+    /* Fix for Google Maps controls */
+    .gm-style .gm-style-iw {
+      font-weight: 400;
+    }
+    .gm-style-cc {
+      display: none;
+    }
+    /* Additional CSS for Public Transport Options */
+    #publicTransportComboBox option {
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    /* Make icon slightly larger and add spacing */
+    #publicTransportComboBox option span {
+      margin-left: 5px;
+      margin-right: 5px;
+      font-weight: 500;
+    }
+
+    /* Custom styling for public transport panel */
+    #publicTransportOptionsPanel {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      border: 1px solid #dee2e6;
+      margin-top: 20px;
+    }
+
+    #publicTransportOptionsPanel h5 {
+      color: #343a40;
+      margin-bottom: 10px;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    /* Style for the select element */
+    #publicTransportComboBox {
+      padding: 8px 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    /* Make arrival time label more readable with transport icons */
+    #arrivalTimeLabel {
+      font-size: 15px;
+      line-height: 1.5;
+    }
   </style>
 {% endblock %}
 
@@ -73,7 +144,7 @@
     <div class="row no-gutters slider-text js-fullheight align-items-center justify-content-center" data-scrollax-parent="true" style="height: 300px !important;">
       <div class="col-md-9 text text-center ftco-animate" data-scrollax=" properties: { translateY: '70%' }">
         <h1 data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Navigation</h1>
-        <p class="caps" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Trouvez le meilleur itinéraire pour vous déplacer dans la ville</p>
+        <p class="caps" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Find the best route to move around the city</p>
       </div>
     </div>
   </div>
@@ -85,17 +156,17 @@
       <div class="col-md-4">
         <div class="card shadow-sm mb-4">
           <div class="card-header bg-white">
-            <h5 class="card-title mb-0">Itinéraire</h5>
+            <h5 class="card-title mb-0">Route</h5>
           </div>
           <div class="card-body">
             <form id="routeForm">
               <!-- Departure Location -->
               <div class="mb-3">
-                <label for="departurePlaceField" class="form-label">Départ</label>
+                <label for="departurePlaceField" class="form-label">Departure</label>
                 <div class="input-group">
-                  <input type="text" class="form-control" id="departurePlaceField" placeholder="Entrer lieu de départ">
+                  <input type="text" class="form-control" id="departurePlaceField" placeholder="Enter departure place">
                   <button class="btn btn-outline-secondary" type="button" id="currentLocationButton">
-                    <i class="fa fa-map-marker"></i> Position
+                    <i class="fa fa-map-marker"></i> Current
                   </button>
                 </div>
                 <div class="location-suggestions" id="departureSuggestions"></div>
@@ -111,8 +182,8 @@
 
               <!-- Arrival Location -->
               <div class="mb-3">
-                <label for="arrivalPlaceField" class="form-label">Arrivée</label>
-                <input type="text" class="form-control" id="arrivalPlaceField" placeholder="Entrer lieu d'arrivée">
+                <label for="arrivalPlaceField" class="form-label">Arrival</label>
+                <input type="text" class="form-control" id="arrivalPlaceField" placeholder="Enter arrival place">
                 <div class="location-suggestions" id="arrivalSuggestions"></div>
                 <div class="row mt-2">
                   <div class="col">
@@ -126,13 +197,13 @@
 
               <div class="mb-3">
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="swapLocationsButton">
-                  <i class="fa fa-exchange"></i> Inverser les lieux
+                  <i class="fa fa-exchange"></i> Swap Locations
                 </button>
               </div>
 
               <!-- Transport Mode -->
               <div class="mb-3">
-                <label for="transportModeComboBox" class="form-label">Mode de transport</label>
+                <label for="transportModeComboBox" class="form-label">Transport Mode</label>
                 <select class="form-select form-control" id="transportModeComboBox">
                   {% for mode in transportModes %}
                     <option value="{{ mode.name }}">{{ mode.name }}</option>
@@ -142,7 +213,7 @@
 
               <!-- Date and Time (for public transport) -->
               <div class="mb-3" id="dateTimeSection" style="display: none;">
-                <label class="form-label">Date & Heure de départ</label>
+                <label class="form-label">Departure Date & Time</label>
                 <div class="row">
                   <div class="col">
                     <input type="date" class="form-control" id="departureDatePicker">
@@ -159,17 +230,17 @@
 
               <!-- Route Name -->
               <div class="mb-3">
-                <label for="routeNameField" class="form-label">Nom de l'itinéraire (pour enregistrement)</label>
-                <input type="text" class="form-control" id="routeNameField" placeholder="Optionnel">
+                <label for="routeNameField" class="form-label">Route Name (for saving)</label>
+                <input type="text" class="form-control" id="routeNameField" placeholder="Optional">
               </div>
 
               <!-- Buttons -->
               <div class="d-grid gap-2">
                 <button type="button" class="btn btn-primary" id="showRouteButton" disabled>
-                  Afficher l'itinéraire
+                  Show Route
                 </button>
                 <button type="button" class="btn btn-outline-secondary" id="clearRouteButton">
-                  Effacer
+                  Clear
                 </button>
               </div>
             </form>
@@ -179,17 +250,17 @@
         <!-- Saved Routes -->
         <div class="card shadow-sm mb-4">
           <div class="card-header bg-white">
-            <h5 class="card-title mb-0">Itinéraires enregistrés</h5>
+            <h5 class="card-title mb-0">Saved Routes</h5>
           </div>
           <div class="card-body">
             <select class="form-select form-control mb-2" id="savedRoutesComboBox">
-              <option value="">Sélectionner un itinéraire</option>
+              <option value="">Select a saved route</option>
               {% for route in savedRoutes %}
                 <option value="{{ route.id }}">{{ route.name }}</option>
               {% endfor %}
             </select>
             <button type="button" class="btn btn-outline-danger btn-sm" id="deleteRouteButton">
-              Supprimer
+              Delete
             </button>
           </div>
         </div>
@@ -199,28 +270,28 @@
         <!-- Map and Route Information -->
         <div class="card shadow-sm mb-4">
           <div class="card-header bg-white">
-            <h5 class="card-title mb-0">Carte d'itinéraire</h5>
+            <h5 class="card-title mb-0">Route Map</h5>
           </div>
-          <div class="card-body">
-            <div id="map"></div>
+          <div class="card-body" style="overflow:hidden; position:relative;">
+            <div id="navigationMap" style="height: 500px; border-radius: 12px;"></div>
             <div class="mt-3">
               <div class="alert alert-info" id="arrivalTimeLabel">
-                Les informations sur l'itinéraire apparaîtront ici
+                Route information will appear here
               </div>
             </div>
             
             <!-- Loading Spinner -->
             <div class="text-center loading-spinner" id="progressIndicator">
               <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Chargement...</span>
+                <span class="visually-hidden">Loading...</span>
               </div>
             </div>
 
             <!-- Public Transport Options -->
             <div id="publicTransportOptionsPanel" style="display: none;" class="mt-3">
-              <h5>Options de transport public</h5>
+              <h5>Public Transport Options</h5>
               <select class="form-select form-control mb-2" id="publicTransportComboBox">
-                <option value="">Chargement des options...</option>
+                <option value="">Loading options...</option>
               </select>
             </div>
           </div>
@@ -229,230 +300,26 @@
     </div>
   </div>
 </section>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script>
-    // Initialize map when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize the map
-      const map = L.map('map').setView([36.8065, 10.1815], 13); // Centered on Tunis
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
 
-      // Global variables for map markers and routes
-      let markers = [];
-      let routeLines = [];
-      
-      // Function to clear existing route
-      function clearRoute() {
-        // Remove markers
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = [];
-        
-        // Remove route lines
-        routeLines.forEach(line => map.removeLayer(line));
-        routeLines = [];
-      }
-      
-      // Function to decode Google polyline
-      function decodePolyline(encoded) {
-        if (!encoded || encoded.length === 0) return [];
-        
-        let poly = [];
-        let index = 0, len = encoded.length;
-        let lat = 0, lng = 0;
-        
-        while (index < len) {
-          let b, shift = 0, result = 0;
-          
-          do {
-            b = encoded.charCodeAt(index++) - 63;
-            result |= (b & 0x1f) << shift;
-            shift += 5;
-          } while (b >= 0x20);
-          
-          let dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
-          lat += dlat;
-          
-          shift = 0;
-          result = 0;
-          
-          do {
-            b = encoded.charCodeAt(index++) - 63;
-            result |= (b & 0x1f) << shift;
-            shift += 5;
-          } while (b >= 0x20);
-          
-          let dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
-          lng += dlng;
-          
-          poly.push([lat * 1e-5, lng * 1e-5]);
-        }
-        
-        return poly;
-      }
+<!-- Google Maps Scripts -->
+<script>
+  // Remove any previous Google Maps initializations
+  window.preventGoogleMapsInit = false;
+</script>
 
-      // Include the rest of the JavaScript for map functionality, location search, routing, etc.
-      // This will be similar to the code you provided in your route_finder/index.html.twig template,
-      // but with URLs adjusted to match the new routes and some French translations.
-      
-      // Function to show route on map
-      function showRoute(depLat, depLon, arrLat, arrLon, transportMode) {
-        clearRoute();
-        
-        // Create markers for start and end points
-        const startMarker = L.marker([depLat, depLon])
-          .bindPopup('Départ<br>Lat: ' + depLat + '<br>Lon: ' + depLon)
-          .addTo(map);
-          
-        const endMarker = L.marker([arrLat, arrLon])
-          .bindPopup('Arrivée<br>Lat: ' + arrLat + '<br>Lon: ' + arrLon)
-          .addTo(map);
-          
-        markers.push(startMarker, endMarker);
-        
-        // Choose color based on transport mode
-        const colors = {
-          'driving': '#4CAF50',
-          'walking': '#2196F3',
-          'cycling': '#FF9800',
-          'public_transport': '#9C27B0'
-        };
-        
-        const color = colors[transportMode] || '#4CAF50';
-        
-        // Create a line between the points
-        const routeLine = L.polyline([[depLat, depLon], [arrLat, arrLon]], {
-          color: color,
-          weight: 5,
-          opacity: 0.7
-        }).addTo(map);
-        
-        routeLines.push(routeLine);
-        
-        // Fit the map to show the entire route
-        map.fitBounds(routeLine.getBounds(), {
-          padding: [50, 50]
-        });
-      }
-      
-      // Initialize the rest of JavaScript functionality here
-      // (location search, calculate route, etc.)
-    });
-  </script>
+<!-- Load Google Maps API with required libraries - Updated for 2025 APIs -->
+<script src="https://maps.googleapis.com/maps/api/js?key=googleApiKey&libraries=places,geometry,routes&callback=initMap&v=weekly" async defer></script>
+<script>
+  function initMap() {
+    console.log('Google Maps API loaded');
+    // This is a callback function that will be called when Google Maps API is loaded
+  }
+</script>
+
+<!-- Load our custom navigation script -->
+<script type="module" src="{{ asset('js/navigation/main.js') }}"></script>
 {% endblock %}
 
 {% block javascripts %}
   {{ parent() }}
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script>
-    // Initialize map when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize the map
-      const map = L.map('map').setView([36.8065, 10.1815], 13); // Centered on Tunis
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
-
-      // Global variables for map markers and routes
-      let markers = [];
-      let routeLines = [];
-      
-      // Function to clear existing route
-      function clearRoute() {
-        // Remove markers
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = [];
-        
-        // Remove route lines
-        routeLines.forEach(line => map.removeLayer(line));
-        routeLines = [];
-      }
-      
-      // Function to decode Google polyline
-      function decodePolyline(encoded) {
-        if (!encoded || encoded.length === 0) return [];
-        
-        let poly = [];
-        let index = 0, len = encoded.length;
-        let lat = 0, lng = 0;
-        
-        while (index < len) {
-          let b, shift = 0, result = 0;
-          
-          do {
-            b = encoded.charCodeAt(index++) - 63;
-            result |= (b & 0x1f) << shift;
-            shift += 5;
-          } while (b >= 0x20);
-          
-          let dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
-          lat += dlat;
-          
-          shift = 0;
-          result = 0;
-          
-          do {
-            b = encoded.charCodeAt(index++) - 63;
-            result |= (b & 0x1f) << shift;
-            shift += 5;
-          } while (b >= 0x20);
-          
-          let dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
-          lng += dlng;
-          
-          poly.push([lat * 1e-5, lng * 1e-5]);
-        }
-        
-        return poly;
-      }
-
-      // Include the rest of the JavaScript for map functionality, location search, routing, etc.
-      // This will be similar to the code you provided in your route_finder/index.html.twig template,
-      // but with URLs adjusted to match the new routes and some French translations.
-      
-      // Function to show route on map
-      function showRoute(depLat, depLon, arrLat, arrLon, transportMode) {
-        clearRoute();
-        
-        // Create markers for start and end points
-        const startMarker = L.marker([depLat, depLon])
-          .bindPopup('Départ<br>Lat: ' + depLat + '<br>Lon: ' + depLon)
-          .addTo(map);
-          
-        const endMarker = L.marker([arrLat, arrLon])
-          .bindPopup('Arrivée<br>Lat: ' + arrLat + '<br>Lon: ' + arrLon)
-          .addTo(map);
-          
-        markers.push(startMarker, endMarker);
-        
-        // Choose color based on transport mode
-        const colors = {
-          'driving': '#4CAF50',
-          'walking': '#2196F3',
-          'cycling': '#FF9800',
-          'public_transport': '#9C27B0'
-        };
-        
-        const color = colors[transportMode] || '#4CAF50';
-        
-        // Create a line between the points
-        const routeLine = L.polyline([[depLat, depLon], [arrLat, arrLon]], {
-          color: color,
-          weight: 5,
-          opacity: 0.7
-        }).addTo(map);
-        
-        routeLines.push(routeLine);
-        
-        // Fit the map to show the entire route
-        map.fitBounds(routeLine.getBounds(), {
-          padding: [50, 50]
-        });
-      }
-      
-      // Initialize the rest of JavaScript functionality here
-      // (location search, calculate route, etc.)
-    });
-  </script>
 {% endblock %}

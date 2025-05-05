@@ -26,6 +26,10 @@
   <link rel="stylesheet" href="{{ asset('back_office/vendor/css/core.css') }}">
   <link rel="stylesheet" href="{{ asset('back_office/vendor/fonts/remixicon/remixicon.css') }}">
 
+  <link rel="stylesheet" href="{{ asset('assets/front_office/css/navigation.css') }}">
+
+
+
   <style>
     html { overflow-y: scroll; } /* Always show scrollbar */
   </style>
@@ -43,32 +47,32 @@
         <span class="oi oi-menu"></span> Menu
       </button>
 
-      <div class="collapse navbar-collapse" id="ftco-nav">
-        <ul class="navbar-nav ml-auto align-items-center">
-          <li class="nav-item {% if app.request.attributes.get('_route') == 'app_home' %}active{% endif %}">
-            <a href="{{ path('app_home') }}" class="nav-link">Home</a>
-          </li>
-          <li class="nav-item {% if app.request.attributes.get('_route') == 'app_exploration' %}active{% endif %}">
-            <a href="{{ path('app_exploration') }}" class="nav-link">Exploration</a>
-          </li>
-          <li class="nav-item {% if app.request.attributes.get('_route') == 'app_clubs' %}active{% endif %}">
-            <a href="#" class="nav-link">Clubs</a>
-          </li>
-          <li class="nav-item {% if app.request.attributes.get('_route') == 'app_assistance' %}active{% endif %}">
-            <a href="#" class="nav-link">Assistance</a>
-          </li>
-          <li class="nav-item {% if app.request.attributes.get('_route') == 'app_social' %}active{% endif %}">
-            <a href="{{ path('app_post_index') }}" class="nav-link">Fil Social</a>
-          </li>
-          {% if user %}
-          <li class="nav-item">
-            <a href="#" class="nav-link">Navigation</a>
-          </li>
-          {% else %}
-          <li class="nav-item {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">
-            <a href="#" class="nav-link">Contactez-Nous</a>
-          </li>
-          {% endif %}
+    <div class="collapse navbar-collapse" id="ftco-nav">
+      <ul class="navbar-nav ml-auto align-items-center">
+        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_home' %}active{% endif %}">
+          <a href="{{ path('app_home') }}" class="nav-link">Home</a>
+        </li>
+        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_exploration' %}active{% endif %}">
+          <a href="#" class="nav-link">Exploration</a>
+        </li>
+        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_clubs' %}active{% endif %}">
+          <a href="#" class="nav-link">Clubs</a>
+        </li>
+        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_assistance' %}active{% endif %}">
+          <a href="#" class="nav-link">Assistance</a>
+        </li>
+        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_social' %}active{% endif %}">
+          <a href="#" class="nav-link">Fil Social</a>
+        </li>
+        {% if user %}
+        <li class="nav-item">
+          <a href="navigation" class="nav-link">Navigation</a>
+        </li>
+        {% else %}
+        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">
+          <a href="#" class="nav-link">Contactez-Nous</a>
+        </li>
+        {% endif %}
 
           {% if user %}
           <li class="nav-item dropdown user-dropdown">
@@ -168,7 +172,7 @@
   <script src="{{ asset('assets/front_office/js/bootstrap-datepicker.js') }}"></script>
   <script src="{{ asset('assets/front_office/js/scrollax.min.js') }}"></script>
   <script src="{{ asset('assets/front_office/js/bootstrap.min.js') }}"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=googleApiKey"></script>
   <script src="{{ asset('assets/front_office/js/google-map.js') }}"></script>
   <script src="{{ asset('assets/front_office/js/main.js') }}"></script>
 
