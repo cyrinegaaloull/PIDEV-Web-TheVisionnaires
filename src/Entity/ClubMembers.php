@@ -6,19 +6,20 @@ use App\Entity\Club;
 use App\Entity\Users;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use App\Repository\ClubMembersRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ClubMembersRepository::class)]
 #[ORM\Table(name: 'club_members')]
 class ClubMembers
 {
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Club::class)]
-    #[ORM\JoinColumn(name: 'clubID', referencedColumnName: 'clubid', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'clubID', referencedColumnName: 'clubID', nullable: false, onDelete: 'CASCADE')]
     private Club $clubid;
 
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Users::class)]
-    #[ORM\JoinColumn(name: 'userID', referencedColumnName: 'userId', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'userID', referencedColumnName: 'user_id', nullable: false, onDelete: 'CASCADE')]
     private Users $userid;
 
     #[ORM\Column(name: 'joinDate', type: 'date', nullable: true, options: ['default' => 'CURRENT_DATE'])]

@@ -1,0 +1,225 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<div class="container mt-5">
+  <h2 class="mb-1">
+    <i class="ri-pencil-line text-primary me-2" style="font-size: 1.9rem;"></i> Modifier le Club
+  </h2>
+  <p class="text-muted">Tous les champs sont obligatoires sauf les images.</p>
+
+  <div id="form-messages"></div>
+
+  {{ form_start(form, {
+    'attr': {
+      'enctype': 'multipart/form-data',
+      'id': 'edit-club-form',
+      'class': 'ajax-form',
+      'novalidate': 'novalidate'
+    }
+  }) }}
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      {{ form_label(form.clubName) }}
+      {{ form_widget(form.clubName, {'attr': {'class': 'form-control' ~ (form.clubName.vars.errors|length ? ' is-invalid' : '')}}) }}
+      <div class="invalid-feedback" data-error-for="clubName">
+        {{ form_errors(form.clubName) }}
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      {{ form_label(form.clubContact) }}
+      {{ form_widget(form.clubContact, {'attr': {'class': 'form-control' ~ (form.clubContact.vars.errors|length ? ' is-invalid' : '')}}) }}
+      <div class="invalid-feedback" data-error-for="clubContact">
+        {{ form_errors(form.clubContact) }}
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-3">
+      {{ form_label(form.clubDescription) }}
+      {{ form_widget(form.clubDescription, {'attr': {'class': 'form-control' ~ (form.clubDescription.vars.errors|length ? ' is-invalid' : ''), 'rows': 4}}) }}
+      <div class="invalid-feedback" data-error-for="clubDescription">
+        {{ form_errors(form.clubDescription) }}
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      {{ form_label(form.clubCategory) }}
+      {{ form_widget(form.clubCategory, {'attr': {'class': 'form-select' ~ (form.clubCategory.vars.errors|length ? ' is-invalid' : '')}}) }}
+      <div class="invalid-feedback" data-error-for="clubCategory">
+        {{ form_errors(form.clubCategory) }}
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      {{ form_label(form.clubLocation) }}
+      {{ form_widget(form.clubLocation, {'attr': {'class': 'form-control' ~ (form.clubLocation.vars.errors|length ? ' is-invalid' : '')}}) }}
+      <div class="invalid-feedback" data-error-for="clubLocation">
+        {{ form_errors(form.clubLocation) }}
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      {{ form_label(form.scheduleInfo) }}
+      {{ form_widget(form.scheduleInfo, {'attr': {'class': 'form-control' ~ (form.scheduleInfo.vars.errors|length ? ' is-invalid' : '')}}) }}
+      <div class="invalid-feedback" data-error-for="scheduleInfo">
+        {{ form_errors(form.scheduleInfo) }}
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      {{ form_label(form.creationDate) }}
+      {{ form_widget(form.creationDate, {'attr': {'class': 'form-control', 'disabled': true}}) }}
+    </div>
+
+    <div class="col-md-3 mb-3">
+      {{ form_label(form.membersCount) }}
+      {{ form_widget(form.membersCount, {'attr': {'class': 'form-control', 'disabled': true}}) }}
+    </div>
+
+    <div class="col-md-6 mb-3">
+      {{ form_label(form.clubLogo) }}
+      <div class="input-group">
+        {{ form_widget(form.clubLogo, {'attr': {'class': 'form-control' ~ (form.clubLogo.vars.errors|length ? ' is-invalid' : '')}}) }}
+        {% if club.clublogo %}
+          <span class="input-group-text text-success">
+            <i class="ri-check-line me-1"></i> Existe
+          </span>
+        {% endif %}
+      </div>
+      {% if club.clublogo %}
+        <small class="text-muted d-block mt-1">Actuel: {{ club.clublogo }}</small>
+        <img src="{{ asset('uploads/' ~ club.clublogo) }}" alt="Logo actuel" class="mt-2 rounded-circle" width="50" id="current-logo">
+      {% endif %}
+      <div class="invalid-feedback" data-error-for="clubLogo">
+        {{ form_errors(form.clubLogo) }}
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      {{ form_label(form.bannerImage) }}
+      <div class="input-group">
+        {{ form_widget(form.bannerImage, {'attr': {'class': 'form-control' ~ (form.bannerImage.vars.errors|length ? ' is-invalid' : '')}}) }}
+        {% if club.bannerimage %}
+          <span class="input-group-text text-success">
+            <i class="ri-check-line me-1"></i> Existe
+          </span>
+        {% endif %}
+      </div>
+      {% if club.bannerimage %}
+        <small class="text-muted d-block mt-1">Actuel: {{ club.bannerimage }}</small>
+        <img src="{{ asset('uploads/' ~ club.bannerimage) }}" alt="Bannière actuelle" class="mt-2" width="100" id="current-banner">
+      {% endif %}
+      <div class="invalid-feedback" data-error-for="bannerImage">
+        {{ form_errors(form.bannerImage) }}
+      </div>
+    </div>
+  </div>
+
+  {{ form_row(form._token) }}
+  <div class="mt-3 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">
+      <i class="ri-save-line me-1"></i> {{ form.submit.vars.label }}
+    </button>
+    <a href="{{ path('admin_club_list') }}" class="btn btn-outline-secondary">
+      <i class="ri-arrow-go-back-line me-1"></i> Annuler
+    </a>
+  </div>
+
+  {{ form_end(form, { 'render_rest': false }) }}
+</div>
+
+<style>
+  .invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  .is-invalid {
+    border-color: #dc3545;
+    background-image: none;
+  }
+  
+  .input-group-text.text-success {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('edit-club-form');
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        // Reset UI
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        const messageBox = document.getElementById('form-messages');
+        messageBox.innerHTML = '';
+
+        try {
+            const formData = new FormData(form);
+
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            console.log('✅ Server response:', data);
+
+            if (!response.ok) {
+                // Show a global alert message
+                const globalError = document.createElement('div');
+                globalError.className = 'alert alert-danger';
+                globalError.innerHTML = `<i class="ri-error-warning-line"></i> ${data.message || 'Erreur de validation ou de traitement.'}`;
+                messageBox.appendChild(globalError);
+            }
+
+            if (data.success) {
+                const success = document.createElement('div');
+                success.className = 'alert alert-success';
+                success.innerHTML = `<i class="ri-check-line"></i> ${data.message}`;
+                messageBox.appendChild(success);
+
+                setTimeout(() => {
+                    window.location.href = data.redirect || '/admin/clubs';
+                }, 1500);
+            } else if (data.errors) {
+                // Loop through error fields
+                for (const [field, message] of Object.entries(data.errors)) {
+                    const input = form.querySelector(`[name="club_edit[${field}]"]`);
+                    const errorContainer = document.querySelector(`[data-error-for="${field}"]`);
+
+                    if (input) {
+                        input.classList.add('is-invalid');
+                    }
+
+                    if (errorContainer) {
+                        errorContainer.textContent = message || 'Erreur de validation.';
+                    } else {
+                        console.warn(`⚠️ Missing error container for: ${field}`);
+                    }
+                }
+            }
+
+        } catch (error) {
+            console.error('❌ AJAX Error:', error);
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger';
+            alert.innerHTML = `<i class="ri-error-warning-line"></i> ${error.message || 'Une erreur technique est survenue.'}`;
+            messageBox.appendChild(alert);
+        }
+    });
+});
+
+</script>
+{% endblock %}

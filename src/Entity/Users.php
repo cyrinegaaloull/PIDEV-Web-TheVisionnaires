@@ -8,6 +8,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordRequestInterface;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordRequestTrait;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
@@ -147,4 +150,22 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return null;
     }
+
+
+    #[ORM\OneToMany(mappedBy: "memberid", targetEntity: Membership::class)]
+    private Collection $memberships;
+
+    public function getMemberships(): Collection
+    {
+        return $this->memberships;
+    }
+
+    public function __construct()
+    {
+        $this->memberships = new ArrayCollection();
+    }
+
+
+
+
 }

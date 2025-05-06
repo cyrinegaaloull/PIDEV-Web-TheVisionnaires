@@ -3,14 +3,20 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
-
 parameters:
-    avatars_directory: '%kernel.project_dir%/public/scripts'
+    avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
     your_upload_directory: '%kernel.project_dir%/public/assets/exploration/images'
+    uploads_directory: '%kernel.project_dir%/public/uploads'
+    uploads_directory_web: '/uploads'
+
+    
     # Add the OpenRouter API key parameter
     openrouter_api_key: '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'
 
+
+    
 services:
+    # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
@@ -22,6 +28,9 @@ services:
         public: true
     App\Service\NotificationService:
         public: true
+    Symfony\Contracts\HttpClient\HttpClientInterface: '@http_client'
+
+
     annotation_reader:
         alias: Doctrine\Common\Annotations\AnnotationReader
   

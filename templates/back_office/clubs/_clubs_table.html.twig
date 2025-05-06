@@ -1,0 +1,166 @@
+<table class="table table-hover">
+  <thead class="table-light">
+    <tr>
+      <th>Logo</th>
+      <th>Nom</th>
+      <th>Date de création</th>
+      <th>Catégorie</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for club in clubs %}
+      <tr>
+        <td>
+          <img src="{{ asset('uploads/' ~ club.clublogo) }}" class="rounded-circle" width="40" height="40" alt="logo">
+        </td>
+        <td>{{ club.clubname }}</td>
+        <td>{{ club.creationdate|date('d/m/Y') }}</td>
+        <td>
+          <span class="badge rounded-pill bg-label-info me-1">
+            {{ club.clubcategory }}
+          </span>
+        </td>
+        <td>
+          <a href="{{ path('admin_club_edit', {id: club.clubid}) }}" class="btn btn-sm btn-warning btn-circle">
+            <i class="ri-pencil-line"></i>
+          </a>
+          <button
+            class="btn btn-sm btn-danger btn-circle btn-delete"
+            data-url="{{ path('admin_club_delete', {id: club.clubid}) }}"
+            data-token="{{ csrf_token('delete' ~ club.clubid) }}"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteModal"
+          >
+            <i class="ri-delete-bin-line"></i>
+          </button>
+          <button class="btn btn-outline-primary btn-icon btn-sm btn-circle show-members" 
+                  data-bs-toggle="offcanvas" 
+                  data-bs-target="#clubMembersOffcanvas" 
+                  data-club-id="{{ club.clubid }}"
+                  title="Voir les membres">
+            <i class="ri-team-line"></i>
+          </button>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">Aucun club trouvé.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Delete Confirmation Modal (Only once, outside loop) -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Êtes-vous sûr de vouloir supprimer ce club ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete-btn">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pagination-rounded .page-link {
+    border-radius: 1.5rem !important;
+  }
+  .btn-circle {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50% !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
+{% if clubs.pageCount > 1 %}
+  <nav>
+    <ul class="pagination pagination-rounded justify-content-center mt-3">
+      {% if clubs.previousPageNumber is defined %}
+        <li class="page-item">
+          <a href="#" class="page-link page-link-ajax" data-page="{{ clubs.previousPageNumber }}">
+            <i class="ri-arrow-left-s-line"></i>
+          </a>
+        </li>
+      {% endif %}
+
+      {% for page in 1..clubs.pageCount %}
+        <li class="page-item {% if page == clubs.currentPageNumber %}active{% endif %}">
+          <a href="#" class="page-link page-link-ajax" data-page="{{ page }}">{{ page }}</a>
+        </li>
+      {% endfor %}
+
+      {% if clubs.nextPageNumber is defined %}
+        <li class="page-item">
+          <a href="#" class="page-link page-link-ajax" data-page="{{ clubs.nextPageNumber }}">
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let currentUrl = '';
+    let currentToken = '';
+
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    const confirmBtn = document.getElementById('confirm-delete-btn');
+
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        currentUrl = this.getAttribute('data-url');
+        currentToken = this.getAttribute('data-token');
+      });
+    });
+
+    confirmBtn.addEventListener('click', function () {
+      fetch(currentUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `_token=${encodeURIComponent(currentToken)}`
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // Hide modal before reloading
+          const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+          deleteModal.hide();
+
+          // Wait a little for UX and then reload
+          setTimeout(() => {
+            location.reload();
+          }, 300);
+        } else {
+          alert(data.message || 'Une erreur est survenue.');
+        }
+      })
+      .catch(error => {
+        console.error('Erreur lors de la suppression :', error);
+        // DO NOT show native alert anymore
+        // alert('An error occurred while deleting');
+      });
+    });
+  });
+</script>
+

@@ -21,7 +21,7 @@ class Activite
     private string $activitedescription;
 
     #[ORM\Column(name: 'activiteDate', type: 'date')]
-    private \DateTimeInterface $activitedate;
+    private ?\DateTimeInterface $activitedate;
 
     #[ORM\Column(name: 'activiteLocation', type: 'string', length: 255)]
     private string $activitelocation;
@@ -29,14 +29,14 @@ class Activite
     #[ORM\Column(name: 'activiteType', type: 'string', length: 100)]
     private string $activitetype;
 
-    #[ORM\Column(name: 'activiteImage', type: 'string', length: 255)]
+    #[ORM\Column(name: 'activiteImage', type: 'string', length: 255, nullable: true)]
     private string $activiteimage;
 
     #[ORM\Column(name: 'startTime', type: 'time')]
-    private \DateTimeInterface $starttime;
+    private ?\DateTimeInterface $starttime;
 
     #[ORM\Column(name: 'endTime', type: 'time')]
-    private \DateTimeInterface $endtime;
+    private ?\DateTimeInterface $endtime;
 
     #[ORM\Column(name: 'activiteStatus', type: 'string', length: 20, options: ['default' => 'A_venir'])]
     private string $activitestatus = 'A_venir';
@@ -74,13 +74,13 @@ class Activite
         return $this->activitedescription;
     }
 
-    public function setActivitedate(\DateTimeInterface $activitedate): self
+    public function setActivitedate(?\DateTimeInterface $activitedate): self
     {
         $this->activitedate = $activitedate;
         return $this;
     }
 
-    public function getActivitedate(): \DateTimeInterface
+    public function getActivitedate(): ?\DateTimeInterface
     {
         return $this->activitedate;
     }
@@ -118,24 +118,24 @@ class Activite
         return $this->activiteimage;
     }
 
-    public function setStarttime(\DateTimeInterface $starttime): self
+    public function setStarttime(?\DateTimeInterface $starttime): self
     {
         $this->starttime = $starttime;
         return $this;
     }
 
-    public function getStarttime(): \DateTimeInterface
+    public function getStarttime(): ?\DateTimeInterface
     {
         return $this->starttime;
     }
 
-    public function setEndtime(\DateTimeInterface $endtime): self
+    public function setEndtime(?\DateTimeInterface $endtime): self
     {
         $this->endtime = $endtime;
         return $this;
     }
 
-    public function getEndtime(): \DateTimeInterface
+    public function getEndtime(): ?\DateTimeInterface
     {
         return $this->endtime;
     }

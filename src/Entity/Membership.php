@@ -6,8 +6,9 @@ use App\Entity\Club;
 use App\Entity\Users;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use App\Repository\MembershipRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: MembershipRepository::class)]
 #[ORM\Table(name: 'membership')]
 class Membership
 {
@@ -22,13 +23,13 @@ class Membership
     #[ORM\Column(name: 'requestDate', type: 'date', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private DateTime $requestdate;
 
-    #[ORM\ManyToOne(targetEntity: Club::class)]
-    #[ORM\JoinColumn(name: 'clubID', referencedColumnName: 'clubid', nullable: false, onDelete: 'CASCADE')]
-    private Club $clubid;
+    #[ORM\ManyToOne(targetEntity: Club::class, inversedBy: "memberships")]
+    #[ORM\JoinColumn(name: 'clubID', referencedColumnName: 'clubID', nullable: false, onDelete: 'CASCADE')]
+    private ?Club $clubid = null;
 
-    #[ORM\ManyToOne(targetEntity: Users::class)]
-    #[ORM\JoinColumn(name: 'memberID', referencedColumnName: 'userId', nullable: false, onDelete: 'CASCADE')]
-    private Users $memberid;
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "memberships")]
+    #[ORM\JoinColumn(name: 'memberID', referencedColumnName: 'user_id', nullable: false, onDelete: 'CASCADE')]
+    private ?Users $memberid = null;
 
     public function getMembershipid(): int
     {
@@ -57,7 +58,7 @@ class Membership
         return $this;
     }
 
-    public function getClubid(): Club
+    public function getClubid(): ?Club
     {
         return $this->clubid;
     }
@@ -68,7 +69,7 @@ class Membership
         return $this;
     }
 
-    public function getMemberid(): Users
+    public function getMemberid(): ?Users
     {
         return $this->memberid;
     }
