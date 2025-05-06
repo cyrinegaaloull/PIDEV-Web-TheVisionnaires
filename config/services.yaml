@@ -6,6 +6,10 @@
 parameters:
     avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
     your_upload_directory: '%kernel.project_dir%/public/assets/exploration/images'
+    uploads_directory: '%kernel.project_dir%/public/uploads'
+    uploads_directory_web: '/uploads'
+
+    
     # Add the OpenRouter API key parameter
     openrouter_api_key: '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'
 
