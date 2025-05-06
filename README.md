@@ -4,6 +4,10 @@
 
 # 🏙️ Local Lens - SmartCity Application
 
+<div align="center">
+  <img src="https://media.discordapp.net/attachments/1331313049096818741/1369317670922621113/image.png?ex=681b6bf5&is=681a1a75&hm=dfe3d31ecc5ab7b3609f8caec6fcf1ca303f0e530dda9fddf25f9b6462ffeaf1&=&format=webp&quality=lossless&width=1775&height=860" width="1000" alt="LocalLensHome">
+</div>
+
 ## 📋 Overview
 
 Local Lens is a comprehensive urban exploration platform available on both desktop and web, designed to enhance the user experience in navigating and engaging with their city. This application enables users to discover interesting venues, access governmental services, connect with like-minded communities through social clubs, navigate efficiently between locations, and interact with other users through a social feed. 
