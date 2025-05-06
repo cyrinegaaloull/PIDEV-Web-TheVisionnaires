@@ -23,6 +23,7 @@ class ServiceController extends AbstractController
         return $this->render('front_office/assistance/services.html.twig', [
             'etablissement' => $etablissement,
             'services' => $services,
+            'user' => $this->getUser(), // Ajoutez cette ligne pour passer l'utilisateur à la vue
         ]);
     }
     
@@ -50,7 +51,9 @@ class ServiceController extends AbstractController
         return $this->render('front_office/assistance/ajouterService.html.twig', [
             'form' => $form->createView(),
             'etablissement' => $etablissement,
+            'user' => $this->getUser(), // Ajoutez cette ligne pour passer l'utilisateur à la vue
             'titre' => 'Ajouter un service'
+            
         ]);
     }
     
@@ -76,6 +79,7 @@ class ServiceController extends AbstractController
         return $this->render('front_office/assistance/ajouterService.html.twig', [
             'form' => $form->createView(),
             'etablissement' => $etablissement,
+            'user' => $this->getUser(), // Ajoutez cette ligne pour passer l'utilisateur à la vue
             'titre' => 'Modifier le service'
         ]);
     }

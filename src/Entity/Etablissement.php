@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Etablissement
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\GeneratedValue]
     #[ORM\Column(name: 'etabID', type: 'integer')]
     private $etabid;
 
@@ -32,7 +32,7 @@ class Etablissement
         min: 10,
         max: 255,
         minMessage: "L'adresse doit contenir au moins {{ limit }} caractères",
-        maxMessage: "L'adresse ne peut pas dépasser {{ limit }} caractères" 
+        maxMessage: "L'adresse ne peut pas dépasser {{ limit }} caractères"
     )]
     private $etabaddress = '';
 
@@ -40,28 +40,28 @@ class Etablissement
     private $etabhoraire = '';
 
     /**
- * Propriété non persistée pour manipuler la date
- */
-#[Assert\NotNull(message: "La date et l'heure d'ouverture ne peuvent pas être vides")]
-#[Assert\LessThanOrEqual(
-    value: "today",
-    message: "La date ne peut pas être dans le futur"
-)]
-private ?\DateTime $horaireDateObject = null;
+     * Propriété non persistée pour manipuler la date
+     */
+    #[Assert\NotNull(message: "La date et l'heure d'ouverture ne peuvent pas être vides")]
+    #[Assert\LessThanOrEqual(
+        value: "today",
+        message: "La date ne peut pas être dans le futur"
+    )]
+    private ?\DateTime $horaireDateObject = null;
 
-#[ORM\Column(name: 'region', type: 'string', length: 50, nullable: true)]
-#[Assert\NotBlank(message: "La région ne peut pas être vide")]
-#[Assert\Length(
-    max: 50,
-    maxMessage: "La région ne peut pas dépasser {{ limit }} caractères"
-)]
-private $region = '';
+    #[ORM\Column(name: 'region', type: 'string', length: 50, nullable: true)]
+    #[Assert\NotBlank(message: "La région ne peut pas être vide")]
+    #[Assert\Length(
+        max: 50,
+        maxMessage: "La région ne peut pas dépasser {{ limit }} caractères"
+    )]
+    private $region = '';
 
-#[ORM\Column(name: 'geolocation', type: 'string', length: 50, nullable: true)]
-#[Assert\Regex(
-    pattern: "/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/",
-    message: "Le format de géolocalisation doit être valide (ex: 48.8566, 2.3522)"
-)]
+    #[ORM\Column(name: 'geolocation', type: 'string', length: 50, nullable: true)]
+    #[Assert\Regex(
+        pattern: "/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/",
+        message: "Le format de géolocalisation doit être valide (ex: 48.8566, 2.3522)"
+    )]
 
     private $geolocation = '';
 
@@ -79,14 +79,14 @@ private $region = '';
     {
         return $this->etabname;
     }
-     // Convertir null en chaîne vide
+    // Convertir null en chaîne vide
     public function setEtabname(?string $etabname): self
     {
         $this->etabname = $etabname === null ? '' : $etabname;
 
         return $this;
     }
-     
+
     public function getEtabaddress(): ?string
     {
         return $this->etabaddress;

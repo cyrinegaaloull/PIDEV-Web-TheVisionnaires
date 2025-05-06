@@ -37,7 +37,7 @@ class Club
     #[ORM\Column(name: "clubLocation", type: "string", length: 255, nullable: false)]
     private $clublocation;
 
-    #[ORM\Column(name: "creationDate", type: "date", nullable: false, options: ["default" => "CURRENT_TIMESTAMP"])]
+    #[ORM\Column(name: "creationDate", type: "datetime", nullable: false, options: ["default" => "CURRENT_TIMESTAMP"])]
     private $creationdate;
 
     #[ORM\Column(name: "membersCount", type: "integer", nullable: false)]
@@ -54,6 +54,8 @@ class Club
 
     public function __construct()
     {
+        $this->activities = new ArrayCollection();
+        $this->creationdate = new \DateTime();
         $this->activities = new ArrayCollection();
     }
 
@@ -89,6 +91,12 @@ class Club
     public function getClubname()
     {
         return $this->clubname;
+    }
+
+
+    public function setCreationDateValue(): void
+    {
+        $this->creationdate = new \DateTimeImmutable();
     }
 
     /**

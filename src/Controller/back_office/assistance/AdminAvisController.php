@@ -27,10 +27,10 @@ class AdminAvisController extends AbstractController
     #[Route('/{avisid}', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, Avis $avis, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$avis->getAvisid(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $avis->getAvisid(), $request->request->get('_token'))) {
             $entityManager->remove($avis);
             $entityManager->flush();
-            
+
             $this->addFlash('success', 'Avis supprimé avec succès!');
         }
 
@@ -47,16 +47,16 @@ class AdminAvisController extends AbstractController
              GROUP BY a.rating
              ORDER BY a.rating ASC'
         )->getResult();
-        
+
         // Préparation des données pour le graphique
         $labels = [];
         $data = [];
-        
+
         foreach ($ratingDistribution as $rating) {
             $labels[] = $rating['rating'] . ' étoile(s)';
             $data[] = $rating['count'];
         }
-        
+
         // Obtenir les établissements les mieux notés
         $topEtablissements = $entityManager->createQuery(
             'SELECT e.etabname, AVG(a.rating) as avgRating, COUNT(a.avisid) as totalAvis
@@ -66,9 +66,9 @@ class AdminAvisController extends AbstractController
              HAVING COUNT(a.avisid) > 2
              ORDER BY avgRating DESC'
         )
-        ->setMaxResults(5)
-        ->getResult();
-        
+            ->setMaxResults(5)
+            ->getResult();
+
         return $this->render('back_office/assistance/avis_stats.html.twig', [
             'ratingDistribution' => $ratingDistribution,
             'chartLabels' => json_encode($labels),

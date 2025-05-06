@@ -21,6 +21,8 @@ class EtablissementController extends AbstractController
         
         return $this->render('front_office/assistance/etabs.html.twig', [
             'etablissements' => $etablissements,
+            'user' => $this->getUser(), // Ajoutez cette ligne pour passer l'utilisateur à la vue
+            'titre' => 'Liste des établissements'
         ]);
     }
     
@@ -43,6 +45,7 @@ class EtablissementController extends AbstractController
         
         return $this->render('front_office/assistance/ajouterEtabs.html.twig', [
             'form' => $form->createView(),
+            'user' => $this->getUser(), // Ajoutez cette ligne pour passer l'utilisateur à la vue
             'titre' => 'Ajouter un établissement'
         ]);
     }
@@ -61,6 +64,7 @@ class EtablissementController extends AbstractController
                 $this->addFlash('error', 'Le nom de l\'établissement ne peut pas être vide');
                 return $this->render('front_office/assistance/ajouterEtabs.html.twig', [
                     'form' => $form->createView(),
+                    'user' => $this->getUser(), // Ajoutez cette ligne pour passer l'utilisateur à la vue
                     'titre' => 'Modifier l\'établissement'
                 ]);
             }
@@ -70,6 +74,7 @@ class EtablissementController extends AbstractController
                 $this->addFlash('error', 'L\'adresse ne peut pas être vide');
                 return $this->render('front_office/assistance/ajouterEtabs.html.twig', [
                     'form' => $form->createView(),
+                    'user' => $this->getUser(), // Ajoutez cette ligne pour passer l'utilisateur à la vue
                     'titre' => 'Modifier l\'établissement'
                 ]);
             }
@@ -83,6 +88,7 @@ class EtablissementController extends AbstractController
         
         return $this->render('front_office/assistance/ajouterEtabs.html.twig', [
             'form' => $form->createView(),
+            'user' => $this->getUser(), // Ajoutez cette ligne pour passer l'utilisateur à la vue
             'titre' => 'Modifier l\'établissement'
         ]);
     }

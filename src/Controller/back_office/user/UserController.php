@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 
 function safeFilename($filename) {
@@ -206,8 +207,7 @@ class UserController extends AbstractController
 
             $user->setNom($nom);
             $user->setPrenom($prenom);
-            $user->setAvatar($avatarPath);
-            $user->setRole($role);
+            $user->setProfilePicture('path/to/avatar.jpg');            $user->setRole($role);
 
             // Persist and flush
             $entityManager->persist($user);
@@ -377,7 +377,7 @@ class UserController extends AbstractController
     
                 try {
                     $avatarFile->move($this->getParameter('avatars_directory'), $newFilename);
-                    $user->setAvatar($newFilename);
+                    $user->setProfilePicture($newFilename);
                 } catch (FileException $e) {
                     $this->addFlash('error', 'Failed to upload avatar: ' . $e->getMessage());
                     $roles = $entityManager->getRepository(Roles::class)->findAll();

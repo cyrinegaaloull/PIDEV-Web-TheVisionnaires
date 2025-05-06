@@ -1,301 +1,335 @@
-{% extends 'front_office/base-front-office.html.twig' %}
-
-{% block title %}{{ user.username }} Profile{% endblock %}
-
-{% block body %}
-<section class="profile-section js-fullheight" style="background-image: url('{{ asset('assets/front_office/images/index1.jpg') }}');">
-    <div class="overlay"></div>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="profile-box">
-                    <div class="text-center">
-                        <div class="profile-image">
-                            <div class="avatar-online">
-                                {% if user and user.avatar %}
-                                    <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="{{ user.username }}" class="rounded-circle">
-                                {% else %}
-                                    <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Profile" class="rounded-circle">
-                                {% endif %}
-                            </div>
-                        </div>
-                        <h2 class="profile-name">{{ user.nom }} {{ user.prenom }}</h2>
-                        <p class="profile-email">{{ user.email }}</p>
-
-                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                            <div class="panel panel-default">
-                                <div class="panel-heading" role="tab" id="headingOne">
-                                    <h4 class="panel-title">
-                                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                            <div class="profile-btn">À PROPOS DE {{ user.username|upper }}</div>
-                                        </a>
-                                    </h4>
-                                </div>
-                                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-                                    <div class="panel-body">
-                                        <div class="profile-info-item">
-                                            <span class="info-label">Nom complet :</span>
-                                            <span class="info-value">{{ user.nom }} {{ user.prenom }}</span>
-                                        </div>
-                                        <div class="profile-info-item">
-                                            <span class="info-label">Email :</span>
-                                            <span class="info-value">{{ user.email }}</span>
-                                        </div>
-                                        <div class="profile-info-item">
-                                            <span class="info-label">Username :</span>
-                                            <span class="info-value">{{ user.username }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {# Flash Messages (Bottom of the profile box) #}
-                    <div id="flash-messages" style="margin-top: 20px; display: none;">
-                        {% for message in app.flashes('success') %}
-                            <div class="alert alert-success">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                        {% for message in app.flashes('error') %}
-                            <div class="alert alert-danger">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
+{% extends 'front_office/base-front-office.html.twig' %} {% block title %}{{
+  user.username
+}}
+Profile{% endblock %} {% block body %}
+<section
+  class="profile-section js-fullheight"
+  style="background-image: url('{{
+    asset('assets/front_office/images/index1.jpg')
+  }}');">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="profile-box">
+          <div class="text-center">
+            <div class="profile-image">
+              <div class="avatar-online">
+                {% if user and user.profilePicture %}
+                <img
+                  src="{{ asset('uploads/avatars/' ~ user.profilePicture) }}"
+                  alt="{{ user.username }}"
+                  class="rounded-circle" />
+                {% else %}
+                <img
+                  src="{{
+                    asset(
+                      'assets/front_office/images/default_profile_picture.png'
+                    )
+                  }}"
+                  alt="Profile"
+                  class="rounded-circle" />
+                {% endif %}
+              </div>
             </div>
+            <h2 class="profile-name">{{ user.nom }} {{ user.prenom }}</h2>
+            <p class="profile-email">{{ user.email }}</p>
+
+            <div
+              class="panel-group"
+              id="accordion"
+              role="tablist"
+              aria-multiselectable="true">
+              <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                  <h4 class="panel-title">
+                    <a
+                      role="button"
+                      data-toggle="collapse"
+                      data-parent="#accordion"
+                      href="#collapseOne"
+                      aria-expanded="true"
+                      aria-controls="collapseOne">
+                      <div class="profile-btn">
+                        À PROPOS DE {{ user.username | upper }}
+                      </div>
+                    </a>
+                  </h4>
+                </div>
+                <div
+                  id="collapseOne"
+                  class="panel-collapse collapse in"
+                  role="tabpanel"
+                  aria-labelledby="headingOne">
+                  <div class="panel-body">
+                    <div class="profile-info-item">
+                      <span class="info-label">Nom complet :</span>
+                      <span class="info-value"
+                        >{{ user.nom }} {{ user.prenom }}</span
+                      >
+                    </div>
+                    <div class="profile-info-item">
+                      <span class="info-label">Email :</span>
+                      <span class="info-value">{{ user.email }}</span>
+                    </div>
+                    <div class="profile-info-item">
+                      <span class="info-label">Username :</span>
+                      <span class="info-value">{{ user.username }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {# Flash Messages (Bottom of the profile box) #}
+          <div id="flash-messages" style="margin-top: 20px; display: none">
+            {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+              {{ message }}
+            </div>
+            {% endfor %} {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+              {{ message }}
+            </div>
+            {% endfor %}
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </section>
 
 <style>
-    /* Base styles */
-    .profile-section {
-        position: relative;
-        background-size: cover;
-        background-position: center;
-        min-height: 100vh;
-        padding: 7em 0;
-        display: flex;
-        align-items: center;
-        transition: all 0.5s ease;
-    }
+  /* Base styles */
+  .profile-section {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    padding: 7em 0;
+    display: flex;
+    align-items: center;
+    transition: all 0.5s ease;
+  }
 
-    .profile-section .overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 100%);
-        backdrop-filter: blur(2px);
-    }
+  .profile-section .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
+    backdrop-filter: blur(2px);
+  }
 
-    /* Profile Box */
+  /* Profile Box */
+  .profile-box {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 50px 40px;
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    margin-top: 0;
+    position: relative;
+    z-index: 1;
+    transform: translateY(0);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+
+  .profile-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Profile Image */
+  .profile-image {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .profile-image .avatar-online {
+    position: relative;
+    display: inline-block;
+  }
+
+  .profile-image .avatar-online:after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #2ecc71;
+    border: 3px solid #fff;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+    animation: pulse 2s infinite;
+  }
+
+  .profile-image img.rounded-circle {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border: 5px solid #fff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.5s ease;
+  }
+
+  .profile-image img.rounded-circle:hover {
+    transform: scale(1.08);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Profile Text */
+  .profile-name {
+    font-family: "Poppins", sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #2d3436;
+    animation: fadeIn 1s ease-out;
+  }
+
+  .profile-email {
+    font-size: 16px;
+    color: #636e72;
+    margin-bottom: 35px;
+    letter-spacing: 0.5px;
+    animation: fadeIn 1.2s ease-out;
+  }
+
+  /* Profile Button */
+  .profile-btn {
+    display: block;
+    width: 100%;
+    padding: 15px 0;
+    background-color: transparent;
+    color: #2d3436;
+    border: 2px solid #2d3436;
+    border-radius: 12px;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .profile-btn:hover {
+    background-color: #2d3436;
+    color: #fff;
+    letter-spacing: 2px;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(45, 52, 54, 0.3);
+  }
+
+  /* Profile Content */
+  .panel-body {
+    padding: 30px 0 10px;
+    font-size: 16px;
+    line-height: 1.8;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .profile-info-item {
+    display: flex;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    transition: all 0.3s ease;
+  }
+
+  .profile-info-item:hover {
+    transform: translateX(5px);
+    border-bottom: 1px solid #2d3436;
+  }
+
+  .info-label {
+    font-weight: 600;
+    color: #2d3436;
+    width: 130px;
+    flex-shrink: 0;
+  }
+
+  .info-value {
+    color: #636e72;
+    flex-grow: 1;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.6);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+    }
+  }
+
+  /* Media Queries for Responsiveness */
+  @media (max-width: 768px) {
     .profile-box {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 50px 40px;
-        border-radius: 24px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-        margin-top: 0;
-        position: relative;
-        z-index: 1;
-        transform: translateY(0);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        animation: fadeInUp 0.8s ease-out forwards;
-    }
-
-    .profile-box:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Profile Image */
-    .profile-image {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .profile-image .avatar-online {
-        position: relative;
-        display: inline-block;
-    }
-
-    .profile-image .avatar-online:after {
-        content: '';
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-        background-color: #2ecc71;
-        border: 3px solid #fff;
-        box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
-        animation: pulse 2s infinite;
+      padding: 35px 25px;
+      margin-top: 20px;
     }
 
     .profile-image img.rounded-circle {
-        width: 180px;
-        height: 180px;
-        object-fit: cover;
-        border: 5px solid #fff;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        transition: all 0.5s ease;
+      width: 150px;
+      height: 150px;
     }
 
-    .profile-image img.rounded-circle:hover {
-        transform: scale(1.08);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-    }
-
-    /* Profile Text */
     .profile-name {
-        font-family: 'Poppins', sans-serif;
-        font-size: 30px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        color: #2d3436;
-        animation: fadeIn 1s ease-out;
-    }
-
-    .profile-email {
-        font-size: 16px;
-        color: #636e72;
-        margin-bottom: 35px;
-        letter-spacing: 0.5px;
-        animation: fadeIn 1.2s ease-out;
-    }
-
-    /* Profile Button */
-    .profile-btn {
-        display: block;
-        width: 100%;
-        padding: 15px 0;
-        background-color: transparent;
-        color: #2d3436;
-        border: 2px solid #2d3436;
-        border-radius: 12px;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        font-size: 16px;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .profile-btn:hover {
-        background-color: #2d3436;
-        color: #fff;
-        letter-spacing: 2px;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(45, 52, 54, 0.3);
-    }
-
-    /* Profile Content */
-    .panel-body {
-        padding: 30px 0 10px;
-        font-size: 16px;
-        line-height: 1.8;
-        animation: fadeIn 0.5s ease-out;
+      font-size: 24px;
     }
 
     .profile-info-item {
-        display: flex;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #eee;
-        transition: all 0.3s ease;
-    }
-
-    .profile-info-item:hover {
-        transform: translateX(5px);
-        border-bottom: 1px solid #2d3436;
+      flex-direction: column;
     }
 
     .info-label {
-        font-weight: 600;
-        color: #2d3436;
-        width: 130px;
-        flex-shrink: 0;
+      width: 100%;
+      margin-bottom: 5px;
     }
-
-    .info-value {
-        color: #636e72;
-        flex-grow: 1;
-    }
-
-    /* Animations */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-
-    @keyframes pulse {
-        0% {
-            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.6);
-        }
-        70% {
-            box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
-        }
-        100% {
-            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
-        }
-    }
-
-    /* Media Queries for Responsiveness */
-    @media (max-width: 768px) {
-        .profile-box {
-            padding: 35px 25px;
-            margin-top: 20px;
-        }
-
-        .profile-image img.rounded-circle {
-            width: 150px;
-            height: 150px;
-        }
-
-        .profile-name {
-            font-size: 24px;
-        }
-
-        .profile-info-item {
-            flex-direction: column;
-        }
-
-        .info-label {
-            width: 100%;
-            margin-bottom: 5px;
-        }
-    }
+  }
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const flashMessages = document.getElementById('flash-messages');
-        if (flashMessages && flashMessages.children.length > 0) {
-            flashMessages.style.display = 'block';
-            setTimeout(function() {
-                flashMessages.style.display = 'none';
-            }, 4000); // 4000 milliseconds = 4 seconds
-        }
-    });
+  document.addEventListener("DOMContentLoaded", function () {
+    const flashMessages = document.getElementById("flash-messages");
+    if (flashMessages && flashMessages.children.length > 0) {
+      flashMessages.style.display = "block";
+      setTimeout(function () {
+        flashMessages.style.display = "none";
+      }, 4000); // 4000 milliseconds = 4 seconds
+    }
+  });
 </script>
 {% endblock %}

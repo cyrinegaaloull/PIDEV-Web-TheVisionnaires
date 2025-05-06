@@ -1,204 +1,279 @@
-{% extends 'back_office/base-back-office.html.twig' %}
-
-{% block title %}Statistiques Assistance | LocalLens{% endblock %}
-
-{% block stylesheets %}
+{% extends 'back_office/base-back-office.html.twig' %} {% block title
+%}Statistiques Assistance | LocalLens{% endblock %} {% block stylesheets %}
 {{ parent() }}
-<link rel="stylesheet" href="{{ asset('assets/back_office/css/NaimaCss.css') }}">
-{% endblock %}
-
-{% block body %}
+<link
+  rel="stylesheet"
+  href="{{ asset('assets/back_office/css/NaimaCss.css') }}" />
+{% endblock %} {% block body %}
 <div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Statistiques module Assistance</h5>
-                <a href="{{ path('admin_assistance_dashboard') }}" class="btn btn-secondary">
-                    <i class="ri-arrow-left-line me-1"></i> Retour au tableau de bord
-                </a>
-            </div>
+  <div class="col-12">
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Statistiques module Assistance</h5>
+        <div>
+          <a
+            href="{{ path('admin_assistance_dashboard') }}"
+            class="btn btn-secondary">
+            <i class="ri-arrow-left-line me-1"></i> Retour au tableau de bord
+          </a>
+          <button id="download-pdf" class="btn btn-primary ms-2">
+            <i class="ri-file-pdf-line me-1"></i> Télécharger PDF
+          </button>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
-<div class="row mb-4">
+<div id="stats-content">
+  <div class="row mb-4">
     <!-- Graphique distribution par catégorie -->
     <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Locaux par catégorie</h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-container" style="height: 300px;">
-                    <canvas id="categoryChart"></canvas>
-                </div>
-                
-                <div class="table-responsive mt-3">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Catégorie</th>
-                                <th>Nombre de locaux</th>
-                                <th>Pourcentage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% set totalEtabs = 0 %}
-                            {% for category in etabByCategories %}
-                                {% set totalEtabs = totalEtabs + category.count %}
-                            {% endfor %}
-                            
-                            {% for category in etabByCategories %}
-                                <tr>
-                                    <td>{{ category.categoryname }}</td>
-                                    <td>{{ category.count }}</td>
-                                    <td>
-                                        {% set percentage = (category.count / totalEtabs * 100)|round(2) %}
-                                        {{ percentage }}%
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Locaux par catégorie</h5>
         </div>
+        <div class="card-body">
+          {% if etabByCategories is empty %}
+          <p class="text-muted text-center">
+            Aucune donnée disponible pour les catégories.
+          </p>
+          {% else %}
+          <div class="chart-container" style="height: 300px">
+            <canvas id="categoryChart"></canvas>
+          </div>
+
+          <div class="table-responsive mt-3">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Catégorie</th>
+                  <th>Nombre de locaux</th>
+                  <th>Pourcentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% set totalEtabs = 0 %} {% for category in etabByCategories %}
+                {% set totalEtabs = totalEtabs + category.count %} {% endfor %}
+                {% for category in etabByCategories %}
+                <tr>
+                  <td>{{ category.categoryname|default('Non spécifié') }}</td>
+                  <td>{{ category.count }}</td>
+                  <td>
+                    {% if totalEtabs > 0 %} {% set percentage = (category.count
+                    / totalEtabs * 100)|round(2) %}
+                    {{ percentage }}% {% else %} 0% {% endif %}
+                  </td>
+                </tr>
+
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
     <!-- Graphique distribution des notes -->
     <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Distribution des Notes</h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-container" style="height: 300px;">
-                    <canvas id="ratingChart"></canvas>
-                </div>
-                
-                <div class="table-responsive mt-3">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Note</th>
-                                <th>Nombre d'avis</th>
-                                <th>Pourcentage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% set totalRatings = 0 %}
-                            {% for rating in ratingDistribution %}
-                                {% set totalRatings = totalRatings + rating.count %}
-                            {% endfor %}
-                            
-                            {% for rating in ratingDistribution %}
-                                <tr>
-                                    <td>{{ rating.rating }} étoiles</td>
-                                    <td>{{ rating.count }}</td>
-                                    <td>
-                                        {% set percentage = (rating.count / totalRatings * 100)|round(2) %}
-                                        {{ percentage }}%
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Distribution des Notes</h5>
         </div>
-    </div>
-</div>
+        <div class="card-body">
+          {% if ratingDistribution is empty %}
+          <p class="text-muted text-center">
+            Aucune donnée disponible pour les notes.
+          </p>
+          {% else %}
+          <div class="chart-container" style="height: 300px">
+            <canvas id="ratingChart"></canvas>
+          </div>
 
-<!-- Prix moyen par établissement -->
-<div class="row">
+          <div class="table-responsive mt-3">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Note</th>
+                  <th>Nombre d'avis</th>
+                  <th>Pourcentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% set totalRatings = 0 %} {% for rating in ratingDistribution
+                %} {% set totalRatings = totalRatings + rating.count %} {%
+                endfor %} {% for rating in ratingDistribution %}
+                <tr>
+                  <td>
+                    {{ rating.rating }} étoile{{ rating.rating > 1 ? "s" : "" }}
+                  </td>
+                  <td>{{ rating.count }}</td>
+                  <td>
+                    {% if totalRatings > 0 %} {% set percentage = (rating.count
+                    / totalRatings * 100)|round(2) %}
+                    {{ percentage }}% {% else %} 0% {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prix moyen par établissement -->
+  <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Prix Moyen par Établissement</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Établissement</th>
-                                <th>Prix Moyen</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for etab in avgPriceByEtab %}
-                                <tr>
-                                    <td>{{ etab.etabname }}</td>
-                                    <td>{{ etab.avgPrice|number_format(2) }} €</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Prix Moyen par Établissement</h5>
         </div>
+        <div class="card-body">
+          {% if avgPriceByEtab is empty %}
+          <p class="text-muted text-center">
+            Aucune donnée disponible pour les prix moyens.
+          </p>
+          {% else %}
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Établissement</th>
+                  <th>Prix Moyen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for etab in avgPriceByEtab %}
+                <tr>
+                  <td>{{ etab.etabname|default('Non spécifié') }}</td>
+                  <td>{{ etab.avgPrice|number_format(2) }} €</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block javascripts %}
+{% endblock %} {% block javascripts %}
 {{ parent() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Graphique des catégories
-        var ctxCategory = document.getElementById('categoryChart').getContext('2d');
-        var categoryData = {
-            labels: [{% for category in etabByCategories %}'{{ category.categoryname }}'{% if not loop.last %},{% endif %}{% endfor %}],
-            datasets: [{
-                label: 'Nombre de locaux',
-                data: [{% for category in etabByCategories %}{{ category.count }}{% if not loop.last %},{% endif %}{% endfor %}],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 206, 86, 0.6)',
-                    'rgba(75, 192, 192, 0.6)'
-                ]
-            }]
-        };
-        new Chart(ctxCategory, {
-            type: 'pie',
-            data: categoryData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
+  document.addEventListener('DOMContentLoaded', function () {
+      // Graphique des catégories
+      const ctxCategory = document.getElementById('categoryChart')?.getContext('2d');
+      if (ctxCategory) {
+          const categoryData = {
+              labels: [{% for category in etabByCategories %}'{{ category.categoryname|default('Non spécifié') }}'{% if not loop.last %},{% endif %}{% endfor %}],
+              datasets: [{
+                  label: 'Nombre de locaux',
+                  data: [{% for category in etabByCategories %}{{ category.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.6)',
+                      'rgba(54, 162, 235, 0.6)',
+                      'rgba(255, 206, 86, 0.6)',
+                      'rgba(75, 192, 192, 0.6)',
+                      'rgba(153, 102, 255, 0.6)',
+                      'rgba(255, 159, 64, 0.6)'
+                  ],
+                  borderWidth: 1
+              }]
+          };
+          new Chart(ctxCategory, {
+              type: 'pie',
+              data: categoryData,
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                      legend: {
+                          position: 'top'
+                      }
+                  }
+              }
+          });
+      }
 
-        // Graphique des notes
-        var ctxRating = document.getElementById('ratingChart').getContext('2d');
-        var ratingData = {
-            labels: [{% for rating in ratingDistribution %}{{ rating.rating }}{% if not loop.last %},{% endif %}{% endfor %}],
-            datasets: [{
-                label: 'Nombre d\'avis',
-                data: [{% for rating in ratingDistribution %}{{ rating.count }}{% if not loop.last %},{% endif %}{% endfor %}],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 206, 86, 0.6)',
-                    'rgba(75, 192, 192, 0.6)',
-                    'rgba(153, 102, 255, 0.6)'
-                ]
-            }]
-        };
-        new Chart(ctxRating, {
-            type: 'bar',
-            data: ratingData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    });
+      // Graphique des notes
+      const ctxRating = document.getElementById('ratingChart')?.getContext('2d');
+      if (ctxRating) {
+          const ratingData = {
+              labels: [{% for rating in ratingDistribution %}{{ rating.rating }}{% if not loop.last %},{% endif %}{% endfor %}],
+              datasets: [{
+                  label: "Nombre d'avis",
+                  data: [{% for rating in ratingDistribution %}{{ rating.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.6)',
+                      'rgba(54, 162, 235, 0.6)',
+                      'rgba(255, 206, 86, 0.6)',
+                      'rgba(75, 192, 192, 0.6)',
+                      'rgba(153, 102, 255, 0.6)'
+                  ],
+                  borderColor: [
+                      'rgba(255, 99, 132, 1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+          };
+          new Chart(ctxRating, {
+              type: 'bar',
+              data: ratingData,
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          title: {
+                              display: true,
+                              text: "Nombre d'avis"
+                          }
+                      },
+                      x: {
+                          title: {
+                              display: true,
+                              text: 'Note (étoiles)'
+                          }
+                      }
+                  },
+                  plugins: {
+                      legend: {
+                          display: false
+                      }
+                  }
+              }
+          });
+      }
+
+      // PDF Download Functionality
+      document.getElementById('download-pdf').addEventListener('click', function () {
+          const element = document.getElementById('stats-content');
+          const opt = {
+              margin: 0.5,
+              filename: 'Statistiques_Assistance.pdf',
+              image: { type: 'jpeg', quality: 0.98 },
+              html2canvas: { scale: 2, useCORS: true },
+              jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+          };
+
+          // Ensure charts are rendered before generating PDF
+          setTimeout(() => {
+              html2pdf().set(opt).from(element).save();
+          }, 1000); // Delay to ensure charts are fully rendered
+      });
+  });
 </script>
 {% endblock %}

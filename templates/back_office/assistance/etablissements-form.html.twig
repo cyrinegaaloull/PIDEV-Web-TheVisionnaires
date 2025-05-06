@@ -1,254 +1,293 @@
-{% extends 'back_office/base-back-office.html.twig' %}
-
-{% block title %}Administration - {{ mode == 'create' ? 'Création' : 'Modification' }} d'établissement | LocalLens{% endblock %}
-
-{% block stylesheets %}
+{% extends 'back_office/base-back-office.html.twig' %} {% block title %}
+Administration -
+{{ mode == "create" ? "Création" : "Modification" }} d'établissement | LocalLens
+{% endblock %} {% block stylesheets %}
 {{ parent() }}
-<link rel="stylesheet" href="{{ asset('assets/back_office/css/NaimaCss.css') }}">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-{% endblock %}
-
-{% block body %}
+<link
+  rel="stylesheet"
+  href="{{ asset('assets/back_office/css/NaimaCss.css') }}" />
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+{% endblock %} {% block body %}
 <div class="row">
-    <div class="col-12">
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">{{ mode == 'create' ? 'Créer un nouvel établissement' : 'Modifier l\'établissement' }}</h5>
-                <a href="{{ path('admin_assistance_etablissements_list') }}" class="btn btn-secondary">
-                    <i class="ri-arrow-left-line me-1"></i> Retour à la liste
-                </a>
-            </div>
-            <div class="card-body">
-                {% for message in app.flashes('error') %}
-                    <div class="alert alert-danger alert-dismissible" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-                
-                {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            {{ form_label(form.etabname) }}
-                            {{ form_widget(form.etabname) }}
-                            <div class="invalid-feedback">
-                                {{ form_errors(form.etabname) }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            {{ form_label(form.categoryid) }}
-                            {{ form_widget(form.categoryid) }}
-                            <div class="invalid-feedback">
-                                {{ form_errors(form.categoryid) }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            {{ form_label(form.etabaddress) }}
-                            {{ form_widget(form.etabaddress) }}
-                            <div class="invalid-feedback">
-                                {{ form_errors(form.etabaddress) }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            {{ form_label(form.horaireDateObject) }}
-                            {{ form_widget(form.horaireDateObject) }}
-                            <div class="invalid-feedback">
-                                {{ form_errors(form.horaireDateObject) }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            {{ form_label(form.region) }}
-                            {{ form_widget(form.region) }}
-                            <div class="invalid-feedback">
-                                {{ form_errors(form.region) }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            {{ form_label(form.geolocation) }}
-                            {{ form_widget(form.geolocation) }}
-                            <small class="text-muted">Format: latitude, longitude (ex: 36.8065, 10.1815)</small>
-                            <div class="invalid-feedback">
-                                {{ form_errors(form.geolocation) }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            {{ form_label(form.imageFile) }}
-                            {{ form_widget(form.imageFile) }}
-                            <small class="text-muted">Formats acceptés: JPG, PNG. Taille max: 1Mo</small>
-                            <div class="invalid-feedback">
-                                {{ form_errors(form.imageFile) }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="mb-3">
-                            <label class="form-label">Sélectionner la position sur la carte</label>
-                            <div id="map" style="height: 300px; width: 100%; border-radius: 0.375rem;"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                {{ form_row(form._token) }}
-                
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="ri-save-line me-1"></i> {{ mode == 'create' ? 'Créer l\'établissement' : 'Enregistrer les modifications' }}
-                    </button>
-                    <a href="{{ path('admin_assistance_etablissements_list') }}" class="btn btn-secondary">Annuler</a>
-                </div>
-                
-                {{ form_end(form, {'render_rest': false}) }}
-            </div>
+  <div class="col-12">
+    <div class="card mb-4">
+      <div
+        class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          {{
+            mode == "create"
+              ? "Créer un nouvel établissement"
+              : "Modifier l'établissement"
+          }}
+        </h5>
+        <a
+          href="{{ path('admin_assistance_etablissements_list') }}"
+          class="btn btn-secondary">
+          <i class="ri-arrow-left-line me-1"></i> Retour à la liste
+        </a>
+      </div>
+      <div class="card-body">
+        {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"></button>
         </div>
+        {% endfor %}
+
+        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'
+        }}) }} {% if form_errors(form) %}
+        <div class="alert alert-danger">
+          {{ form_errors(form) }}
+        </div>
+        {% endif %}
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form_label(form.etabname) }}
+              {{ form_widget(form.etabname, {'attr': {'class': form_errors(form.etabname) ? 'form-control is-invalid' : 'form-control'
+              }}) }}
+              <div class="invalid-feedback">
+                {{ form_errors(form.etabname) }}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form_label(form.categoryid) }}
+              {{ form_widget(form.categoryid, {'attr': {'class': form_errors(form.categoryid) ? 'form-control is-invalid' : 'form-control'
+              }}) }}
+              <div class="invalid-feedback">
+                {{ form_errors(form.categoryid) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <div class="form-group">
+              {{ form_label(form.etabaddress) }}
+              {{ form_widget(form.etabaddress, {'attr': {'class': form_errors(form.etabaddress) ? 'form-control is-invalid' : 'form-control'
+              }}) }} {% if form_errors(form.etabaddress) %}
+              <div class="text-danger">
+                {{ form_errors(form.etabaddress) }}
+              </div>
+              {% endif %}
+              <div class="invalid-feedback">
+                {{ form_errors(form.etabaddress) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form_label(form.horaireDateObject) }}
+              {{ form_widget(form.horaireDateObject, {'attr': {'class': form_errors(form.horaireDateObject) ? 'form-control is-invalid' : 'form-control'
+              }}) }}
+              <div class="invalid-feedback">
+                {{ form_errors(form.horaireDateObject) }}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form_label(form.region) }}
+              {{ form_widget(form.region, {'attr': {'class': form_errors(form.region) ? 'form-control is-invalid' : 'form-control'
+              }}) }}
+              <div class="invalid-feedback">
+                {{ form_errors(form.region) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form_label(form.geolocation) }}
+              {{ form_widget(form.geolocation, {'attr': {'class': form_errors(form.geolocation) ? 'form-control is-invalid' : 'form-control'
+              }}) }}
+              <small class="text-muted"
+                >Format: latitude, longitude (ex: 36.8065, 10.1815)</small
+              >
+              <div class="invalid-feedback">
+                {{ form_errors(form.geolocation) }}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form_label(form.imageFile) }}
+              {{ form_widget(form.imageFile, {'attr': {'class': form_errors(form.imageFile) ? 'form-control is-invalid' : 'form-control'
+              }}) }}
+              <small class="text-muted"
+                >Formats acceptés: JPG, PNG. Taille max: 1Mo</small
+              >
+              <div class="invalid-feedback">
+                {{ form_errors(form.imageFile) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="mb-3">
+              <label class="form-label"
+                >Sélectionner la position sur la carte</label
+              >
+              <div
+                id="map"
+                style="
+                  height: 300px;
+                  width: 100%;
+                  border-radius: 0.375rem;
+                "></div>
+            </div>
+          </div>
+        </div>
+
+        {{ form_row(form._token) }}
+
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i>
+            {{
+              mode == "create"
+                ? "Créer l'établissement"
+                : "Enregistrer les modifications"
+            }}
+          </button>
+          <a
+            href="{{ path('admin_assistance_etablissements_list') }}"
+            class="btn btn-secondary"
+            >Annuler</a
+          >
+        </div>
+
+        {{ form_end(form, { render_rest: false }) }}
+      </div>
     </div>
+  </div>
 </div>
-
-{% block javascripts %}
+{% endblock %} {% block javascripts %}
 {{ parent() }}
-<!-- Ajouter ces deux lignes pour Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
-<!-- Ajouter ces lignes pour le contrôle de localisation (optionnel) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.css" />
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.css" />
 <script src="https://unpkg.com/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Coordonnées par défaut (centrage sur la Tunisie)
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize Bootstrap validation
+    var form = document.querySelector("form.needs-validation");
+    form.addEventListener(
+      "submit",
+      function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add("was-validated");
+      },
+      false
+    );
+
+    // Leaflet map initialization
     var defaultLat = 36.8065;
     var defaultLng = 10.1815;
-    
-    // Initialiser la carte
-    var map = L.map('map', {
-        center: [defaultLat, defaultLng],
-        zoom: 13,
-        zoomControl: true,
-        attributionControl: true
+    var map = L.map("map", {
+      center: [defaultLat, defaultLng],
+      zoom: 13,
+      zoomControl: true,
+      attributionControl: true,
     });
-    
-    // Ajouter le fond de carte OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        minZoom: 5,
-        attribution: '© OpenStreetMap contributors'
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      minZoom: 5,
+      attribution: "© OpenStreetMap contributors",
     }).addTo(map);
-    
-    // Créer une icône de marqueur personnalisée
     var markerIcon = L.divIcon({
-        className: 'custom-marker',
-        html: '<div style="width: 24px; height: 24px; background-color: #7367f0; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+      className: "custom-marker",
+      html: '<div style="width: 24px; height: 24px; background-color: #7367f0; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
     });
-    
     var marker;
     var geoInput = document.querySelector('[name$="[geolocation]"]');
-    
-    // Fonction pour ajouter/mettre à jour le marqueur
     function updateMarker(latlng) {
-        // Supprimer le marqueur existant
-        if (marker) {
-            map.removeLayer(marker);
-        }
-        
-        // Créer un nouveau marqueur
-        marker = L.marker(latlng, {
-            icon: markerIcon,
-            draggable: true  // Rendre le marqueur déplaçable
-        }).addTo(map);
-        
-        // Centrer la carte sur le marqueur
-        map.setView(latlng, 15);
-        
-        // Mettre à jour le champ de géolocalisation
+      if (marker) {
+        map.removeLayer(marker);
+      }
+      marker = L.marker(latlng, {
+        icon: markerIcon,
+        draggable: true,
+      }).addTo(map);
+      map.setView(latlng, 15);
+      if (geoInput) {
+        geoInput.value = latlng.lat.toFixed(6) + ", " + latlng.lng.toFixed(6);
+      }
+      marker.on("dragend", function (event) {
+        var newLatLng = event.target.getLatLng();
         if (geoInput) {
-            geoInput.value = latlng.lat.toFixed(6) + ', ' + latlng.lng.toFixed(6);
+          geoInput.value =
+            newLatLng.lat.toFixed(6) + ", " + newLatLng.lng.toFixed(6);
         }
-        
-        // Gérer le glisser-déposer du marqueur
-        marker.on('dragend', function(event) {
-            var newLatLng = event.target.getLatLng();
-            if (geoInput) {
-                geoInput.value = newLatLng.lat.toFixed(6) + ', ' + newLatLng.lng.toFixed(6);
-            }
-        });
+      });
     }
-    
-    // Si des coordonnées existent déjà
     if (geoInput && geoInput.value) {
-        try {
-            var coords = geoInput.value.split(',').map(parseFloat);
-            if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
-                updateMarker(L.latLng(coords[0], coords[1]));
-            }
-        } catch (error) {
-            console.error('Erreur de parsing des coordonnées', error);
+      try {
+        var coords = geoInput.value.split(",").map(parseFloat);
+        if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+          updateMarker(L.latLng(coords[0], coords[1]));
         }
+      } catch (error) {
+        console.error("Erreur de parsing des coordonnées", error);
+      }
     }
-    
-    // Ajouter un marqueur au clic sur la carte
-    map.on('click', function(e) {
-        updateMarker(e.latlng);
+    map.on("click", function (e) {
+      updateMarker(e.latlng);
     });
-
-    // Ajouter un contrôle de localisation
-    L.control.locate({
-        position: 'topright',
+    L.control
+      .locate({
+        position: "topright",
         drawCircle: true,
         follow: true,
         setView: true,
         keepCurrentZoomLevel: false,
         markerClass: L.marker,
         circleStyle: {
-            color: '#136AEC',
-            fillColor: '#136AEC',
-            fillOpacity: 0.15,
-            weight: 2,
-            opacity: 0.5
+          color: "#136AEC",
+          fillColor: "#136AEC",
+          fillOpacity: 0.15,
+          weight: 2,
+          opacity: 0.5,
         },
         markerStyle: {
-            color: '#136AEC',
-            fillColor: '#2A93EE',
-            fillOpacity: 0.7,
-            weight: 2,
-            opacity: 0.9,
-            radius: 8
+          color: "#136AEC",
+          fillColor: "#2A93EE",
+          fillOpacity: 0.7,
+          weight: 2,
+          opacity: 0.9,
+          radius: 8,
         },
         icon: L.divIcon({
-            className: 'leaflet-locate-circle',
-            html: '<div></div>',
-            iconSize: [20, 20]
-        })
-    }).addTo(map);
-        });
-    
+          className: "leaflet-locate-circle",
+          html: "<div></div>",
+          iconSize: [20, 20],
+        }),
+      })
+      .addTo(map);
+  });
 </script>
-{% endblock %}
 {% endblock %}

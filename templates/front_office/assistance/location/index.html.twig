@@ -1,0 +1,203 @@
+{% extends 'front_office/base-front-office.html.twig' %} {% block title
+%}Location Search{% endblock %} {% block body %}
+<div class="container my-5">
+  <!-- Title and Form Section -->
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      <h1 class="text-center mb-4">Search Locations</h1>
+
+      <form
+        method="POST"
+        class="p-4 bg-white rounded shadow-sm"
+        id="location-search-form"
+        aria-labelledby="form-title">
+        <div class="mb-3">
+          <label for="location" class="form-label fw-bold"
+            >Enter a Location:</label
+          >
+          <input
+            type="text"
+            name="location"
+            id="location"
+            value="{{ location }}"
+            placeholder="e.g., New York, Paris"
+            required
+            class="form-control"
+            aria-describedby="locationHelp error-message"
+            aria-required="true" />
+          <div id="locationHelp" class="form-text">
+            Enter a city or specific place to search.
+          </div>
+        </div>
+        <button
+          type="submit"
+          class="btn btn-primary w-100 d-flex align-items-center justify-content-center"
+          id="search-button"
+          aria-label="Search locations">
+          <span
+            class="spinner-border spinner-border-sm me-2 d-none"
+            role="status"
+            aria-hidden="true"></span>
+          <i class="fas fa-search me-2"></i>Search
+        </button>
+      </form>
+
+      <!-- Display Error Message -->
+      {% if errorMessage %}
+      <div
+        class="alert alert-danger mt-4 alert-dismissible fade show"
+        role="alert"
+        aria-live="assertive"
+        id="error-message">
+        {{ errorMessage }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"></button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Display Search Results -->
+  {% if locationsData is not empty %}
+  <div class="row mt-5">
+    <div class="col-lg-6 col-md-8 mx-auto">
+      <h2 class="text-center mb-4">Search Results</h2>
+
+      <div class="list-group" role="list">
+        {% for place in locationsData %}
+        <div
+          class="list-group-item list-group-item-action p-3 mb-2 rounded"
+          data-lat="{{ place.geocodes.main.latitude }}"
+          data-lng="{{ place.geocodes.main.longitude }}"
+          role="listitem"
+          tabindex="0"
+          aria-label="Location: {{ place.name }}">
+          <h5 class="mb-1">{{ place.name }}</h5>
+          <p class="mb-1 text-muted">
+            {{ place.location.address ?? "Address not available" }}
+          </p>
+          <small
+            >Coordinates: {{ place.geocodes.main.latitude }},
+            {{ place.geocodes.main.longitude }}</small
+          >
+
+          <!-- Display Recommendations -->
+          {% if place.related is defined and place.related is not empty %}
+          <div class="mt-2">
+            <small class="text-muted">You might also like:</small>
+            <ul class="list-unstyled mt-1">
+              {% for related in place.related %}
+              <li>
+                <a
+                  href="#"
+                  class="text-primary"
+                  aria-label="Related location: {{ related.name }}"
+                  >{{ related.name }}</a
+                >
+                <small class="text-muted"
+                  >({{ related.location.address ?? "No address" }})</small
+                >
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Action Buttons -->
+  <div class="row justify-content-center mt-5">
+    <div class="col-lg-6 col-md-8 text-center">
+      <a
+        href="{{ path('ajouter_etablissement') }}"
+        class="btn btn-success me-2"
+        aria-label="Add new establishment">
+        <i class="fas fa-plus me-2"></i>Add Establishment
+      </a>
+      <button
+        type="button"
+        class="btn btn-info"
+        onclick="document.getElementById('location-search-form').reset(); document.getElementById('location').focus();"
+        aria-label="Reset search form">
+        <i class="fas fa-undo me-2"></i>Reset Search
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block javascripts %}
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+  defer></script>
+<script>
+  // Form submission feedback
+  document
+    .getElementById("location-search-form")
+    .addEventListener("submit", function (e) {
+      const button = document.getElementById("search-button");
+      const spinner = button.querySelector(".spinner-border");
+      button.disabled = true;
+      spinner.classList.remove("d-none");
+    });
+
+  // Initialize map if search results exist
+  if (document.querySelector(".list-group-item")) {
+    const mapLoading = document.getElementById("map-loading");
+    mapLoading.style.display = "block";
+
+    const map = L.map("map", {
+      zoomControl: true,
+      scrollWheelZoom: false,
+    }).setView([0, 0], 2);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 18,
+    }).addTo(map);
+
+    const markers = [];
+    document.querySelectorAll(".list-group-item").forEach((item) => {
+      const lat = parseFloat(item.dataset.lat);
+      const lng = parseFloat(item.dataset.lng);
+      const name = item.querySelector("h5").textContent;
+      const marker = L.marker([lat, lng], {
+        title: name,
+      })
+        .addTo(map)
+        .bindPopup(name, { autoClose: false });
+      markers.push([lat, lng]);
+
+      // Click and keyboard interaction
+      const onItemSelect = () => {
+        map.setView([lat, lng], 15);
+        marker.openPopup();
+      };
+      item.addEventListener("click", onItemSelect);
+      item.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onItemSelect();
+        }
+      });
+    });
+
+    if (markers.length > 0) {
+      map.fitBounds(markers, { padding: [50, 50] });
+    }
+
+    map.on("load", () => {
+      mapLoading.style.display = "none";
+    });
+    map.fire("load");
+  }
+</script>
+{% endblock %}

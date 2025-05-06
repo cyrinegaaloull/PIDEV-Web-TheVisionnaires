@@ -1,194 +1,220 @@
-{% extends 'back_office/base-back-office.html.twig' %}
-
-{% block title %}Administration - Statistiques des Avis | LocalLens{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('assets/back_office/css/NaimaCss.css') }}">
-{% endblock %}
-
-{% block body %}
+{% extends 'back_office/base-back-office.html.twig' %} {% block title
+%}Administration - Statistiques des Avis | LocalLens{% endblock %} {% block
+stylesheets %}
+{{ parent() }}
+<link
+  rel="stylesheet"
+  href="{{ asset('assets/back_office/css/NaimaCss.css') }}" />
+{% endblock %} {% block body %}
 <div class="row">
-    <div class="col-12 mb-4">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Statistiques des avis</h5>
-                <a href="{{ path('admin_avis_index') }}" class="btn btn-secondary">
-                    <i class="ri-arrow-left-line me-1"></i> Retour à la liste
-                </a>
-            </div>
-        </div>
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Statistiques des avis</h5>
+        <a href="{{ path('admin_avis_index') }}" class="btn btn-secondary">
+          <i class="ri-arrow-left-line me-1"></i> Retour à la liste
+        </a>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="row">
-    <!-- Graphique de distribution des notes -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="mb-0">Distribution des notes</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="ratingChart" height="300"></canvas>
-            </div>
+  <!-- Graphique de distribution des notes -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0">Distribution des notes</h5>
+      </div>
+      <div class="card-body">
+        {% if ratingDistribution is empty %}
+        <p class="text-muted text-center">
+          Aucune donnée disponible pour la distribution des notes.
+        </p>
+        {% else %}
+        <div class="chart-container" style="height: 300px">
+          <canvas id="ratingChart"></canvas>
         </div>
+        {% endif %}
+      </div>
     </div>
-    
-    <!-- Établissements les mieux notés -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="mb-0">Top établissements</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Établissement</th>
-                                <th>Note moyenne</th>
-                                <th>Total avis</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for etab in topEtablissements %}
-                            <tr>
-                                <td>{{ etab.etabname }}</td>
-                                <td>
-                                    <div class="text-warning">
-                                        {% for i in 1..5 %}
-                                            {% if i <= etab.avgRating|round %}
-                                                <i class="ri-star-fill"></i>
-                                            {% else %}
-                                                <i class="ri-star-line"></i>
-                                            {% endif %}
-                                        {% endfor %}
-                                        <span class="ms-1">{{ etab.avgRating|number_format(1) }}</span>
-                                    </div>
-                                </td>
-                                <td>{{ etab.totalAvis }}</td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="3" class="text-center">Aucun établissement noté</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  </div>
+
+  <!-- Établissements les mieux notés -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0">Top établissements</h5>
+      </div>
+      <div class="card-body">
+        {% if topEtablissements is empty %}
+        <p class="text-muted text-center">Aucun établissement noté.</p>
+        {% else %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Établissement</th>
+                <th>Note moyenne</th>
+                <th>Total avis</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for etab in topEtablissements %}
+              <tr>
+                <td>{{ etab.etabname|default('Non spécifié') }}</td>
+                <td>
+                  <div class="text-warning">
+                    {% for i in 1..5 %} {% if i <= etab.avgRating|round %}
+                    <i class="ri-star-fill"></i>
+                    {% else %}
+                    <i class="ri-star-line"></i>
+                    {% endif %} {% endfor %}
+                    <span
+                      class="ms-1"
+                      >{{ etab.avgRating|number_format(1) }}</span
+                    >
+                  </div>
+                </td>
+                <td>{{ etab.totalAvis }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="row">
-    <!-- Statistiques détaillées -->
-    <div class="col-12 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Détails des notes</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Note</th>
-                                <th>Nombre d'avis</th>
-                                <th>Pourcentage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% set totalCount = 0 %}
-                            {% for rating in ratingDistribution %}
-                                {% set totalCount = totalCount + rating.count %}
-                            {% endfor %}
-                            
-                            {% for rating in ratingDistribution %}
-                            <tr>
-                                <td>{{ rating.rating }} étoile(s)</td>
-                                <td>{{ rating.count }}</td>
-                                <td>
-                                    {% if totalCount > 0 %}
-                                        {% set percentage = (rating.count / totalCount) * 100 %}
-                                        <div class="d-flex align-items-center">
-                                            <div class="progress w-100 me-3" style="height: 8px;">
-                                                <div class="progress-bar bg-primary" style="width: {{ percentage }}%"></div>
-                                            </div>
-                                            <span>{{ percentage|number_format(1) }}%</span>
-                                        </div>
-                                    {% else %}
-                                        0%
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="3" class="text-center">Aucune donnée disponible</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  <!-- Statistiques détaillées -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Détails des notes</h5>
+      </div>
+      <div class="card-body">
+        {% if ratingDistribution is empty %}
+        <p class="text-muted text-center">
+          Aucune donnée disponible pour les détails des notes.
+        </p>
+        {% else %}
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Note</th>
+                <th>Nombre d'avis</th>
+                <th>Pourcentage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% set totalCount = 0 %} {% for rating in ratingDistribution %} {%
+              set totalCount = totalCount + rating.count %} {% endfor %} {% for
+              rating in ratingDistribution %}
+              <tr>
+                <td>
+                  {{ rating.rating }} étoile{{ rating.rating > 1 ? "s" : "" }}
+                </td>
+                <td>{{ rating.count }}</td>
+                <td>
+                  {% if totalCount > 0 %} {% set percentage = (rating.count /
+                  totalCount) * 100 %}
+                  <div class="d-flex align-items-center">
+                    <div class="progress w-100 me-3" style="height: 8px">
+                      <div
+                        class="progress-bar bg-primary"
+                        style="width: {{ percentage }}%;"></div>
+                    </div>
+                    <span>{{ percentage|number_format(1) }}%</span>
+                  </div>
+                  {% else %}
+                  <span>0%</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
-
-{% block javascripts %}
+{% endblock %} {% block javascripts %}
 {{ parent() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Données pour le graphique
-        var labels = {{ chartLabels|raw }};
-        var data = {{ chartData|raw }};
-        
-        // Couleurs pour le graphique
-        var backgroundColors = [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(255, 159, 64, 0.2)',
-            'rgba(255, 205, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(54, 162, 235, 0.2)'
-        ];
-        
-        var borderColors = [
-            'rgb(255, 99, 132)',
-            'rgb(255, 159, 64)',
-            'rgb(255, 205, 86)',
-            'rgb(75, 192, 192)',
-            'rgb(54, 162, 235)'
-        ];
-        
-        // Création du graphique
-        var ctx = document.getElementById('ratingChart').getContext('2d');
-        var ratingChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Distribution des notes',
-                    data: data,
-                    backgroundColor: backgroundColors,
-                    borderColor: borderColors,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                }
-            }
-        });
-    });
+  document.addEventListener('DOMContentLoaded', function () {
+      const ctx = document.getElementById('ratingChart')?.getContext('2d');
+      if (ctx) {
+          // Données pour le graphique
+          const labels = {{ chartLabels|raw }};
+          const data = {{ chartData|raw }};
+
+          // Couleurs pour le graphique
+          const backgroundColors = [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(255, 159, 64, 0.2)',
+              'rgba(255, 205, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(54, 162, 235, 0.2)'
+          ];
+
+          const borderColors = [
+              'rgb(255, 99, 132)',
+              'rgb(255, 159, 64)',
+              'rgb(255, 205, 86)',
+              'rgb(75, 192, 192)',
+              'rgb(54, 162, 235)'
+          ];
+
+          // Création du graphique
+          new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels: labels,
+                  datasets: [{
+                      label: "Nombre d'avis",
+                      data: data,
+                      backgroundColor: backgroundColors,
+                      borderColor: borderColors,
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          ticks: {
+                              precision: 0
+                          },
+                          title: {
+                              display: true,
+                              text: "Nombre d'avis"
+                          }
+                      },
+                      x: {
+                          title: {
+                              display: true,
+                              text: 'Note (étoiles)'
+                          }
+                      }
+                  },
+                  plugins: {
+                      legend: {
+                          display: false
+                      }
+                  }
+              }
+          });
+      }
+  });
 </script>
-{% endblock %}
 {% endblock %}

@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 #[Route('/admin/assistance', name: 'admin_assistance_')]
 class AdminAssistanceController extends AbstractController
@@ -29,15 +31,14 @@ class AdminAssistanceController extends AbstractController
         EtablissementRepository $etablissementRepository,
         ServiceRepository $serviceRepository,
         AvisRepository $avisRepository
-    ): Response
-    {
+    ): Response {
         // Statistiques pour la section Assistance
         $stats = [
             'totalEtablissements' => count($etablissementRepository->findAll()),
             'totalServices' => count($serviceRepository->findAll()),
             'totalAvis' => count($avisRepository->findAll()),
         ];
-        
+
         // Obtenir des établissements les mieux notés
         $topEtablissements = $entityManager->createQuery(
             'SELECT e.etabname, AVG(a.rating) as avgRating, COUNT(a.avisid) as totalAvis
@@ -47,9 +48,9 @@ class AdminAssistanceController extends AbstractController
              HAVING COUNT(a.avisid) > 0
              ORDER BY avgRating DESC'
         )
-        ->setMaxResults(5)
-        ->getResult();
-        
+            ->setMaxResults(5)
+            ->getResult();
+
         // Obtenir la distribution des services par établissement
         $servicesByEtab = $entityManager->createQuery(
             'SELECT e.etabname, COUNT(s.serviceid) as serviceCount
@@ -58,16 +59,16 @@ class AdminAssistanceController extends AbstractController
              GROUP BY e.etabid, e.etabname
              ORDER BY serviceCount DESC'
         )
-        ->setMaxResults(5)
-        ->getResult();
-        
+            ->setMaxResults(5)
+            ->getResult();
+
         return $this->render('back_office/assistance/dashboardAssistance.html.twig', [
             'stats' => $stats,
             'topEtablissements' => $topEtablissements,
             'servicesByEtab' => $servicesByEtab
         ]);
     }
-    
+
 
     // Gestion des établissements
     #[Route('/locaux', name: 'etablissements_list')]
@@ -91,7 +92,7 @@ class AdminAssistanceController extends AbstractController
             if ($imageFile) {
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
 
                 try {
                     $imageFile->move(
@@ -130,7 +131,7 @@ class AdminAssistanceController extends AbstractController
             if ($imageFile) {
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
 
                 try {
                     $imageFile->move(
@@ -159,7 +160,7 @@ class AdminAssistanceController extends AbstractController
     #[Route('/locaux/{etabid}/supprimer', name: 'etablissement_delete', methods: ['POST'])]
     public function deleteEtablissement(Request $request, Etablissement $etablissement, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$etablissement->getEtabid(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $etablissement->getEtabid(), $request->request->get('_token'))) {
             $entityManager->remove($etablissement);
             $entityManager->flush();
             $this->addFlash('success', 'Local supprimé avec succès!');
@@ -170,38 +171,38 @@ class AdminAssistanceController extends AbstractController
 
     // Gestion des services
     #[Route('/prestations', name: 'services_list')]
-public function listServices(ServiceRepository $serviceRepository): Response
-{
-    $services = $serviceRepository->findAllWithEtablissement();
+    public function listServices(ServiceRepository $serviceRepository): Response
+    {
+        $services = $serviceRepository->findAllWithEtablissement();
 
-    return $this->render('back_office/assistance/services-list.html.twig', [
-        'services' => $services,
-    ]);
-}
-
-    #[Route('/prestations/creer', name: 'service_create')]
-public function createService(Request $request, EntityManagerInterface $entityManager): Response
-{
-    $service = new Service();
-    $form = $this->createForm(AdminServiceType::class, $service);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // La relation avec l'établissement est déjà gérée par le formulaire
-        $entityManager->persist($service);
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Prestation ajoutée avec succès!');
-        return $this->redirectToRoute('admin_assistance_services_list');
+        return $this->render('back_office/assistance/services-list.html.twig', [
+            'services' => $services,
+        ]);
     }
 
-    return $this->render('back_office/assistance/services-form.html.twig', [
-        'form' => $form->createView(),
-        'service' => $service,
-        'mode' => 'create'
-    ]);
-}
-    
+    #[Route('/prestations/creer', name: 'service_create')]
+    public function createService(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $service = new Service();
+        $form = $this->createForm(AdminServiceType::class, $service);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // La relation avec l'établissement est déjà gérée par le formulaire
+            $entityManager->persist($service);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Prestation ajoutée avec succès!');
+            return $this->redirectToRoute('admin_assistance_services_list');
+        }
+
+        return $this->render('back_office/assistance/services-form.html.twig', [
+            'form' => $form->createView(),
+            'service' => $service,
+            'mode' => 'create'
+        ]);
+    }
+
 
 
     #[Route('/prestations/{serviceid}/editer', name: 'service_edit')]
@@ -209,33 +210,33 @@ public function createService(Request $request, EntityManagerInterface $entityMa
     {
         $form = $this->createForm(AdminServiceType::class, $service);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer l'établissement sélectionné dans le formulaire (objet Etablissement)
             $etablissement = $service->getEtablissement(); // C'est un objet Etablissement
-    
+
             // Assurez-vous que l'établissement est bien associé au service
             $service->setEtablissement($etablissement);
-    
+
             // Mettre à jour le service avec l'établissement associé
             $entityManager->flush();
-    
+
             $this->addFlash('success', 'Prestation modifiée avec succès!');
             return $this->redirectToRoute('admin_assistance_services_list');
         }
-    
+
         return $this->render('back_office/assistance/services-form.html.twig', [
             'form' => $form->createView(),
             'service' => $service,
             'mode' => 'edit'
         ]);
     }
-    
+
 
     #[Route('/prestations/{serviceid}/supprimer', name: 'service_delete', methods: ['POST'])]
     public function deleteService(Request $request, Service $service, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$service->getServiceid(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $service->getServiceid(), $request->request->get('_token'))) {
             $entityManager->remove($service);
             $entityManager->flush();
             $this->addFlash('success', 'Prestation supprimée avec succès!');
@@ -245,23 +246,23 @@ public function createService(Request $request, EntityManagerInterface $entityMa
     }
 
     #[Route('/etablissements/liste-json', name: 'etablissements_list_json')]
-public function listEtablissementsJson(EtablissementRepository $etablissementRepository): JsonResponse
-{
-    try {
-        $etablissements = $etablissementRepository->findAll();
-        $data = [];
-        foreach ($etablissements as $etablissement) {
-            $data[] = [
-                'etabid' => $etablissement->getEtabid(),
-                'etabname' => $etablissement->getEtabname()
-            ];
+    public function listEtablissementsJson(EtablissementRepository $etablissementRepository): JsonResponse
+    {
+        try {
+            $etablissements = $etablissementRepository->findAll();
+            $data = [];
+            foreach ($etablissements as $etablissement) {
+                $data[] = [
+                    'etabid' => $etablissement->getEtabid(),
+                    'etabname' => $etablissement->getEtabname()
+                ];
+            }
+            return $this->json($data);
+        } catch (\Exception $e) {
+            // Log the error
+            return $this->json(['error' => $e->getMessage()], 500);
         }
-        return $this->json($data);
-    } catch (\Exception $e) {
-        // Log the error
-        return $this->json(['error' => $e->getMessage()], 500);
     }
-}
 
     // Gestion des avis
     #[Route('/evaluations', name: 'avis_list')]
@@ -275,7 +276,7 @@ public function listEtablissementsJson(EtablissementRepository $etablissementRep
     #[Route('/evaluations/{avisid}/supprimer', name: 'avis_delete', methods: ['POST'])]
     public function deleteAvis(Request $request, Avis $avis, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$avis->getAvisid(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $avis->getAvisid(), $request->request->get('_token'))) {
             $entityManager->remove($avis);
             $entityManager->flush();
             $this->addFlash('success', 'Évaluation supprimée avec succès!');
@@ -283,7 +284,7 @@ public function listEtablissementsJson(EtablissementRepository $etablissementRep
 
         return $this->redirectToRoute('admin_assistance_avis_list');
     }
-    
+
     // Statistiques
     #[Route('/statistiques', name: 'stats_dashboard')]
     public function statisticsAssistance(
@@ -291,8 +292,7 @@ public function listEtablissementsJson(EtablissementRepository $etablissementRep
         EtablissementRepository $etablissementRepository,
         ServiceRepository $serviceRepository,
         AvisRepository $avisRepository
-    ): Response
-    {
+    ): Response {
         // Statistiques sur les établissements
         $etabByCategories = $entityManager->createQuery(
             'SELECT c.categoryname, COUNT(e.etabid) as count
@@ -300,7 +300,7 @@ public function listEtablissementsJson(EtablissementRepository $etablissementRep
              JOIN e.categoryid c
              GROUP BY c.categoryid, c.categoryname'
         )->getResult();
-        
+
         // Statistiques sur les avis
         $ratingDistribution = $entityManager->createQuery(
             'SELECT a.rating, COUNT(a.avisid) as count
@@ -308,7 +308,7 @@ public function listEtablissementsJson(EtablissementRepository $etablissementRep
              GROUP BY a.rating
              ORDER BY a.rating ASC'
         )->getResult();
-        
+
         // Statistiques sur les services
         $avgPriceByEtab = $entityManager->createQuery(
             'SELECT e.etabname, AVG(s.serviceprix) as avgPrice
@@ -317,11 +317,41 @@ public function listEtablissementsJson(EtablissementRepository $etablissementRep
              GROUP BY e.etabid, e.etabname
              ORDER BY avgPrice DESC'
         )->getResult();
-        
+
         return $this->render('back_office/assistance/statsAssistance.html.twig', [
             'etabByCategories' => $etabByCategories,
             'ratingDistribution' => $ratingDistribution,
             'avgPriceByEtab' => $avgPriceByEtab
         ]);
+    }
+
+    #[Route('/locaux/telecharger-pdf', name: 'etablissement_download_pdf')]
+    public function downloadEtablissementPdf(EtablissementRepository $etablissementRepository): Response
+    {
+        // Fetch all establishments
+        $etablissements = $etablissementRepository->findAll();
+
+        // Render the HTML content for the PDF using a Twig template
+        $html = $this->renderView('back_office/assistance/etablissements-pdf.html.twig', [
+            'etablissements' => $etablissements,
+        ]);
+
+        // Configure Dompdf
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true); // Enable if your HTML includes remote resources like images
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Generate the PDF response
+        $pdfOutput = $dompdf->output();
+        $response = new Response($pdfOutput);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="etablissements_list.pdf"');
+
+        return $response;
     }
 }

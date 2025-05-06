@@ -1,41 +1,39 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
-
+# config/services.yaml
 parameters:
-    avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
-    your_upload_directory: '%kernel.project_dir%/public/assets/exploration/images'
-
+  avatars_directory: "%kernel.project_dir%/public/uploads/avatars"
+  your_upload_directory: "%kernel.project_dir%/public/assets/exploration/images"
 
 services:
-    # default configuration for services in *this* file
-    _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-    Doctrine\Common\Annotations\AnnotationReader:
-        class: Doctrine\Common\Annotations\AnnotationReader
-        public: true
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true
+    autoconfigure: true
 
-    annotation_reader:
-        alias: Doctrine\Common\Annotations\AnnotationReader
+  Doctrine\Common\Annotations\AnnotationReader:
+    class: Doctrine\Common\Annotations\AnnotationReader
+    public: true
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+  annotation_reader:
+    alias: Doctrine\Common\Annotations\AnnotationReader
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    App\Service\NotificationService:
-        arguments:
-            $twilioSid: '%env(TWILIO_ACCOUNT_SID)%'
-            $twilioToken: '%env(TWILIO_AUTH_TOKEN)%'
-            $whatsappNumber: '%env(TWILIO_WHATSAPP_NUMBER)%'
-            $senderEmail: 'cyrinegaaloul6@gmail.com'
+  # makes classes in src/ available to be used as services
+  App\:
+    resource: "../src/"
+    exclude:
+      - "../src/DependencyInjection/"
+      - "../src/Entity/"
+      - "../src/Kernel.php"
 
+  # Explicitly configure LocationController
+  App\Controller\front_office\assistance\LocationController:
+    arguments:
+      $foursquareApiKey: "%env(FOURSQUARE_API_KEY)%"
+      $cache: "@cache.app"
+
+  # Existing service definition
+  App\Service\NotificationService:
+    arguments:
+      $twilioSid: "%env(TWILIO_ACCOUNT_SID)%"
+      $twilioToken: "%env(TWILIO_AUTH_TOKEN)%"
+      $whatsappNumber: "%env(TWILIO_WHATSAPP_NUMBER)%"
+      $senderEmail: "cyrinegaaloul6@gmail.com"
