@@ -1,31 +1,26 @@
 {% extends 'back_office/base-back-office.html.twig' %}
 
-{% block title %}Nouvelle Activité{% endblock %}
-
 {% block body %}
 <div class="container mt-5">
   <h2 class="mb-1">
-    <i class="ri-calendar-event-line text-primary me-2" style="font-size: 1.7rem;"></i> Ajouter une Activité
+    <i class="ri-add-line text-primary me-2" style="font-size: 1.7rem;"></i> Ajouter une Activité
   </h2>
-  <p class="text-muted">Veuillez remplir tous les champs requis pour créer une activité.</p>
+  <p class="text-muted">Tous les champs sont obligatoires. Veuillez remplir soigneusement chaque section.</p>
 
   <div id="form-messages"></div>
 
- {{ form_start(form, {
-  'action': path('admin_activite_new'),
-  'attr': {
-    'enctype': 'multipart/form-data',
-    'novalidate': 'novalidate',
-    'id': 'activite-form',
-    'class': 'ajax-form'
-  }
-}) }}
-
+  {{ form_start(form, {
+    'attr': {
+      'enctype': 'multipart/form-data',
+      'novalidate': 'novalidate',
+      'id': 'activite-form',
+      'class': 'ajax-form'
+    }
+  }) }}
 
   <div class="row">
-    {% for field in ['activitename', 'activiteimage', 'activitedescription', 'activitedate', 
-                     'activitelocation', 'starttime', 'endtime', 'activitetype', 
-                     'activitestatus', 'clubid'] %}
+    {% for field in ['activitename', 'activitedescription', 'activiteimage', 'activitedate', 
+                     'activitelocation', 'starttime', 'endtime', 'activitetype', 'activitestatus', 'clubid'] %}
       <div class="col-md-{{ field in ['activitedescription'] ? '12' : '6' }} mb-3">
         {{ form_label(attribute(form, field)) }}
         {{ form_widget(attribute(form, field), {'attr': {'class': 'form-control'}}) }}
@@ -34,7 +29,7 @@
     {% endfor %}
   </div>
 
-  <button class="btn btn-primary mt-3"><i class="ri-check-line me-1"></i> Enregistrer</button>
+  {{ form_widget(form.submit, {'attr': {'class': 'btn btn-primary mt-3'}}) }}
   {{ form_end(form) }}
 </div>
 
@@ -52,77 +47,72 @@
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('activite-form');
 
     form.addEventListener('submit', function (e) {
-      e.preventDefault();
+        e.preventDefault();
 
-      // Clear previous errors
-      document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-      document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
-      const messageBox = document.getElementById('form-messages');
-      messageBox.innerHTML = '';
+        // Clear previous errors
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        document.getElementById('form-messages').innerHTML = '';
 
-      const formData = new FormData(form);
+        const formData = new FormData(form);
 
-      fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          // Show success message
-          const success = document.createElement('div');
-          success.className = 'alert alert-success';
-          success.innerHTML = `<i class="ri-check-line"></i> ${data.message}`;
-          messageBox.appendChild(success);
-
-          // Redirect if needed
-          if (data.redirect) {
-            setTimeout(() => {
-              window.location.href = data.redirect;
-            }, 1500);
-          }
-        } else {
-          // Display field-specific errors
-          if (data.errors) {
-            for (const field in data.errors) {
-              const input = form.querySelector(`[name="activite[${field}]"]`);
-              const errorContainer = document.querySelector(`[data-error-for="${field}"]`);
-              
-              if (input) {
-                input.classList.add('is-invalid');
-              }
-              
-              if (errorContainer) {
-                errorContainer.textContent = data.errors[field];
-              }
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
             }
-          }
-          
-          // Show general error message if needed
-          if (data.message && (!data.errors || Object.keys(data.errors).length === 0)) {
-            const error = document.createElement('div');
-            error.className = 'alert alert-danger';
-            error.innerHTML = `<i class="ri-error-warning-line"></i> ${data.message}`;
-            messageBox.appendChild(error);
-          }
-        }
-      })
-      .catch(err => {
-        // Handle connection errors
-        const error = document.createElement('div');
-        error.className = 'alert alert-danger';
-        error.innerHTML = `<i class="ri-error-warning-line"></i> Une erreur est survenue lors de la communication avec le serveur.`;
-        messageBox.appendChild(error);
-        console.error('Fetch error:', err);
-      });
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const successAlert = document.createElement('div');
+                successAlert.className = 'alert alert-success';
+                successAlert.textContent = data.message;
+                document.getElementById('form-messages').appendChild(successAlert);
+
+                if (data.redirect) {
+                    setTimeout(() => window.location.href = data.redirect, 1500);
+                }
+            } else {
+                if (data.errors) {
+                    for (const field in data.errors) {
+                        if (field === 'form') {
+                            const generalAlert = document.createElement('div');
+                            generalAlert.className = 'alert alert-danger';
+                            generalAlert.textContent = data.errors[field].join(' ');
+                            document.getElementById('form-messages').appendChild(generalAlert);
+                            continue;
+                        }
+
+                        const input = form.querySelector(`[name="activite[${field}]"]`);
+                        const errorContainer = document.querySelector(`[data-error-for="${field}"]`);
+
+                        if (input) input.classList.add('is-invalid');
+                        if (errorContainer) errorContainer.textContent = data.errors[field];
+                    }
+                }
+
+                if ((!data.errors || Object.keys(data.errors).length === 0) && data.message) {
+                    const errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert alert-danger';
+                    errorAlert.textContent = data.message;
+                    document.getElementById('form-messages').appendChild(errorAlert);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const errorAlert = document.createElement('div');
+            errorAlert.className = 'alert alert-danger';
+            errorAlert.textContent = 'Une erreur est survenue. Veuillez réessayer.';
+            document.getElementById('form-messages').appendChild(errorAlert);
+        });
     });
-  });
+});
 </script>
 {% endblock %}

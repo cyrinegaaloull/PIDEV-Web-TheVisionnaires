@@ -1,96 +1,37 @@
 {% extends 'back_office/base-back-office.html.twig' %}
 
-{% block title %}Modifier Activité{% endblock %}
-
 {% block body %}
 <div class="container mt-5">
   <h2 class="mb-1">
-    <i class="ri-edit-line text-success me-2" style="font-size: 1.7rem;"></i> Modifier une Activité
+    <i class="ri-edit-2-line text-warning me-2" style="font-size: 1.7rem;"></i> Modifier l’Activité
   </h2>
-  <p class="text-muted">Seules la date et le statut de l’activité peuvent être modifiés ici.</p>
+  <p class="text-muted">Modifiez les informations de l’activité ci-dessous.</p>
 
   <div id="form-messages"></div>
 
   {{ form_start(form, {
     'attr': {
+      'enctype': 'multipart/form-data',
       'novalidate': 'novalidate',
-      'id': 'activite-edit-form',
+      'id': 'activite-form',
       'class': 'ajax-form'
     }
   }) }}
 
   <div class="row">
-    <div class="col-md-6 mb-3">
-      {{ form_label(form.activitename) }}
-      {{ form_widget(form.activitename, {'attr': {'class': 'form-control', 'disabled': true}}) }}
-    </div>
-
-    <div class="col-md-6 mb-3">
-      {{ form_label(form.activitelocation) }}
-      {{ form_widget(form.activitelocation, {'attr': {'class': 'form-control', 'disabled': true}}) }}
-    </div>
-
-    <div class="col-md-12 mb-3">
-      {{ form_label(form.activitedescription) }}
-      {{ form_widget(form.activitedescription, {'attr': {'class': 'form-control', 'rows': 4, 'disabled': true}}) }}
-    </div>
-
-    <div class="col-md-6 mb-3">
-      {{ form_label(form.starttime) }}
-      {{ form_widget(form.starttime, {'attr': {'class': 'form-control', 'disabled': true}}) }}
-    </div>
-
-    <div class="col-md-6 mb-3">
-      {{ form_label(form.endtime) }}
-      {{ form_widget(form.endtime, {'attr': {'class': 'form-control', 'disabled': true}}) }}
-    </div>
-
-    <div class="col-md-6 mb-3">
-      {{ form_label(form.activitetype) }}
-      {{ form_widget(form.activitetype, {'attr': {'class': 'form-control', 'disabled': true}}) }}
-    </div>
-
-    <div class="col-md-6 mb-3">
-      {{ form_label(form.clubid) }}
-      {{ form_widget(form.clubid, {'attr': {'class': 'form-control', 'disabled': true}}) }}
-    </div>
-
-    <div class="col-md-6 mb-3">
-      {{ form_label(form.activitedate) }}
-      {{ form_widget(form.activitedate, {'attr': {'class': 'form-control'}}) }}
-      <div class="invalid-feedback" data-error-for="activitedate">{{ form_errors(form.activitedate) }}</div>
-    </div>
-
-    <div class="col-md-6 mb-3">
-      {{ form_label(form.activitestatus) }}
-      {{ form_widget(form.activitestatus, {'attr': {'class': 'form-select'}}) }}
-      <div class="invalid-feedback" data-error-for="activitestatus">{{ form_errors(form.activitestatus) }}</div>
-    </div>
-
-    <div class="col-md-6 mb-3">
-      {{ form_label(form.activiteimage) }}
-      {{ form_widget(form.activiteimage, {'attr': {'class': 'form-control', 'disabled': true}}) }}
-      {% if activite.activiteimage %}
-        <small class="text-muted d-block mt-1">Image actuelle : {{ activite.activiteimage }}</small>
-        <img src="{{ asset('uploads/' ~ activite.activiteimage) }}" class="mt-2 rounded" width="100">
-      {% endif %}
-      <div class="invalid-feedback" data-error-for="activiteimage">{{ form_errors(form.activiteimage) }}</div>
-    </div>
+    {% for field in ['activitename', 'activitedescription', 'activiteimage', 'activitedate', 
+                     'activitelocation', 'starttime', 'endtime', 'activitetype', 'activitestatus', 'clubid'] %}
+      <div class="col-md-{{ field in ['activitedescription'] ? '12' : '6' }} mb-3">
+        {{ form_label(attribute(form, field)) }}
+        {{ form_widget(attribute(form, field), {'attr': {'class': 'form-control'}}) }}
+        <div class="invalid-feedback" data-error-for="{{ field }}"></div>
+      </div>
+    {% endfor %}
   </div>
 
-  <div class="d-flex gap-2 mt-3">
-    <button type="submit" class="btn btn-success">
-      <i class="ri-save-line me-1"></i> Mettre à jour
-    </button>
-    <a href="{{ path('admin_activite_list') }}" class="btn btn-outline-secondary">
-      <i class="ri-arrow-go-back-line me-1"></i> Retour
-    </a>
-  </div>
-
+  {{ form_widget(form.submit, {'attr': {'class': 'btn btn-warning mt-3'}}) }}
   {{ form_end(form) }}
 </div>
-
-
 
 <style>
   .invalid-feedback {
@@ -99,12 +40,67 @@
     font-size: 0.875rem;
     margin-top: 0.25rem;
   }
+
   .is-invalid {
     border-color: #dc3545;
   }
 </style>
 
 <script>
-  // Optional AJAX or validation logic
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('activite-form');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        document.getElementById('form-messages').innerHTML = '';
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const successAlert = document.createElement('div');
+                successAlert.className = 'alert alert-success';
+                successAlert.textContent = data.message;
+                document.getElementById('form-messages').appendChild(successAlert);
+
+                if (data.redirect) {
+                    setTimeout(() => window.location.href = data.redirect, 1500);
+                }
+            } else {
+                for (const field in data.errors) {
+                    const input = form.querySelector(`[name="activite[${field}]"]`);
+                    const errorContainer = document.querySelector(`[data-error-for="${field}"]`);
+                    if (input) input.classList.add('is-invalid');
+                    if (errorContainer) errorContainer.textContent = data.errors[field];
+                }
+
+                if (Object.keys(data.errors || {}).length === 0 && data.message) {
+                    const errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert alert-danger';
+                    errorAlert.textContent = data.message;
+                    document.getElementById('form-messages').appendChild(errorAlert);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const errorAlert = document.createElement('div');
+            errorAlert.className = 'alert alert-danger';
+            errorAlert.textContent = 'Une erreur est survenue. Veuillez réessayer.';
+            document.getElementById('form-messages').appendChild(errorAlert);
+        });
+    });
+});
 </script>
 {% endblock %}

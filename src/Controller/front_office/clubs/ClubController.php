@@ -13,11 +13,8 @@ use App\Entity\Activite;
 use App\Entity\Club;
 use App\Entity\Membership;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Mime\Email;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use App\Form\ContactFormType;
-use Symfony\Component\Mime\Email as SymfonyEmail;
+use App\Service\ClubEmailService;
 
 
 class ClubController extends AbstractController
@@ -159,48 +156,121 @@ public function joinClubAjax(int $id, Request $request, EntityManagerInterface $
 }
 
 #[Route('/clubs/contact/{id}', name: 'club_contact', methods: ['POST'])]
-public function contactClub(Request $request, MailerInterface $mailer, ClubRepository $clubRepo, int $id): JsonResponse
+public function contactClub(Request $request, ClubRepository $clubRepo, ClubEmailService $emailService, int $id): Response
 {
     $club = $clubRepo->find($id);
-    
     if (!$club) {
-        return new JsonResponse(['success' => false, 'message' => 'Club introuvable.'], 404);
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => false, 'message' => 'Club introuvable.'], 404);
+        }
+        $this->addFlash('error', 'Club introuvable.');
+        return $this->redirectToRoute('app_clubs');
     }
 
-    // Get data directly from the request for AJAX submission
-    $data = json_decode($request->getContent(), true);
-    
-    // Manual validation since we're not using the form component for AJAX
-    if (empty($data['votre nom']) || empty($data['votre email']) || empty($data['votre message'])) {
-        return new JsonResponse(['success' => false, 'message' => 'Tous les champs sont obligatoires.'], 400);
+    // Handle both AJAX and regular form submissions
+    if ($request->isXmlHttpRequest()) {
+        $data = json_decode($request->getContent(), true);
+    } else {
+        $data = [
+            'name' => $request->request->get('name'),
+            'email' => $request->request->get('email'),
+            'subject' => $request->request->get('subject'),
+            'message' => $request->request->get('message')
+        ];
     }
-    
-    if (!filter_var($data['votre email'], FILTER_VALIDATE_EMAIL)) {
-        return new JsonResponse(['success' => false, 'message' => 'Email invalide.'], 400);
+
+    if (empty($data['name']) || empty($data['email']) || empty($data['message'])) {
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => false, 'message' => 'Tous les champs sont obligatoires.'], 400);
+        }
+        $this->addFlash('error', 'Tous les champs sont obligatoires.');
+        return $this->redirectToRoute('app_club_details', ['id' => $id]);
+    }
+
+    if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => false, 'message' => 'Email invalide.'], 400);
+        }
+        $this->addFlash('error', 'Email invalide.');
+        return $this->redirectToRoute('app_club_details', ['id' => $id]);
     }
 
     try {
-        $email = (new SymfonyEmail())
-            ->from($data['votre email'])
-            ->to($club->getClubcontact())
-            ->subject('[Contact Club] ' . ($data['sujet'] ?? $club->getClubname()))
-            ->text(
-                "Nom: {$data['votre nom']}\n" .
-                "Email: {$data['votre email']}\n\n" .
-                "Message:\n{$data['votre message']}"
-            );
+        $subject = "[Contact Club] Message destiné au club : {$club->getClubname()} ({$club->getClubcontact()})";
 
-        $mailer->send($email);
-        
-        // Set the session variable for the toast
+        $message = '
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Message de contact - LocalLens</title>
+            </head>
+            <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 30px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                    <tr>
+                        <td style="background-color: #602080; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; text-align: center;">
+                            <h2 style="color: white; margin: 0;">📩 Nouveau message via le formulaire de contact</h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 16px; margin-bottom: 20px;">Bonjour, vous avez reçu un nouveau message destiné au club <strong>' . htmlspecialchars($club->getClubname()) . '</strong>.</p>
+
+                            <table width="100%" cellpadding="5" cellspacing="0" style="font-size: 15px; color: #333;">
+                                <tr>
+                                    <td style="font-weight: bold; width: 150px;">👤 Nom de l\'expéditeur :</td>
+                                    <td>' . htmlspecialchars($data['name']) . '</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold;">📧 Email de l\'expéditeur :</td>
+                                    <td>' . htmlspecialchars($data['email']) . '</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold;">✉️ Message :</td>
+                                    <td>' . nl2br(htmlspecialchars($data['message'])) . '</td>
+                                </tr>
+                            </table>
+
+                            <p style="margin-top: 30px;">Vous pouvez répondre directement à cet email pour contacter l\'expéditeur.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 13px; color: #777; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                            © ' . date('Y') . ' LocalLens. Tous droits réservés.
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>';
+
+        $emailService->send(
+            to: 'local.lens14@gmail.com',
+            subject: $subject,
+            htmlMessage: $message,
+            replyTo: $data['email']
+        );
+
+        // Set the session flag for toast display
         $request->getSession()->set('show_contact_toast', true);
-        
-        return new JsonResponse(['success' => true]);
+
+        // Return different responses based on request type
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => true]);
+        } else {
+            $this->addFlash('success', 'Votre message a été envoyé avec succès !');
+            return $this->redirectToRoute('app_club_details', ['id' => $id]);
+        }
     } catch (\Exception $e) {
-        // Log the error for debugging
-        error_log('Error sending email: ' . $e->getMessage());
-        return new JsonResponse(['success' => false, 'message' => 'Erreur lors de l\'envoi de l\'email.'], 500);
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => false, 'message' => 'Erreur lors de l\'envoi.'], 500);
+        } else {
+            $this->addFlash('error', 'Erreur lors de l\'envoi du message.');
+            return $this->redirectToRoute('app_club_details', ['id' => $id]);
+        }
     }
 }
+
+
+
 
 }

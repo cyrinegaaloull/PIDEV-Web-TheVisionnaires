@@ -271,10 +271,15 @@ public function new(
 
     private function handleFileUploads($form, $club, $slugger): void
     {
+        error_log("==== Starting handleFileUploads ====");
+
         /** @var UploadedFile|null $logoFile */
         $logoFile = $form->get('clubLogo')->getData();
+        error_log("Logo file: " . ($logoFile ? "Exists" : "NULL"));
         /** @var UploadedFile|null $bannerFile */
         $bannerFile = $form->get('bannerImage')->getData();
+        error_log("Banner file: " . ($bannerFile ? "Exists" : "NULL"));
+
 
         if ($logoFile instanceof UploadedFile) {
             $logoFilename = $this->uploadImage($logoFile, $slugger);
@@ -309,6 +314,10 @@ public function new(
                 $form->get('bannerImage')->addError(new \Symfony\Component\Form\FormError('Erreur lors de l’analyse de la bannière.'));
             }
         }
+        
+        error_log("==== Finishing handleFileUploads ====");
+        error_log("Final club logo value: " . ($club->getClublogo() ?? "NULL"));
+        error_log("Final banner image value: " . ($club->getBannerimage() ?? "NULL"));
     }
 
 
