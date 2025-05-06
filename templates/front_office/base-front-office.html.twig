@@ -10,49 +10,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Arizonia&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-  {# Pacific CSS #}
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/animate.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/owl.carousel.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/owl.theme.default.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/magnific-popup.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/bootstrap-datepicker.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/jquery.timepicker.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/flaticon.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/style.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/navbar.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/custom-footer.css') }}">
-  <link rel="stylesheet" href="{{ asset('back_office/css/demo.css') }}">
-  <link rel="stylesheet" href="{{ asset('back_office/vendor/css/theme-default.css') }}">
-  <link rel="stylesheet" href="{{ asset('back_office/vendor/css/core.css') }}">
-  <link rel="stylesheet" href="{{ asset('back_office/vendor/fonts/remixicon/remixicon.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/clubs.css') }}">
+    {# Pacific CSS #}
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/animate.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/owl.theme.default.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/magnific-popup.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/bootstrap-datepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/jquery.timepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/flaticon.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/navbar.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/front_office/css/custom-footer.css') }}">
+    <link rel="stylesheet" href="{{ asset('back_office/css/demo.css') }}">
+    <link rel="stylesheet" href="{{ asset('back_office/vendor/css/theme-default.css') }}">
+    <link rel="stylesheet" href="{{ asset('back_office/vendor/css/core.css') }}">
+    <link rel="stylesheet" href="{{ asset('back_office/vendor/fonts/remixicon/remixicon.css') }}">
+      <link rel="stylesheet" href="{{ asset('assets/front_office/css/clubs.css') }}">
 
 
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/navigation.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/front_office/css/clubs.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/back_office/vendor/css/core.css') }}">
-
-
-
-
-
-
-  <style>
-    html { overflow-y: scroll; } /* Always show scrollbar */
-  </style>
+    <style>
+        html { overflow-y: scroll; } /* Always show scrollbar */
+    </style>
 </head>
-
 <body>
 
-  {# NAVBAR #}
-  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+{# NAVBAR #}
+<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
     <div class="container">
-      <a class="navbar-brand" href="{{ path('app_home') }}">
-        <img src="{{ asset('assets/front_office/images/logo.png') }}" alt="Logo" style="height: 40px;">
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav">
-        <span class="oi oi-menu"></span> Menu
-      </button>
+        <a class="navbar-brand" href="{{ path('app_home') }}">
+            <img src="{{ asset('assets/front_office/images/logo.png') }}" alt="Logo" style="height: 40px;">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav">
+            <span class="oi oi-menu"></span> Menu
+        </button>
 
         <div class="collapse navbar-collapse" id="ftco-nav">
             <ul class="navbar-nav ml-auto align-items-center">
@@ -63,13 +53,13 @@
                     <a href="{{ path('app_exploration') }}" class="nav-link">Exploration</a>
                 </li>
                 <li class="nav-item dropdown {% if app.request.attributes.get('_route') starts with 'app_clubs' %}active{% endif %}">
-                    <a class="nav-link dropdown-toggle" href="#" id="clubsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Clubs
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="clubsDropdown">
-                    <a class="dropdown-item" href="{{ path('app_clubs') }}">Clubs</a>
-                    <a class="dropdown-item" href="{{path('app_activites')}}">Activités</a>
-                    </div>
+                  <a class="nav-link dropdown-toggle" href="#" id="clubsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Clubs
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="clubsDropdown">
+                  <a class="dropdown-item" href="{{ path('app_clubs') }}">Clubs</a>
+                  <a class="dropdown-item" href="{{path('app_activites')}}">Activités</a>
+                  </div>
                 </li>
                 <li class="nav-item {% if app.request.attributes.get('_route') == 'app_assistance' %}active{% endif %}">
                     <a href="#" class="nav-link">Assistance</a>
@@ -78,58 +68,54 @@
                     <a href="{{ path('app_post_index') }}" class="nav-link">Fil Social</a>
                 </li>
 
-        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_assistance' %}active{% endif %}">
-          <a href="#" class="nav-link">Assistance</a>
-        </li>
-        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_social' %}active{% endif %}">
-          <a href="#" class="nav-link">Fil Social</a>
-        </li>
-        {% if user %}
-        <li class="nav-item">
-          <a href="#" class="nav-link">Navigation</a>
-        </li>
-        {% else %}
-        <li class="nav-item {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">
-          <a href="#" class="nav-link">Contactez-Nous</a>
-        </li>
-        {% endif %}
+                {% if app.user %}
+                    <li class="nav-item">
+                        <a href="navigation" class="nav-link">Navigation</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">
+                        <a href="#" class="nav-link">Contactez-Nous</a>
+                    </li>
+                {% endif %}
 
-
-        {% if user %}
-          <!-- If the user is logged in, display their info -->
-          <li class="nav-item dropdown user-dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button">
-             <div class="avatar avatar-online">
-              {% if user and user.avatar %}
-                <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="seif" class="rounded-circle" style="width: 35px; height: 35px;">
-              {% else %}
-                <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
-              {% endif %}
-            </div>
-                          <span class="ml-2 username-toggle font-weight-bold">{{ user.userIdentifier }}</span>
+                {% if app.user %}
+                    <!-- If the user is logged in, display their info -->
+                    <li class="nav-item dropdown user-dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button">
+                            <div class="avatar avatar-online">
+                                {% if app.user.avatar %}
+                                    <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
+                                {% else %}
+                                    <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
+                                {% endif %}
+                            </div>
+                            <span class="ml-2 username-toggle font-weight-bold">{{ app.user.userIdentifier }}</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-            <a class="dropdown-item" href="{{ path('app_profile') }}">
-                <i class="ri-user-3-line mr-2"></i> Profil
-            </a>
-            <a class="dropdown-item" href="{{ path('app_profile_edit') }}"><i class="ri-settings-4-line mr-2"></i> Paramètres profil</a>
-              <div class="dropdown-divider"></div>
-            <a class="dropdown-item text-danger d-flex align-items-center" href="{{ path('app_logout') }}"><i class="ri-logout-box-line mr-2"></i> Se déconnecter</a>
-            </div>
-          </li>
-          
-        {% else %}
-           <!-- Login Button -->
-        <li class="nav-item ml-3">
-          <a href="#" class="login-btn">Se connecter</a>
-        </li>
-        {% endif %}
-      </ul>
-    </div>
-  </nav>
+                            <a class="dropdown-item" href="{{ path('app_profile') }}">
+                                <i class="ri-user-3-line mr-2"></i> Profil
+                            </a>
+                            <a class="dropdown-item" href="{{ path('app_profile_edit') }}">
+                                <i class="ri-settings-4-line mr-2"></i> Paramètres profil
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger d-flex align-items-center" href="{{ path('app_logout') }}">
+                                <i class="ri-logout-box-line mr-2"></i> Se déconnecter
+                            </a>
+                        </div>
+                    </li>
+                {% else %}
+                    <!-- Login Button -->
+                    <li class="nav-item ml-3">
+                        <a href="{{ path('app_login') }}" class="login-btn">Se connecter</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+</nav>
 
-  {# BODY WRAPPED FOR SCROLL BEHAVIOR #}
-  <div class="js-scroll-wrap">
+{# BODY WRAPPED FOR SCROLL BEHAVIOR #}
+<div class="js-scroll-wrap">
     <main>
         {% block body %}{% endblock %}
     </main>
@@ -138,81 +124,62 @@
 {# FOOTER #}
 <footer class="ftco-footer bg-bottom ftco-no-pt" style="background-image: url('{{ asset('assets/front_office/images/bg_3.jpg') }}');">
     <div class="container">
-      <div class="row mb-5">
-        <div class="col-md pt-5">
-          <div class="ftco-footer-widget pt-md-5 mb-4">
-            <h2 class="ftco-heading-2">À propos de Local Lens</h2>
-            <p>Local Lens est une application innovante qui facilite la vie en ville...</p>
-            <ul class="ftco-footer-social list-unstyled float-md-left float-lft">
-              <li class="ftco-animate"><a href="#"><span class="fa fa-twitter"></span></a></li>
-              <li class="ftco-animate"><a href="#"><span class="fa fa-facebook"></span></a></li>
-              <li class="ftco-animate"><a href="#"><span class="fa fa-instagram"></span></a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md pt-5 border-left">
-          <div class="ftco-footer-widget pt-md-5 mb-4 ml-md-5">
-            <h2 class="ftco-heading-2">Nos fonctionnalités</h2>
-            <ul class="list-unstyled">
-              <li><a href="#" class="py-2 d-block">Exploration des lieux</a></li>
-              <li><a href="#" class="py-2 d-block">Clubs sociaux</a></li>
-              <li><a href="#" class="py-2 d-block">Assistance gouvernementale</a></li>
-              <li><a href="#" class="py-2 d-block">Flux social</a></li>
-              <li><a href="#" class="py-2 d-block">Navigation et transports</a></li>
-              <li><a href="#" class="py-2 d-block">Événements à venir</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md pt-5 border-left">
-          <div class="ftco-footer-widget pt-md-5 mb-4">
-            <h2 class="ftco-heading-2">Contact</h2>
-            <div class="block-23 mb-3">
-              <ul>
-                <li><span class="icon fa fa-map-marker"></span><span class="text">203 Esprit, Tunis, Tunisie</span></li>
-                <li><a href="#"><span class="icon fa fa-phone"></span><span class="text">+216 31090090</span></a></li>
-                <li><a href="#"><span class="icon fa fa-paper-plane"></span><span class="text">locallens.contact@gmail.com</span></a></li>
-              </ul>
+        <div class="row mb-5">
+            <div class="col-md pt-5">
+                <div class="ftco-footer-widget pt-md-5 mb-4">
+                    <h2 class="ftco-heading-2">À propos de Local Lens</h2>
+                    <p>Local Lens est une application innovante qui facilite la vie en ville. Elle permet aux utilisateurs de découvrir des clubs, des lieux intéressants, des événements à venir, tout en offrant un accès direct à l'assistance gouvernementale. Local Lens vous aide à trouver les meilleurs endroits à visiter, à rejoindre des clubs, et à suivre les itinéraires de transport en commun en temps réel.</p>
+                    <ul class="ftco-footer-social list-unstyled float-md-left float-lft">
+                        <li class="ftco-animate"><a href="#"><span class="fa fa-twitter"></span></a></li>
+                        <li class="ftco-animate"><a href="#"><span class="fa fa-facebook"></span></a></li>
+                        <li class="ftco-animate"><a href="#"><span class="fa fa-instagram"></span></a></li>
+                    </ul>
+                </div>
             </div>
-          </div>
+            <div class="col-md pt-5 border-left">
+                <div class="ftco-footer-widget pt-md-5 mb-4 ml-md-5">
+                    <h2 class="ftco-heading-2">Nos fonctionnalités</h2>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="py-2 d-block">Exploration des lieux</a></li>
+                        <li><a href="#" class="py-2 d-block">Clubs sociaux</a></li>
+                        <li><a href="#" class="py-2 d-block">Assistance gouvernementale</a></li>
+                        <li><a href="#" class="py-2 d-block">Flux social</a></li>
+                        <li><a href="#" class="py-2 d-block">Navigation et transports</a></li>
+                        <li><a href="#" class="py-2 d-block">Événements à venir</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md pt-5 border-left">
+                <div class="ftco-footer-widget pt-md-5 mb-4">
+                    <h2 class="ftco-heading-2">Contact</h2>
+                    <div class="block-23 mb-3">
+                        <ul>
+                            <li><span class="icon fa fa-map-marker"></span><span class="text">203 Esprit, Tunis, Tunisie</span></li>
+                            <li><a href="#"><span class="icon fa fa-phone"></span><span class="text">+216 31090090</span></a></li>
+                            <li><a href="#"><span class="icon fa fa-paper-plane"></span><span class="text">locallens.contact@gmail.com</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </footer>
+</footer>
 
-  {# JS FILES #}
-  <script src="{{ asset('assets/front_office/js/jquery.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery-migrate-3.0.1.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery.easing.1.3.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery.waypoints.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery.stellar.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/owl.carousel.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery.magnific-popup.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/jquery.animateNumber.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/bootstrap-datepicker.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/scrollax.min.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/bootstrap.min.js') }}"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=googleApiKey"></script>
-  <script src="{{ asset('assets/front_office/js/google-map.js') }}"></script>
-  <script src="{{ asset('assets/front_office/js/main.js') }}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-Vw4oCPIzHo6Tu1vslQo7a7RuBgBlQ1MaLFXPAekx1wWb5mja8jRloX9UpWWmYwDQ" crossorigin="anonymous"></script>
-  
-
-
-  {# CRISP Chat Script #}
-  <script type="text/javascript">
-    window.$crisp = [];
-    window.CRISP_WEBSITE_ID = "b4a8d480-689f-4a7e-9763-f0a10ec205a5";
-    (function() {
-      d = document;
-      s = d.createElement("script");
-      s.src = "https://client.crisp.chat/l.js";
-      s.async = 1;
-      d.getElementsByTagName("head")[0].appendChild(s);
-    })();
-  </script>
-
-  {% block javascripts %}
-  {% endblock %}
+{# JS FILES #}
+<script src="{{ asset('assets/front_office/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery-migrate-3.0.1.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery.easing.1.3.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery.waypoints.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery.stellar.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/owl.carousel.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery.magnific-popup.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/jquery.animateNumber.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/bootstrap-datepicker.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/scrollax.min.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/bootstrap.min.js') }}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY"></script>
+<script src="{{ asset('assets/front_office/js/google-map.js') }}"></script>
+<script src="{{ asset('assets/front_office/js/main.js') }}"></script>
 
 </body>
 </html>
