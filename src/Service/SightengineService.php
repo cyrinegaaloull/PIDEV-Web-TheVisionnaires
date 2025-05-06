@@ -18,34 +18,33 @@ class SightengineService
     }
 
     public function isImageSafe(string $imagePath): bool
-    {
-        $boundary = uniqid();
-        $body = '';
+{
+    $boundary = uniqid();
+    $body = '';
 
-        // Add API credentials and models
-        $body .= "--$boundary\r\n";
-        $body .= "Content-Disposition: form-data; name=\"models\"\r\n\r\n";
-        $body .= "nudity,wad,offensive,gore,violence,scam,spam,hate-symbols\r\n";
+    // Use valid model name: "offensive-2.0"
+    $body .= "--$boundary\r\n";
+    $body .= "Content-Disposition: form-data; name=\"models\"\r\n\r\n";
+    $body .= "offensive-2.0\r\n";
 
-        $body .= "--$boundary\r\n";
-        $body .= "Content-Disposition: form-data; name=\"api_user\"\r\n\r\n";
-        $body .= $this->apiUser . "\r\n";
+    $body .= "--$boundary\r\n";
+    $body .= "Content-Disposition: form-data; name=\"api_user\"\r\n\r\n";
+    $body .= $this->apiUser . "\r\n";
 
-        $body .= "--$boundary\r\n";
-        $body .= "Content-Disposition: form-data; name=\"api_secret\"\r\n\r\n";
-        $body .= $this->apiSecret . "\r\n";
+    $body .= "--$boundary\r\n";
+    $body .= "Content-Disposition: form-data; name=\"api_secret\"\r\n\r\n";
+    $body .= $this->apiSecret . "\r\n";
 
-        // Add the file
-        $fileContent = file_get_contents($imagePath);
-        $filename = basename($imagePath);
+    $fileContent = file_get_contents($imagePath);
+    $filename = basename($imagePath);
 
-        $body .= "--$boundary\r\n";
-        $body .= "Content-Disposition: form-data; name=\"media\"; filename=\"$filename\"\r\n";
-        $body .= "Content-Type: image/jpeg\r\n\r\n";
-        $body .= $fileContent . "\r\n";
-        $body .= "--$boundary--\r\n";
+    $body .= "--$boundary\r\n";
+    $body .= "Content-Disposition: form-data; name=\"media\"; filename=\"$filename\"\r\n";
+    $body .= "Content-Type: image/jpeg\r\n\r\n";
+    $body .= $fileContent . "\r\n";
+    $body .= "--$boundary--\r\n";
 
-        // Make request
+    try {
         $response = $this->client->request('POST', 'https://api.sightengine.com/1.0/check.json', [
             'headers' => [
                 'Content-Type' => 'multipart/form-data; boundary=' . $boundary,
@@ -55,25 +54,32 @@ class SightengineService
 
         $data = $response->toArray(false);
 
-        if (isset($data['status']) && $data['status'] === 'success') {
-            // Analyze nudity, weapon, alcohol, drugs, offensive, gore, violence, hate
-            if (
-                ($data['nudity']['raw'] ?? 0) > 0.5 ||
-                ($data['nudity']['partial'] ?? 0) > 0.5 ||
-                ($data['weapon'] ?? 0) > 0.5 ||
-                ($data['alcohol'] ?? 0) > 0.5 ||
-                ($data['drugs'] ?? 0) > 0.5 ||
-                ($data['offensive']['prob'] ?? 0) > 0.5 ||
-                ($data['gore']['prob'] ?? 0) > 0.5 ||
-                ($data['violence']['prob'] ?? 0) > 0.5 ||
-                ($data['hate-symbols']['prob'] ?? 0) > 0.5
-            ) {
-                return false;
-            }
+        // Log raw result for review
+        file_put_contents(
+            __DIR__ . '/../../var/log/sightengine.log',
+            "[" . date('Y-m-d H:i:s') . "] " . json_encode($data, JSON_PRETTY_PRINT) . "\n\n",
+            FILE_APPEND
+        );
 
+        if ($data['status'] === 'success' && isset($data['offensive'])) {
+            $offensive = $data['offensive'];
+            $flags = ['nazi', 'asian_swastika', 'confederate', 'supremacist', 'terrorist', 'middle_finger'];
+
+            foreach ($flags as $flag) {
+                if (($offensive[$flag] ?? 0) > 0.7) {
+                    return false;
+                }
+            }
             return true;
         }
 
-        return false;
+    } catch (\Exception $e) {
+        error_log('Sightengine API error: ' . $e->getMessage());
     }
+
+    return true;
+}
+
+
+
 }

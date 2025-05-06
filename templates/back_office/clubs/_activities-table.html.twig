@@ -35,34 +35,13 @@
       </a>
 
       <!-- Trigger delete modal -->
-      <button class="btn btn-sm btn-danger btn-circle" data-bs-toggle="modal" data-bs-target="#deleteModal{{ activite.activiteid }}">
+      <button class="btn btn-sm btn-danger btn-circle btn-delete" 
+              data-url="{{ path('admin_activite_delete', { id: activite.activiteid }) }}"
+              data-token="{{ csrf_token('delete' ~ activite.activiteid) }}">
         <i class="ri-delete-bin-line"></i>
       </button>
     </td>
   </tr>
-
-  <!-- Delete Modal per activity -->
-  <div class="modal fade" id="deleteModal{{ activite.activiteid }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ activite.activiteid }}" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="deleteModalLabel{{ activite.activiteid }}">Confirmer la suppression</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-        </div>
-        <div class="modal-body">
-          Êtes-vous sûr de vouloir supprimer l’activité <strong>{{ activite.activitename }}</strong> ?
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-
-          <form method="post" action="{{ path('admin_activite_delete', { id: activite.activiteid }) }}" class="d-inline-block">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ activite.activiteid) }}">
-            <button type="submit" class="btn btn-danger"><i class="ri-check-line me-1"></i> Confirmer</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
 {% else %}
   <tr>
     <td colspan="5" class="text-center">Aucune activité trouvée.</td>

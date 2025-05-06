@@ -20,11 +20,6 @@ use App\Service\GeocodingService;
 
 class BackExplorationController extends AbstractController
 {
-    #[Route('/admin/dashboard', name: 'admin_dashboard')]
-    public function dashboard(): Response
-    {
-        return $this->render('/back_office/dashboard.html.twig');
-    }
     
     #[Route('/admin/lieu/init', name: 'admin_lieu_init')]
     public function initLieu(): Response
