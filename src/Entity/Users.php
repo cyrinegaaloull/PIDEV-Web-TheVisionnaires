@@ -37,8 +37,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'prenom', type: 'string', length: 255, nullable: false)]
     private string $prenom;
 
-    #[ORM\Column(name: 'avatar', type: 'string', length: 255, nullable: false)]
-    private string $avatar;
+    #[ORM\Column(name: 'profile_picture', type: 'string', length: 255, nullable: true)]
+    private ?string $profilePicture = null;
 
     #[ORM\ManyToOne(targetEntity: Roles::class)]
     #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'id')]
@@ -104,15 +104,15 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->prenom;
     }
 
-    public function setAvatar(string $avatar): self
+    public function setProfilePicture(?string $profilePicture): self
     {
-        $this->avatar = $avatar;
+        $this->profilePicture = $profilePicture;
         return $this;
     }
 
-    public function getAvatar(): string
+    public function getProfilePicture(): ?string
     {
-        return $this->avatar;
+        return $this->profilePicture;
     }
 
     public function setRole(?Roles $role): self

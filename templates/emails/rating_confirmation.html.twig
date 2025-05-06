@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Confirmation de votre avis</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background-color: #f4f4f4;
+        padding: 10px;
+        text-align: center;
+      }
+      .content {
+        padding: 20px;
+      }
+      .footer {
+        font-size: 12px;
+        text-align: center;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Confirmation de votre avis</h1>
+      </div>
+      <div class="content">
+        <p>Bonjour {{ username }},</p>
+        <p>
+          Merci d'avoir laissé un avis pour <strong>{{ etablissement }}</strong
+          >.
+        </p>
+        <p>
+          Votre note : <strong>{{ rating }}/5</strong>
+        </p>
+        <p>
+          Nouvelle moyenne des avis :
+          <strong>{{ average_rating }}/5</strong> (basée sur
+          {{ review_count }} avis)
+        </p>
+        <p>Nous apprécions votre contribution !</p>
+      </div>
+      <div class="footer">
+        <p>
+          Cet email a été envoyé automatiquement. Veuillez ne pas y répondre.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

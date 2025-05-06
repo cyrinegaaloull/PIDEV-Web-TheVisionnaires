@@ -112,12 +112,12 @@
             {% if errors.avatarError is defined %}
               <div class="invalid-feedback">{{ errors.avatarError }}</div>
             {% endif %}
-            {% if user.avatar %}
-              <div class="mt-3">
-                <p class="mb-2">Current Avatar:</p>
-                <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="Current Avatar" class="img-thumbnail" style="max-width: 150px;">
-              </div>
-            {% endif %}
+            {% if user.profilePicture %}
+    <div class="mt-3">
+        <p class="mb-2">Current Profile Picture:</p>
+        <img src="{{ asset('uploads/avatars/' ~ user.profilePicture) }}" alt="Current Profile Picture" class="img-thumbnail" style="max-width: 150px;">
+    </div>
+{% endif %}
           </div>
 
           <div class="form-floating form-floating-outline mb-4">

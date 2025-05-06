@@ -1,4 +1,41 @@
 security:
+
+  enable_authenticator_manager: true
+
+  password_hashers:
+    App\Entity\Users: plaintext
+
+  providers:
+    app_user_provider:
+      entity:
+        class: App\Entity\Users
+        property: username
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+
+    main:
+      lazy: true
+      provider: app_user_provider
+      form_login:
+        login_path: app_login
+        check_path: app_login_check
+        enable_csrf: true
+        success_handler: App\Security\AuthenticationSuccessHandler
+      logout:
+        path: app_logout
+        target: app_login
+        invalidate_session: true
+
+  access_control:
+    - { path: ^/login, roles: PUBLIC_ACCESS }
+    - { path: ^/login_check, roles: PUBLIC_ACCESS }
+    - { path: ^/register, roles: PUBLIC_ACCESS }
+    - { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+
     password_hashers:
         App\Entity\Users: 'plaintext'
 
@@ -43,3 +80,4 @@ security:
         - { path: ^/connect/google/check, roles: PUBLIC_ACCESS }   # <-- add this
         - { path: ^/admin,                roles: ROLE_ADMIN }
         - { path: ^/,                     roles: IS_AUTHENTICATED_FULLY }
+

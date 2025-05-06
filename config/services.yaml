@@ -1,3 +1,9 @@
+
+# config/services.yaml
+parameters:
+  avatars_directory: "%kernel.project_dir%/public/uploads/avatars"
+  your_upload_directory: "%kernel.project_dir%/public/assets/exploration/images"
+
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
 
@@ -14,8 +20,44 @@ parameters:
     openrouter_api_key: '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'
 
 
+
     
 services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  Doctrine\Common\Annotations\AnnotationReader:
+    class: Doctrine\Common\Annotations\AnnotationReader
+    public: true
+
+  annotation_reader:
+    alias: Doctrine\Common\Annotations\AnnotationReader
+
+  # makes classes in src/ available to be used as services
+  App\:
+    resource: "../src/"
+    exclude:
+      - "../src/DependencyInjection/"
+      - "../src/Entity/"
+      - "../src/Kernel.php"
+
+  # Explicitly configure LocationController
+  App\Controller\front_office\assistance\LocationController:
+    arguments:
+      $foursquareApiKey: "%env(FOURSQUARE_API_KEY)%"
+      $cache: "@cache.app"
+
+  # Existing service definition
+  App\Service\NotificationService:
+    arguments:
+      $twilioSid: "%env(TWILIO_ACCOUNT_SID)%"
+      $twilioToken: "%env(TWILIO_AUTH_TOKEN)%"
+      $whatsappNumber: "%env(TWILIO_WHATSAPP_NUMBER)%"
+      $senderEmail: "cyrinegaaloul6@gmail.com"
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
@@ -67,3 +109,4 @@ services:
 
 symfonycasts_reset_password:
     request_password_repository: App\Repository\ResetPasswordRequestRepository
+

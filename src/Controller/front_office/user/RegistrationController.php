@@ -31,7 +31,7 @@ class RegistrationController extends AbstractController
             // Redirecting to login might be confusing if the user intended to register.
             // Consider having a separate route/template for GET requests to '/register'
             // For now, keeping original logic:
-             return $this->redirectToRoute('app_login'); // Or perhaps render a registration form template directly
+            return $this->redirectToRoute('app_login'); // Or perhaps render a registration form template directly
         }
 
         // Get form data
@@ -106,13 +106,13 @@ class RegistrationController extends AbstractController
                 if (!$avatarFile->isValid()) {
                     $errors[] = 'Avatar upload failed: ' . $avatarFile->getErrorMessage();
                 }
-                
+
                 // Additional validations for avatar
                 $maxSize = 2 * 1024 * 1024; // 2MB
                 if ($avatarFile->getSize() > $maxSize) {
                     $errors[] = 'Avatar file is too large (max 2MB)';
                 }
-                
+
                 $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
                 if (!in_array($avatarFile->getMimeType(), $allowedMimeTypes)) {
                     $errors[] = 'Avatar must be a JPG, PNG or GIF image';
@@ -183,19 +183,19 @@ class RegistrationController extends AbstractController
                     $this->addFlash('warning', 'Account created, but avatar could not be uploaded.');
                 }
             }
-            
-            $user->setAvatar($avatarFilename);
+
+            $user->setProfilePicture($avatarFilename); // Updated from setAvatar
 
             // Save user to database
             $entityManager->persist($user);
             $entityManager->flush();
+
 
             // Add success flash message
             $this->addFlash('success', 'Account created successfully! You can now log in.');
 
             // Redirect with success parameter
             return $this->redirectToRoute('app_login', ['registration' => 'success']);
-
         } catch (\Exception $e) {
             // Log the general error
             // error_log('Registration failed: ' . $e->getMessage());

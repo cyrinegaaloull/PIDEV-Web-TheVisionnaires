@@ -1,158 +1,715 @@
-{% extends 'front_office/base-front-office.html.twig' %}
+{% extends 'front_office/base-front-office.html.twig' %} {% block title %}Nos
+Établissements{% endblock %} {% block stylesheets %}
+{{ parent() }}
+<link
+  rel="stylesheet"
+  href="{{ asset('assets/front_office/css/naimafrontstyle.css') }}" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+{% endblock %} {% block javascripts %}
+{{ parent() }}
+<script src="{{ asset('assets/front_office/js/naimafront.js') }}"></script>
+{% endblock %} {% block body %}
+<!-- Hero Section -->
+<section
+  class="hero-wrap js-fullheight"
+  style="background-image: url('{{
+    asset('assets/uploads-naima/buildingss.jpg')
+  }}');">
+  <div class="overlay"></div>
+  <div class="container">
+    <div
+      class="row no-gutters slider-text js-fullheight align-items-center"
+      data-scrollax-parent="true">
+      <div class="col-md-7 ftco-animate">
+        <h1 class="mb-4">
+          Découvrez nos <br />
+          Établissements
+        </h1>
+        <p class="caps">
+          Explorez les meilleurs établissements de votre ville intelligente.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
-{% block title %}Nos Établissements{% endblock %}
+<!-- Établissements Section -->
+<section
+  class="ftco-section services-section bg-light"
+  style="padding-top: 40px; padding-bottom: 40px">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-12 text-center heading-section ftco-animate">
+        <span class="subheading" style="font-size: 40px"
+          >Nos Établissements</span
+        >
+        <h2 class="mb-4" style="padding-bottom: 40px">
+          Trouvez les meilleures adresses près de chez vous
+        </h2>
+      </div>
+    </div>
 
-{% block body %}
-  <!-- Hero Section -->
-  <section class="hero-wrap js-fullheight" style="background-image: url('{{ asset('assets/uploads-naima/buildingss.jpg') }}');">
-    <div class="overlay"></div>
-    <div class="container">
-      <div class="row no-gutters slider-text js-fullheight align-items-center" data-scrollax-parent="true">
-        <div class="col-md-7 ftco-animate">
-          <h1 class="mb-4">Découvrez nos <br> Établissements </h1>
-          <p class="caps">Explorez les meilleurs établissements de votre ville intelligente.</p>
+    <!-- Messages flash -->
+    {% for label, messages in app.flashes %} {% for message in messages %}
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-8">
+        <div class="alert alert-{{ label }}" role="alert">
+          {{ message }}
         </div>
       </div>
     </div>
-  </section>
+    {% endfor %} {% endfor %}
 
-  <!-- Établissements Section -->
-  <section class="ftco-section services-section bg-light" style="padding-top: 40px; padding-bottom: 40px;">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-12 text-center heading-section ftco-animate">
-          <span class="subheading" style="font-size: 40px;">Nos Établissements</span>
-          <h2 class="mb-4" style="padding-bottom: 40px;">Trouvez les meilleures adresses près de chez vous</h2>
+    <!-- Bouton Ajouter -->
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-8 text-center">
+        <a href="{{ path('ajouter_etablissement') }}" class="btn btn-primary">
+          <i class="fa fa-plus mr-2"></i> Ajouter un établissement
+        </a>
+        <a href="{{ path('locations') }}" class="btn btn-primary">
+          <i class="fa fa-plus mr-2"></i> chercher des recommandations
+        </a>
+      </div>
+    </div>
+
+    {% if etablissements is empty %}
+    <div class="row justify-content-center">
+      <div class="col-md-8 ftco-animate">
+        <div class="alert alert-info text-center p-4">
+          <p class="mb-0">
+            Aucun établissement trouvé. Revenez bientôt pour découvrir nos
+            nouveautés.
+          </p>
         </div>
       </div>
-      
-      <!-- Messages flash -->
-      {% for label, messages in app.flashes %}
-        {% for message in messages %}
-          <div class="row justify-content-center mb-4">
-            <div class="col-md-8">
-              <div class="alert alert-{{ label }}" role="alert">
-                {{ message }}
+    </div>
+    {% else %}
+    <div class="row">
+      {% for etab in etablissements %}
+      <div class="col-md-4 ftco-animate mb-4">
+        <div class="card h-100 border-0 shadow-sm overflow-hidden">
+          <!-- Card Header with Info Button -->
+          <div class="card-header bg-white border-0 position-relative">
+            <div
+              class="info-button-container position-absolute"
+              style="top: 15px; right: 15px">
+              <a
+                href="javascript:void(0)"
+                onclick="toggleInfo('info-{{ etab.etabid }}')"
+                class="info-button text-secondary">
+                <i class="fas fa-info-circle fa-lg"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="card-body text-center pt-0 px-4 pb-4">
+            <!-- Category Icon -->
+            <div class="icon-wrapper mb-3">
+              {% if etab.categoryid %} {% if etab.categoryid.categoryname ==
+              'Hôtellerie' %}
+              <div class="icon-circle bg-blue-soft">
+                <i class="fas fa-hotel fa-3x text-blue"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Santé' %}
+              <div class="icon-circle bg-red-soft">
+                <i class="fas fa-hospital fa-3x text-red"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Restauration' or
+              etab.categoryid.categoryname == 'Café' %}
+              <div class="icon-circle bg-orange-soft">
+                <i class="fas fa-utensils fa-3x text-orange"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Commercial' %}
+              <div class="icon-circle bg-green-soft">
+                <i class="fas fa-shopping-bag fa-3x text-green"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Éducation' %}
+              <div class="icon-circle bg-purple-soft">
+                <i class="fas fa-graduation-cap fa-3x text-purple"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Sport' %}
+              <div class="icon-circle bg-teal-soft">
+                <i class="fas fa-futbol fa-3x text-teal"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Art' %}
+              <div class="icon-circle bg-deep-orange-soft">
+                <i class="fas fa-paint-brush fa-3x text-deep-orange"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Culture' %}
+              <div class="icon-circle bg-deep-purple-soft">
+                <i class="fas fa-book fa-3x text-deep-purple"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Industriel' %}
+              <div class="icon-circle bg-gray-soft">
+                <i class="fas fa-industry fa-3x text-gray"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Fonction publique' %}
+              <div class="icon-circle bg-blue-gray-soft">
+                <i class="fas fa-university fa-3x text-blue-gray"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Marketing' %}
+              <div class="icon-circle bg-yellow-soft">
+                <i class="fas fa-bullhorn fa-3x text-yellow"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Ingénierie' %}
+              <div class="icon-circle bg-gray-soft">
+                <i class="fas fa-cogs fa-3x text-gray"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Création' %}
+              <div class="icon-circle bg-amber-soft">
+                <i class="fas fa-lightbulb fa-3x text-amber"></i>
+              </div>
+              {% elseif etab.categoryid.categoryname == 'Agroalimentaire' %}
+              <div class="icon-circle bg-teal-soft">
+                <i class="fas fa-leaf fa-3x text-teal"></i>
+              </div>
+              {% else %}
+              <div class="icon-circle bg-indigo-soft">
+                <i class="fas fa-building fa-3x text-indigo"></i>
+              </div>
+              {% endif %} {% else %}
+              <div class="icon-circle bg-indigo-soft">
+                <i class="fas fa-building fa-3x text-indigo"></i>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Establishment Name -->
+            <h3 class="h5 font-weight-bold mb-2 text-truncate">
+              {{ etab.etabname }}
+            </h3>
+
+            <!-- Region and Category Badges -->
+            <div class="d-flex justify-content-center flex-wrap mb-3">
+              {% if etab.region %}
+              <span
+                class="badge badge-pill bg-light-blue text-blue mr-2 mb-1"
+                >{{ etab.region }}</span
+              >
+              {% endif %} {% if etab.categoryid %}
+              <span class="badge badge-pill bg-light-green text-green">
+                {{ etab.categoryid.categoryname|default('Non catégorisé') }}
+              </span>
+              {% endif %}
+            </div>
+
+            <!-- Rating Display -->
+            <div class="rating-display mb-3" data-etab="{{ etab.etabid }}">
+              <div class="stars-container mb-1">
+                {% for i in 1..5 %}
+                <i class="fas fa-star text-amber"></i>
+                {% endfor %}
+              </div>
+              <div class="rating-info small">
+                <span class="rating-average font-weight-bold">--</span>
+                <span class="rating-count text-muted">(0 avis)</span>
               </div>
             </div>
           </div>
-        {% endfor %}
-      {% endfor %}
-      
-      <!-- Bouton Ajouter -->
-      <div class="row justify-content-center mb-4">
-        <div class="col-md-8 text-center">
-          <a href="{{ path('ajouter_etablissement') }}" class="btn btn-primary">
-            <i class="fa fa-plus mr-2"></i> Ajouter un établissement
-          </a>
-        </div>
-      </div>
-      
-      {% if etablissements is empty %}
-        <div class="row justify-content-center">
-          <div class="col-md-8 ftco-animate">
-            <div class="alert alert-info text-center p-4">
-              <p class="mb-0">Aucun établissement trouvé. Revenez bientôt pour découvrir nos nouveautés.</p>
+
+          <!-- Action Buttons -->
+          <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+            <div class="d-flex justify-content-center">
+              <a
+                href="{{ path('modifier_etablissement', { id: etab.etabid }) }}"
+                class="btn btn-sm btn-icon btn-light mx-1"
+                title="Modifier">
+                <i class="fas fa-edit text-indigo"></i>
+              </a>
+              <a
+                href="{{
+                  path('supprimer_etablissement', { id: etab.etabid })
+                }}"
+                class="btn btn-sm btn-icon btn-light mx-1"
+                title="Supprimer"
+                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet établissement?');">
+                <i class="fas fa-trash text-red"></i>
+              </a>
+              <a
+                href="{{ path('liste_services', { id: etab.etabid }) }}"
+                class="btn btn-sm btn-icon btn-light mx-1"
+                title="Services">
+                <i class="fas fa-cogs text-green"></i>
+              </a>
             </div>
           </div>
         </div>
-      {% else %}
-        <div class="row">
-          {% for etab in etablissements %}
-            <div class="col-md-4 ftco-animate">
-              <div class="service-item text-center p-4 mb-4" style="background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                <div class="icon d-flex align-items-center justify-content-center mb-3">
-                  {% if etab.categoryid %}
-                    {# Icônes spécifiques selon la catégorie #}
-                    {% if etab.categoryid.categoryname == 'Hôtellerie' %}
-                      <i class="fa fa-hotel" style="font-size: 60px; color: #3498db;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Santé' %}
-                      <i class="fa fa-hospital-o" style="font-size: 60px; color: #e74c3c;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Restauration' or etab.categoryid.categoryname == 'Café' %}
-                      <i class="fa fa-cutlery" style="font-size: 60px; color: #f39c12;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Commercial' %}
-                      <i class="fa fa-shopping-bag" style="font-size: 60px; color: #2ecc71;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Éducation' %}
-                      <i class="fa fa-graduation-cap" style="font-size: 60px; color: #9b59b6;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Sport' %}
-                      <i class="fa fa-futbol-o" style="font-size: 60px; color: #27ae60;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Art' %}
-                      <i class="fa fa-paint-brush" style="font-size: 60px; color: #d35400;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Culture' %}
-                      <i class="fa fa-book" style="font-size: 60px; color: #8e44ad;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Industriel' %}
-                      <i class="fa fa-industry" style="font-size: 60px; color: #7f8c8d;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Fonction publique' %}
-                      <i class="fa fa-university" style="font-size: 60px; color: #2c3e50;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Marketing' %}
-                      <i class="fa fa-bullhorn" style="font-size: 60px; color: #f1c40f;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Ingénierie' %}
-                      <i class="fa fa-gears" style="font-size: 60px; color: #95a5a6;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Création' %}
-                      <i class="fa fa-lightbulb-o" style="font-size: 60px; color: #e67e22;"></i>
-                    {% elseif etab.categoryid.categoryname == 'Agroalimentaire' %}
-                      <i class="fa fa-leaf" style="font-size: 60px; color: #16a085;"></i>
-                    {% else %}
-                      {# Icône par défaut pour les autres catégories #}
-                      <i class="fa fa-building" style="font-size: 60px; color: #34495e;"></i>
-                    {% endif %}
-                  {% else %}
-                    {# Icône par défaut si pas de catégorie #}
-                    <i class="fa fa-building" style="font-size: 60px; color: #34495e;"></i>
-                  {% endif %}
+      </div>
+
+      <!-- Info Popup -->
+      <div
+        id="info-{{ etab.etabid }}"
+        class="info-popup-overlay"
+        style="display: none">
+        <div class="info-popup animate__animated animate__fadeIn">
+          <div class="info-popup-header bg-gradient-primary">
+            <div class="info-popup-image">
+              <i class="fas fa-info-circle"></i>
+            </div>
+            <h4 class="info-title text-white mb-0">Informations</h4>
+            <button
+              onclick="toggleInfo('info-{{ etab.etabid }}')"
+              class="close-button">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="info-popup-content p-4">
+            <h5 class="text-center font-weight-bold mb-4">
+              {{ etab.etabname }}
+            </h5>
+
+            <div class="info-details">
+              <div class="info-detail-item mb-3">
+                <div class="detail-icon bg-light-blue text-blue">
+                  <i class="fas fa-map-marker-alt"></i>
                 </div>
-                <h3>{{ etab.etabname }}</h3>
-                <div class="d-flex align-items-center justify-content-center mb-2">
-                  <span class="icon-map-marker mr-2"></span>
+                <div class="detail-content">
+                  <h6 class="mb-0 text-muted small">Adresse</h6>
                   <p class="mb-0">{{ etab.etabaddress }}</p>
                 </div>
-                {% if etab.region %}
-                  <div class="mb-2">
-                    <span class="badge badge-primary">{{ etab.region }}</span>
-                  </div>
-                {% endif %}
-                <div class="mb-3">
-                  <span class="icon-clock-o mr-2"></span>
-                  <p class="mb-0">{{ etab.etabhoraire }}</p>
-                </div>
-                {% if etab.geolocation %}
-                  <div class="mb-3">
-                    <span class="icon-location-arrow mr-2"></span>
-                    <p class="mb-0">{{ etab.geolocation }}</p>
-                  </div>
-                {% endif %}
-                {% if etab.categoryid %}
-                  <div class="mb-3">
-                    <span class="icon-tag mr-2"></span>
-                    <p class="mb-0">{{ etab.categoryid.categoryname|default('Non catégorisé') }}</p>
-                  </div>
-                {% endif %}
+              </div>
 
-                <!-- Boutons Modifier et Supprimer -->
-                <div class="mt-3">
-                  <a href="{{ path('modifier_etablissement', {'id': etab.etabid}) }}" class="btn btn-warning btn-sm">
-                    <i class="fa fa-edit"></i> Modifier
-                  </a>
-                  <a href="{{ path('supprimer_etablissement', {'id': etab.etabid}) }}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet établissement?');">
-                    <i class="fa fa-trash"></i> Supprimer
-                  </a>
-                  
-                  {# Bouton pour gérer les services - à ajouter si vous avez implémenté les services #}
-                  <a href="{{ path('liste_services', {'id': etab.etabid}) }}" class="btn btn-info btn-sm mt-2">
-                    <i class="fa fa-cogs"></i> Services
-                  </a>
+              {% if etab.region %}
+              <div class="info-detail-item mb-3">
+                <div class="detail-icon bg-light-blue text-blue">
+                  <i class="fas fa-globe"></i>
+                </div>
+                <div class="detail-content">
+                  <h6 class="mb-0 text-muted small">Région</h6>
+                  <p class="mb-0">{{ etab.region }}</p>
                 </div>
               </div>
+              {% endif %} {% if etab.etabhoraire %}
+              <div class="info-detail-item mb-3">
+                <div class="detail-icon bg-light-blue text-blue">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="detail-content">
+                  <h6 class="mb-0 text-muted small">Horaires</h6>
+                  <p class="mb-0">{{ etab.etabhoraire }}</p>
+                </div>
+              </div>
+              {% endif %} {% if etab.geolocation %}
+              <div class="info-detail-item mb-3">
+                <div class="detail-icon bg-light-blue text-blue">
+                  <i class="fas fa-location-arrow"></i>
+                </div>
+                <div class="detail-content">
+                  <h6 class="mb-0 text-muted small">Localisation</h6>
+                  <p class="mb-0">{{ etab.geolocation }}</p>
+                </div>
+              </div>
+              {% endif %} {% if etab.categoryid %}
+              <div class="info-detail-item mb-3">
+                <div class="detail-icon bg-light-blue text-blue">
+                  <i class="fas fa-tag"></i>
+                </div>
+                <div class="detail-content">
+                  <h6 class="mb-0 text-muted small">Catégorie</h6>
+                  <p class="mb-0">{{ etab.categoryid.categoryname }}</p>
+                </div>
+              </div>
+              {% endif %}
             </div>
-          {% endfor %}
-        </div>
-        
-        <div class="row justify-content-center mt-4">
-          <div class="col-md-6 text-center">
-            <p>{{ etablissements|length }} établissement(s) trouvé(s)</p>
+
+            <!-- Rating System -->
+            <div class="rating-system mt-4 pt-3 border-top">
+              <h6 class="text-center mb-3 font-weight-bold">
+                Votre avis compte!
+              </h6>
+              <div
+                class="interactive-stars d-flex justify-content-center mb-2"
+                data-etab="{{ etab.etabid }}">
+                {% for i in 1..5 %}
+                <i
+                  class="fas fa-star fa-2x text-amber mx-1"
+                  data-rating="{{ i }}"
+                  style="cursor: pointer"></i>
+                {% endfor %}
+              </div>
+              <div class="rating-message text-center small text-muted"></div>
+            </div>
+
+            <button
+              onclick="toggleInfo('info-{{ etab.etabid }}')"
+              class="btn btn-outline-primary btn-block mt-4">
+              Fermer
+            </button>
           </div>
         </div>
-      {% endif %}
+      </div>
+      {% endfor %}
+
+      <!-- Add this CSS to your stylesheet -->
+      <style>
+        /* Card Styles */
+        .card {
+          border-radius: 12px;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Icon Circle */
+        .icon-circle {
+          width: 90px;
+          height: 90px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 15px;
+        }
+
+        /* Color Utilities */
+        .bg-blue-soft {
+          background-color: #e3f2fd;
+        }
+        .text-blue {
+          color: #1976d2;
+        }
+        .bg-red-soft {
+          background-color: #ffebee;
+        }
+        .text-red {
+          color: #d32f2f;
+        }
+        .bg-orange-soft {
+          background-color: #fff3e0;
+        }
+        .text-orange {
+          color: #f57c00;
+        }
+        .bg-green-soft {
+          background-color: #e8f5e9;
+        }
+        .text-green {
+          color: #388e3c;
+        }
+        .bg-purple-soft {
+          background-color: #f3e5f5;
+        }
+        .text-purple {
+          color: #7b1fa2;
+        }
+        .bg-teal-soft {
+          background-color: #e0f2f1;
+        }
+        .text-teal {
+          color: #00796b;
+        }
+        .bg-deep-orange-soft {
+          background-color: #fbe9e7;
+        }
+        .text-deep-orange {
+          color: #e64a19;
+        }
+        .bg-deep-purple-soft {
+          background-color: #ede7f6;
+        }
+        .text-deep-purple {
+          color: #512da8;
+        }
+        .bg-gray-soft {
+          background-color: #f5f5f5;
+        }
+        .text-gray {
+          color: #616161;
+        }
+        .bg-blue-gray-soft {
+          background-color: #eceff1;
+        }
+        .text-blue-gray {
+          color: #455a64;
+        }
+        .bg-yellow-soft {
+          background-color: #fffde7;
+        }
+        .text-yellow {
+          color: #fbc02d;
+        }
+        .bg-amber-soft {
+          background-color: #fff8e1;
+        }
+        .text-amber {
+          color: #ffa000;
+        }
+        .bg-indigo-soft {
+          background-color: #e8eaf6;
+        }
+        .text-indigo {
+          color: #303f9f;
+        }
+        .bg-light-blue {
+          background-color: #e1f5fe;
+        }
+
+        /* Info Popup Styles */
+        .info-popup-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 1050;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          backdrop-filter: blur(5px);
+        }
+
+        .info-popup {
+          background: white;
+          border-radius: 12px;
+          width: 90%;
+          max-width: 500px;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-popup-header {
+          padding: 20px;
+          display: flex;
+          align-items: center;
+          position: relative;
+        }
+
+        .info-popup-image {
+          width: 40px;
+          height: 40px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 15px;
+        }
+
+        .info-title {
+          font-weight: 600;
+        }
+
+        .close-button {
+          position: absolute;
+          right: 15px;
+          top: 15px;
+          background: none;
+          border: none;
+          color: white;
+          font-size: 1.2rem;
+        }
+
+        /* Detail Items */
+        .info-detail-item {
+          display: flex;
+          align-items: flex-start;
+          margin-bottom: 15px;
+        }
+
+        .detail-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 15px;
+          flex-shrink: 0;
+        }
+
+        .detail-content {
+          flex-grow: 1;
+        }
+
+        /* Interactive Stars */
+        .interactive-stars .fa-star {
+          transition: all 0.2s ease;
+        }
+
+        .interactive-stars .fa-star:hover {
+          transform: scale(1.2);
+        }
+
+        /* Gradient Background */
+        .bg-gradient-primary {
+          background: linear-gradient(135deg, #1976d2, #2196f3);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+          .icon-circle {
+            width: 70px;
+            height: 70px;
+          }
+
+          .info-popup {
+            width: 95%;
+          }
+        }
+      </style>
     </div>
-  </section>
+
+    <div class="row justify-content-center mt-4">
+      <div class="col-md-6 text-center">
+        <p>{{ etablissements | length }} établissement(s) trouvé(s)</p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  function toggleInfo(id) {
+    var infoPopup = document.getElementById(id);
+    if (infoPopup.style.display === "none") {
+      infoPopup.style.display = "flex";
+    } else {
+      infoPopup.style.display = "none";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialiser toutes les notes moyennes
+    document.querySelectorAll(".rating-display").forEach(function (container) {
+      const etabId = container.getAttribute("data-etab");
+      fetchRatingAverage(etabId, container);
+    });
+
+    // Initialiser toutes les étoiles interactives
+    document
+      .querySelectorAll(".interactive-stars")
+      .forEach(function (container) {
+        const etabId = container.getAttribute("data-etab");
+
+        // Récupérer l'avis de l'utilisateur s'il existe
+        fetch(`/etablissements/${etabId}/avis/user`)
+          .then((response) => response.json())
+          .then((data) => {
+            const userRating = data.rating;
+            if (userRating > 0) {
+              highlightStars(container, userRating);
+            }
+          });
+
+        // Ajouter les événements pour les étoiles
+        container.querySelectorAll(".fa-star").forEach(function (star) {
+          star.addEventListener("mouseover", function () {
+            const rating = parseInt(this.getAttribute("data-rating"));
+            highlightStars(container, rating);
+          });
+
+          star.addEventListener("mouseout", function () {
+            // Récupérer la valeur actuellement sélectionnée
+            const selectedRating = parseInt(
+              container.getAttribute("data-selected") || 0
+            );
+            highlightStars(container, selectedRating);
+          });
+
+          star.addEventListener("click", function () {
+            const rating = parseInt(this.getAttribute("data-rating"));
+            container.setAttribute("data-selected", rating);
+
+            // Envoyer la note au serveur
+            sendRating(etabId, rating, container);
+          });
+        });
+      });
+  });
+
+  function highlightStars(container, rating) {
+    container.querySelectorAll(".fa-star").forEach(function (star) {
+      const starRating = parseInt(star.getAttribute("data-rating"));
+      if (starRating <= rating) {
+        star.classList.add("active");
+      } else {
+        star.classList.remove("active");
+      }
+    });
+  }
+
+  function sendRating(etabId, rating, container) {
+    const messageContainer =
+      container.parentElement.querySelector(".rating-message");
+    messageContainer.textContent = "Envoi en cours...";
+    messageContainer.classList.remove("text-success", "text-danger");
+
+    fetch(`api/etablissements/${etabId}/avis`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: JSON.stringify({ rating: rating }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          messageContainer.textContent = data.message;
+          messageContainer.classList.add("text-success");
+
+          // Mettre à jour l'affichage moyen
+          const etabDisplay = document.querySelector(
+            `.rating-display[data-etab="${etabId}"]`
+          );
+          if (etabDisplay) {
+            updateRatingDisplay(etabDisplay, data.average, data.count);
+          }
+        } else {
+          messageContainer.textContent = data.message;
+          messageContainer.classList.add("text-danger");
+        }
+      })
+      .catch((error) => {
+        messageContainer.textContent = "Erreur lors de l'envoi de votre avis";
+        messageContainer.classList.add("text-danger");
+        console.error("Error:", error);
+      });
+  }
+
+  function fetchRatingAverage(etabId, container) {
+    // Simuler la récupération de la note moyenne (à remplacer par un vrai appel API)
+    fetch(`/api/etablissements/${etabId}/rating`)
+      .then((response) => response.json())
+      .then((data) => {
+        updateRatingDisplay(container, data.average, data.count);
+      })
+      .catch((error) => {
+        // En cas d'erreur, initialiser avec des valeurs par défaut
+        updateRatingDisplay(container, 0, 0);
+      });
+  }
+
+  function updateRatingDisplay(container, average, count) {
+    const starsContainer = container.querySelector(".stars-container");
+    const averageElement = container.querySelector(".rating-average");
+    const countElement = container.querySelector(".rating-count");
+
+    // Mettre à jour le texte
+    averageElement.textContent = average > 0 ? average.toFixed(1) : "--";
+    countElement.textContent = `(${count} avis)`;
+
+    // Mettre à jour les étoiles
+    if (average > 0) {
+      const stars = starsContainer.querySelectorAll(".fa-star");
+      for (let i = 0; i < stars.length; i++) {
+        if (i < Math.floor(average)) {
+          stars[i].className = "fas fa-star full";
+        } else if (i < Math.floor(average) + 0.5) {
+          stars[i].className = "fas fa-star-half-alt half";
+        } else {
+          stars[i].className = "far fa-star empty";
+        }
+      }
+    }
+  }
+</script>
+
 {% endblock %}

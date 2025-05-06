@@ -1,165 +1,206 @@
-{% extends 'back_office/base-back-office.html.twig' %}
-
-{% block title %}Administration - Liste des Avis | LocalLens{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('assets/back_office/css/NaimaCss.css') }}">
-{% endblock %}
-
-{% block body %}
+{% extends 'back_office/base-back-office.html.twig' %} {% block title
+%}Administration - Liste des Avis | LocalLens{% endblock %} {% block stylesheets
+%}
+{{ parent() }}
+<link
+  rel="stylesheet"
+  href="{{ asset('assets/back_office/css/NaimaCss.css') }}" />
+<link
+  rel="stylesheet"
+  href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css" />
+{% endblock %} {% block body %}
 <div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Administration des avis</h5>
-                <div>
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
-                        <i class="ri-filter-line me-1"></i> Filtrer
-                    </button>
-                    <a href="{{ path('admin_avis_stats_ratings') }}" class="btn btn-outline-info">
-                        <i class="ri-bar-chart-line me-1"></i> Statistiques
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
-                {% for message in app.flashes('success') %}
-                    <div class="alert alert-success alert-dismissible" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-                
-                <div class="table-responsive text-nowrap">
-                    <table class="table table-hover" id="avisTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Établissement</th>
-                                <th>Utilisateur</th>
-                                <th>Note</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="table-border-bottom-0">
-                            {% for a in avis %}
-                            <tr>
-                                <td>{{ a.avisid }}</td>
-                                <td>{{ a.etabid }}</td>
-                                <td>{{ a.userid }}</td>
-                                <td>
-                                    <div class="avis-rating">
-                                        {% for i in 1..5 %}
-                                            {% if i <= a.rating %}
-                                                <i class="ri-star-fill text-warning"></i>
-                                            {% else %}
-                                                <i class="ri-star-line text-warning"></i>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                </td>
-                                <td>{{ a.dateavis|date('d/m/Y H:i') }}</td>
-                                <td>
-                                    <form method="post" action="{{ path('admin_avis_delete', {'avisid': a.avisid}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet avis?');" class="d-inline">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ a.avisid) }}">
-                                        <button class="btn btn-sm btn-outline-danger">
-                                            <i class="ri-delete-bin-line me-1"></i> Supprimer
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center">Aucun avis trouvé</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  <div class="col-12">
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Administration des avis</h5>
+        <div>
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#filterModal">
+            <i class="ri-filter-line me-1"></i> Filtrer
+          </button>
+          <a
+            href="{{ path('admin_avis_stats_ratings') }}"
+            class="btn btn-outline-info">
+            <i class="ri-bar-chart-line me-1"></i> Statistiques
+          </a>
         </div>
+      </div>
+      <div class="card-body">
+        {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible" role="alert">
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"></button>
+        </div>
+        {% endfor %}
+
+        <div class="table-responsive text-nowrap">
+          <table class="table table-hover" id="avisTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Établissement</th>
+                <th>Utilisateur</th>
+                <th>Note</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+              {% for a in avis %}
+              <tr>
+                <td>{{ a.avisid }}</td>
+                <td>
+                  {{ a.etablissement.etabname|default('Non spécifié') }} (ID:
+                  {{ a.etabid }})
+                </td>
+                <td>
+                  {{ a.user ? a.user.username|default('Anonyme') : 'Anonyme' }}
+                </td>
+                <td>
+                  <div class="avis-rating">
+                    {% for i in 1..5 %} {% if i <= a.rating %}
+                    <i class="ri-star-fill text-warning"></i>
+                    {% else %}
+                    <i class="ri-star-line text-warning"></i>
+                    {% endif %} {% endfor %}
+                    <span class="ms-1">{{ a.rating }} / 5</span>
+                  </div>
+                </td>
+                <td>{{ a.dateavis|date('d/m/Y H:i') }}</td>
+                <td>
+                  <form
+                    method="post"
+                    action="{{
+                      path('admin_avis_delete', { avisid: a.avisid })
+                    }}"
+                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet avis ?');"
+                    class="d-inline">
+                    <input
+                      type="hidden"
+                      name="_token"
+                      value="{{ csrf_token('delete' ~ a.avisid) }}" />
+                    <button class="btn btn-sm btn-outline-danger">
+                      <i class="ri-delete-bin-line me-1"></i> Supprimer
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="6" class="text-center">Aucun avis trouvé</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Modal de filtre -->
 <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Filtrer les avis</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="filterForm" action="{{ path('admin_avis_index') }}" method="get">
-                    <div class="mb-3">
-                        <label class="form-label">Établissement</label>
-                        <select name="etablissement" class="form-select">
-                            <option value="">Tous les établissements</option>
-                            <!-- Les options seront chargées dynamiquement -->
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Note minimum</label>
-                        <select name="note_min" class="form-select">
-                            <option value="">Toutes les notes</option>
-                            <option value="5">5 étoiles</option>
-                            <option value="4">4 étoiles et plus</option>
-                            <option value="3">3 étoiles et plus</option>
-                            <option value="2">2 étoiles et plus</option>
-                            <option value="1">1 étoile et plus</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Période</label>
-                        <select name="periode" class="form-select">
-                            <option value="">Toutes les périodes</option>
-                            <option value="today">Aujourd'hui</option>
-                            <option value="week">Cette semaine</option>
-                            <option value="month">Ce mois</option>
-                            <option value="year">Cette année</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="submit" form="filterForm" class="btn btn-primary">Appliquer</button>
-            </div>
-        </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Filtrer les avis</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form
+          id="filterForm"
+          action="{{ path('admin_avis_index') }}"
+          method="get">
+          <div class="mb-3">
+            <label class="form-label">Établissement</label>
+            <select name="etablissement" class="form-select">
+              <option value="">Tous les établissements</option>
+              <!-- Options will be loaded dynamically via JavaScript -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Note minimum</label>
+            <select name="note_min" class="form-select">
+              <option value="">Toutes les notes</option>
+              <option value="5">5 étoiles</option>
+              <option value="4">4 étoiles et plus</option>
+              <option value="3">3 étoiles et plus</option>
+              <option value="2">2 étoiles et plus</option>
+              <option value="1">1 étoile et plus</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Période</label>
+            <select name="periode" class="form-select">
+              <option value="">Toutes les périodes</option>
+              <option value="today">Aujourd'hui</option>
+              <option value="week">Cette semaine</option>
+              <option value="month">Ce mois</option>
+              <option value="year">Cette année</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Annuler
+        </button>
+        <button type="submit" form="filterForm" class="btn btn-primary">
+          Appliquer
+        </button>
+      </div>
     </div>
+  </div>
 </div>
-
-{% block javascripts %}
+{% endblock %} {% block javascripts %}
 {{ parent() }}
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialisation du tableau avec DataTables
-        $('#avisTable').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.10.25/i18n/French.json'
-            },
-            responsive: true,
-            columnDefs: [
-                { orderable: false, targets: 5 } // Désactiver le tri sur la colonne Actions
-            ]
-        });
-        
-        // Charger dynamiquement les établissements pour le filtre
-        $.ajax({
-            url: '/api/etablissements', // Créez cet endpoint pour retourner la liste des établissements
-            method: 'GET',
-            success: function(response) {
-                var select = $('select[name="etablissement"]');
-                response.forEach(function(etab) {
-                    select.append($('<option>', {
-                        value: etab.id,
-                        text: etab.name
-                    }));
-                });
-            }
-        });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialisation du tableau avec DataTables
+    $("#avisTable").DataTable({
+      language: {
+        url: "//cdn.datatables.net/plug-ins/1.10.25/i18n/French.json",
+      },
+      responsive: true,
+      columnDefs: [
+        { orderable: false, targets: 5 }, // Désactiver le tri sur la colonne Actions
+      ],
     });
+
+    // Charger dynamiquement les établissements pour le filtre
+    $.ajax({
+      url: "/api/etablissements", // Créez cet endpoint pour retourner la liste des établissements
+      method: "GET",
+      success: function (response) {
+        const select = $('select[name="etablissement"]');
+        response.forEach(function (etab) {
+          select.append(
+            $("<option>", {
+              value: etab.id,
+              text: etab.name,
+            })
+          );
+        });
+      },
+      error: function () {
+        console.error("Erreur lors du chargement des établissements.");
+      },
+    });
+  });
 </script>
-{% endblock %}
 {% endblock %}

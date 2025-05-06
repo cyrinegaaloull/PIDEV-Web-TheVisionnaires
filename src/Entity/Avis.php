@@ -1,9 +1,11 @@
 <?php
 
+namespace App\Entity;
 
-namespace App\Entity; 
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Etablissement;
+use App\Entity\Users;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'avis')]
 #[ORM\Index(name: 'etabID', columns: ['etabID'])]
@@ -14,106 +16,65 @@ class Avis
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(name: 'avisID', type: 'integer', nullable: false)]
-    private $avisid;
-
+    private ?int $avisid = null;
 
     #[ORM\ManyToOne(targetEntity: Etablissement::class)]
     #[ORM\JoinColumn(name: 'etabID', referencedColumnName: 'etabID', nullable: false)]
     private ?Etablissement $etablissement = null;
 
-    #[ORM\Column(name: 'etabID', type: 'integer', nullable: false)]
-    private $etabid;
-
-
-    #[ORM\Column(name: 'userID', type: 'integer', nullable: false)]
-    private $userid;
+    #[ORM\ManyToOne(targetEntity: Users::class)]
+    #[ORM\JoinColumn(name: 'userID', referencedColumnName: 'user_id', nullable: false)] // Fix: Match the column name in Users entity
+    private ?Users $user = null;
 
     #[ORM\Column(name: 'rating', type: 'integer', nullable: false)]
-    private $rating;
+    #[Assert\Range(
+        min: 1,
+        max: 5,
+        notInRangeMessage: 'La note doit être entre {{ min }} et {{ max }} étoiles.'
+    )]
+    private ?int $rating = null;
 
-    #[ORM\Column(name: 'dateAvis', type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private $dateavis = 'CURRENT_TIMESTAMP';
+    #[ORM\Column(name: 'dateAvis', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $dateavis = null;
 
-    /**
-     * Get avisid.
-     *
-     * @return int
-     */
-    public function getAvisid()
+    public function getAvisid(): ?int
     {
         return $this->avisid;
     }
 
-    /**
-     * Get userid.
-     *
-     * @return int
-     */
-    public function getUserid()
+    public function getUser(): ?Users
     {
-        return $this->userid;
+        return $this->user;
     }
 
-    /**
-     * Set userid.
-     *
-     * @param int $userid
-     *
-     * @return Avis
-     */
-    public function setUserid($userid)
+    public function setUser(Users $user): self
     {
-        $this->userid = $userid;
+        $this->user = $user;
         return $this;
     }
 
-    /**
-     * Get rating.
-     *
-     * @return int
-     */
-    public function getRating()
+    public function getRating(): ?int
     {
         return $this->rating;
     }
 
-    /**
-     * Set rating.
-     *
-     * @param int $rating
-     *
-     * @return Avis
-     */
-    public function setRating($rating)
+    public function setRating(int $rating): self
     {
         $this->rating = $rating;
         return $this;
     }
 
-    /**
-     * Get dateavis.
-     *
-     * @return \DateTime
-     */
-    public function getDateavis()
+    public function getDateavis(): ?\DateTimeInterface
     {
         return $this->dateavis;
     }
 
-    /**
-     * Set dateavis.
-     *
-     * @param \DateTime $dateavis
-     *
-     * @return Avis
-     */
-    public function setDateavis($dateavis)
+    public function setDateavis(\DateTimeInterface $dateavis): self
     {
         $this->dateavis = $dateavis;
         return $this;
     }
 
-    // Méthode pour compatibilité avec les anciennes requêtes
     public function getEtabid(): ?int
     {
         return $this->etablissement ? $this->etablissement->getEtabid() : null;

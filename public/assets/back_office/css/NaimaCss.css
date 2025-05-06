@@ -1,0 +1,295 @@
+/**
+ * NaimaCss - Fichier de styles pour le back-office de LocalLens
+ * Développé par: Naima
+ * Date: Avril 2025
+ */
+
+/* ============================================ */
+/* STYLES GÉNÉRAUX
+/* ============================================ */
+.card {
+    border-radius: 0.428rem;
+    box-shadow: 0 4px 16px 0 rgba(34, 41, 47, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 6px 20px 0 rgba(34, 41, 47, 0.15);
+}
+
+.card-header {
+    background-color: #f8f7fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* ============================================ */
+/* GESTION DES AVIS
+/* ============================================ */
+
+/* Styles pour l'affichage des étoiles */
+.avis-rating {
+    display: inline-flex;
+    align-items: center;
+}
+
+.avis-rating i {
+    font-size: 1rem;
+    margin-right: 2px;
+}
+
+/* Styles pour le tableau des avis */
+#avisTable tbody tr:hover {
+    background-color: rgba(75, 70, 92, 0.04);
+}
+
+/* Styles pour les badges de statistiques */
+.avis-stats-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    background-color: #f8f7fa;
+    margin-bottom: 1rem;
+}
+
+.avis-stats-badge i {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.avis-stats-badge .stats-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.avis-stats-badge .stats-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Styles pour les boutons d'action */
+.btn-outline-danger {
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-outline-danger:hover {
+    background-color: #ea5455;
+    color: #fff;
+}
+
+/* ============================================ */
+/* STATISTIQUES ET GRAPHIQUES
+/* ============================================ */
+
+/* Styles pour les graphiques */
+canvas {
+    width: 100% !important;
+    height: 300px !important;
+}
+
+/* Styles pour les tableaux de statistiques */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(75, 70, 92, 0.04);
+}
+
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.857rem;
+    letter-spacing: 0.5px;
+}
+
+/* Progress bars */
+.progress {
+    height: 8px;
+    background-color: rgba(75, 70, 92, 0.08);
+    border-radius: 0.357rem;
+}
+
+.progress-bar {
+    border-radius: 0.357rem;
+}
+
+/* Stats info cards */
+.stats-info-card {
+    padding: 1.5rem;
+    border-radius: 0.428rem;
+    margin-bottom: 2rem;
+}
+
+.stats-info-card .card-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.stats-info-card .stats-value {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.stats-info-card .stats-change {
+    display: flex;
+    align-items: center;
+    font-size: 0.857rem;
+}
+
+.stats-info-card .stats-change.positive {
+    color: #28c76f;
+}
+
+.stats-info-card .stats-change.negative {
+    color: #ea5455;
+}
+
+/* ============================================ */
+/* FORMULAIRES
+/* ============================================ */
+
+/* Style des champs de formulaire */
+.form-control, .form-select {
+    border-radius: 0.357rem;
+    padding: 0.571rem 1rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #7367f0;
+    box-shadow: 0 3px 10px 0 rgba(115, 103, 240, 0.1);
+}
+
+.form-label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Style pour les messages de validation */
+.invalid-feedback {
+    font-size: 0.857rem;
+    margin-top: 0.25rem;
+}
+
+/* ============================================ */
+/* MODALS
+/* ============================================ */
+
+.modal-content {
+    border-radius: 0.428rem;
+    box-shadow: 0 5px 20px 0 rgba(34, 41, 47, 0.1);
+}
+
+.modal-header {
+    padding: 1.25rem 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+}
+
+/* ============================================ */
+/* MESSAGES FLASH
+/* ============================================ */
+
+.alert {
+    border-radius: 0.428rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-success {
+    background-color: rgba(40, 199, 111, 0.12);
+    border-color: rgba(40, 199, 111, 0.5);
+    color: #24b263;
+}
+
+.alert-danger {
+    background-color: rgba(234, 84, 85, 0.12);
+    border-color: rgba(234, 84, 85, 0.5);
+    color: #ea5455;
+}
+
+.alert-info {
+    background-color: rgba(0, 207, 232, 0.12);
+    border-color: rgba(0, 207, 232, 0.5);
+    color: #00cfea;
+}
+
+/* ============================================ */
+/* ÉLÉMENTS DE NAVIGATION
+/* ============================================ */
+
+/* Pagination */
+.pagination .page-item.active .page-link {
+    background-color: #7367f0;
+    border-color: #7367f0;
+}
+
+.pagination .page-link {
+    color: #7367f0;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 1.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: '\e902';
+    font-family: 'remixicon';
+    font-size: 0.857rem;
+}
+
+/* ============================================ */
+/* RESPONSIVE
+/* ============================================ */
+
+@media (max-width: 768px) {
+    .card-header {
+        flex-direction: column;
+        align-items: start !important;
+    }
+    
+    .card-header > div {
+        margin-top: 1rem;
+        width: 100%;
+    }
+    
+    .card-header .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+/* ============================================ */
+/* Pour Map
+/* ============================================ */
+
+/* Styles spécifiques pour la carte */
+#map {
+    height: 400px; /* Hauteur de la carte */
+    width: 100%; /* Largeur de la carte */
+    border-radius: 0.428rem; /* Correspond au style des cards */
+    box-shadow: 0 4px 16px 0 rgba(34, 41, 47, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+#map:hover {
+    box-shadow: 0 6px 20px 0 rgba(34, 41, 47, 0.15);
+}
+
+/* Style pour le marqueur personnalisé */
+.custom-marker {
+    transition: all 0.3s ease-in-out;
+    background-color: #7367f0;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+    .leaflet-locate-circle {
+        border-radius: 50%;
+        border: 2px solid #136AEC;
+        background-color: rgba(19, 106, 236, 0.2);
+}
