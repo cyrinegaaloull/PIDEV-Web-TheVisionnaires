@@ -84,7 +84,7 @@
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button">
                             <div class="avatar avatar-online">
                                 {% if app.user.avatar %}
-                                    <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
+                                    <img src="{{  asset('scripts/' ~ user.avatar) }}" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
                                 {% else %}
                                     <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
                                 {% endif %}
@@ -181,5 +181,20 @@
 <script src="{{ asset('assets/front_office/js/google-map.js') }}"></script>
 <script src="{{ asset('assets/front_office/js/main.js') }}"></script>
 
+
+  {# CRISP Chat Script #}
+  <script type="text/javascript">
+    window.$crisp = [];
+    window.CRISP_WEBSITE_ID = "b4a8d480-689f-4a7e-9763-f0a10ec205a5";
+    (function() {
+      d = document;
+      s = d.createElement("script");
+      s.src = "https://client.crisp.chat/l.js";
+      s.async = 1;
+      d.getElementsByTagName("head")[0].appendChild(s);
+    })();
+  </script>
+
+  
 </body>
 </html>
