@@ -159,13 +159,23 @@ class RegistrationController extends AbstractController
             $avatarFilename = null;
 
             if ($avatarFile) {
-                $originalFilename = pathinfo($avatarFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $avatarFile->guessExtension();
+                // Use slugged username instead of original filename
+                $safeUsername = $slugger->slug($username);
+                $fileExtension = $avatarFile->guessExtension() ?: 'jpg';
+                $newFilename = $safeUsername . '.' . $fileExtension;
+                
+                // Check if file with this name already exists and handle accordingly
+                $avatarsDir = $this->getParameter('avatars_directory');
+                if (file_exists($avatarsDir . '/' . $newFilename)) {
+                    // Either remove the old file
+                    unlink($avatarsDir . '/' . $newFilename);
+                    // Or add a timestamp to make it unique if you prefer
+                    // $newFilename = $safeUsername . '-' . time() . '.' . $fileExtension;
+                }
 
                 try {
                     $avatarFile->move(
-                        $this->getParameter('avatars_directory'),
+                        $avatarsDir,
                         $newFilename
                     );
                     $avatarFilename = $newFilename;

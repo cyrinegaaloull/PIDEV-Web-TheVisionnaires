@@ -1,39 +1,28 @@
-{% extends 'front_office/base-front-office.html.twig' %} {% block title %}{{
-  user.username
-}}
-Profile{% endblock %} {% block body %}
-<section
-  class="profile-section js-fullheight"
-  style="background-image: url('{{
-    asset('assets/front_office/images/index1.jpg')
-  }}');">
-  <div class="overlay"></div>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-6">
-        <div class="profile-box">
-          <div class="text-center">
-            <div class="profile-image">
-              <div class="avatar-online">
-                {% if user and user.profilePicture %}
-                <img
-                  src="{{ asset('uploads/avatars/' ~ user.profilePicture) }}"
-                  alt="{{ user.username }}"
-                  class="rounded-circle" />
-                {% else %}
-                <img
-                  src="{{
-                    asset(
-                      'assets/front_office/images/default_profile_picture.png'
-                    )
-                  }}"
-                  alt="Profile"
-                  class="rounded-circle" />
-                {% endif %}
-              </div>
-            </div>
-            <h2 class="profile-name">{{ user.nom }} {{ user.prenom }}</h2>
-            <p class="profile-email">{{ user.email }}</p>
+
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}{{ user.username }} Profile{% endblock %}
+
+{% block body %}
+<section class="profile-section js-fullheight" style="background-image: url('{{ asset('assets/front_office/images/index1.jpg') }}');">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="profile-box">
+                    <div class="text-center">
+                        <div class="profile-image">
+                            <div class="avatar-online">
+                                {% if user and user.avatar %}
+                                    <img src="{{ asset('scripts/' ~ user.avatar) }}" alt="{{ user.username }}" class="rounded-circle">
+                                {% else %}
+                                    <img src="{{ asset('assets/front_office/images/default_profile_picture.png') }}" alt="Profile" class="rounded-circle">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <h2 class="profile-name">{{ user.nom }} {{ user.prenom }}</h2>
+                        <p class="profile-email">{{ user.email }}</p>
+
 
             <div
               class="panel-group"

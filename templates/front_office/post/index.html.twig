@@ -1,0 +1,181 @@
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}Post Index{% endblock %}
+
+{% block body %}
+    <style>
+        /* (your same CSS as before) */
+        .hero-section {
+            background-image: url('{{ asset('assets/front_office/images/Web-Bg.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            position: relative;
+            margin-bottom: 50px;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(220, 220, 220, 0.6);
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #333;
+        }
+
+        .card-category {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .card-content {
+            text-align: center;
+            flex-grow: 1;
+            margin-bottom: 15px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .posts-container {
+            padding: 0 20px;
+        }
+
+        .search-form {
+            max-width: 500px;
+        }
+
+        .action-buttons {
+            margin-bottom: 30px;
+        }
+    </style>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <div class="row">
+                <div class="col-md-8">
+                    <h1 class="hero-title">Découvrez votre Fil social</h1>
+                    <p class="hero-subtitle">Accédez aux meilleures adresses, services d'urgence, événements et plus encore en un seul clic.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Posts Section -->
+    <div class="container posts-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3 action-buttons">
+                    <a href="{{ path('app_post_new') }}" class="btn btn-success px-4 py-2">
+                        <i class="fa fa-plus mr-2"></i> Add Post
+                    </a>
+
+                    <form id="search-form" method="get" action="" class="d-flex gap-2 search-form" onsubmit="return false;">
+                        <div class="input-group">
+                            <input type="text" id="search-input" name="search" class="form-control" placeholder="Search posts...">
+                            <a href="{{ path('app_post_index') }}" class="btn btn-secondary">
+                                <i class="fa fa-refresh"></i>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Posts Grid -->
+                <div id="posts-grid" class="row">
+                    {% include 'front_office/post/_posts_grid.html.twig' with {'posts': posts} %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const postsGrid = document.getElementById('posts-grid');
+
+        let debounceTimeout;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimeout);
+
+            debounceTimeout = setTimeout(() => {
+                const query = searchInput.value;
+
+                fetch(`{{ path('app_post_index') }}?search=${encodeURIComponent(query)}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(html => {
+                        // Extract only the posts-grid part
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newPostsGrid = doc.getElementById('posts-grid');
+
+                        if (newPostsGrid) {
+                            postsGrid.innerHTML = newPostsGrid.innerHTML;
+                        }
+                    })
+                    .catch(error => console.error('Error fetching posts:', error));
+            }, 300); // debounce: wait 300ms after last typing
+        });
+    </script>
+{% endblock %}

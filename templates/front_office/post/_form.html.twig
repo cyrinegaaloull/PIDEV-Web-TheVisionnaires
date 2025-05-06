@@ -1,0 +1,40 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+<div class="mb-3">
+    {{ form_label(form.title, 'Titre', {'class': 'form-label'}) }}
+    {{ form_widget(form.title, {'attr': {'class': form.title.vars.valid ? 'form-control' : 'form-control is-invalid'}}) }}
+    {% if form.title.vars.errors|length > 0 %}
+        <div class="invalid-feedback">
+            {% for error in form.title.vars.errors %}
+                {{ error.message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.content, 'Contenu', {'class': 'form-label'}) }}
+    {{ form_widget(form.content, {'attr': {'class': form.content.vars.valid ? 'form-control' : 'form-control is-invalid'}}) }}
+    {% if form.content.vars.errors|length > 0 %}
+        <div class="invalid-feedback">
+            {% for error in form.content.vars.errors %}
+                {{ error.message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.category, 'Catégorie', {'class': 'form-label'}) }}
+    {{ form_widget(form.category, {'attr': {'class': form.category.vars.valid ? 'form-control' : 'form-control is-invalid'}}) }}
+    {% if form.category.vars.errors|length > 0 %}
+        <div class="invalid-feedback">
+            {% for error in form.category.vars.errors %}
+                {{ error.message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<button type="submit" class="btn btn-primary">{{ button_label|default('Publier') }}</button>
+{{ form_end(form) }}

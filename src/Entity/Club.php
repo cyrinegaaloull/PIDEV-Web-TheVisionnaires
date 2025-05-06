@@ -25,10 +25,10 @@ class Club
     #[ORM\Column(name: "clubDescription", type: "string", length: 255, nullable: false)]
     private $clubdescription;
 
-    #[ORM\Column(name: "clubCategory", type: "string", length: 0, nullable: true)]
+    #[ORM\Column(name: "clubCategory", type: "string", nullable: false)]
     private $clubcategory;
 
-    #[ORM\Column(name: "clubLogo", type: "string", length: 255, nullable: false)]
+    #[ORM\Column(name: "clubLogo", type: "string", length: 255, nullable: true)]
     private $clublogo;
 
     #[ORM\Column(name: "clubContact", type: "string", length: 255, nullable: false)]
@@ -40,17 +40,21 @@ class Club
     #[ORM\Column(name: "creationDate", type: "datetime", nullable: false, options: ["default" => "CURRENT_TIMESTAMP"])]
     private $creationdate;
 
-    #[ORM\Column(name: "membersCount", type: "integer", nullable: false)]
+    #[ORM\Column(name: "membersCount", type: "integer", nullable: true)]
     private $memberscount;
 
     #[ORM\Column(name: "scheduleInfo", type: "text", length: 65535, nullable: false)]
     private $scheduleinfo;
 
-    #[ORM\Column(name: "bannerImage", type: "string", length: 255, nullable: false)]
+    #[ORM\Column(name: "bannerImage", type: "string", length: 255, nullable: true)]
     private $bannerimage;
 
     #[ORM\OneToMany(targetEntity: Activite::class, mappedBy: "clubid", orphanRemoval: true)]
     private $activities;
+
+    #[ORM\OneToMany(mappedBy: "clubid", targetEntity: Membership::class)]
+    private Collection $memberships;
+
 
     public function __construct()
     {
@@ -323,6 +327,15 @@ class Club
     {
         return $this->activities;
     }
+
+    /**
+ * @return Collection<int, Membership>
+ */
+public function getMemberships(): Collection
+{
+    return $this->memberships;
+}
+
 
     public function addActivity(Activite $activity): self
     {

@@ -5,7 +5,8 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-#[ORM\Entity(repositoryClass: "App\Repository\LieuRepository")]
+use App\Repository\LieuRepository;
+#[ORM\Entity(repositoryClass: LieuRepository::class)]
 #[ORM\Table(name: "lieu")]
 class Lieu
 {

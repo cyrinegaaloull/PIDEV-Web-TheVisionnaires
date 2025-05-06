@@ -1,0 +1,14 @@
+<div id="members-list-container" style="max-height: 65vh; overflow-y: auto;" class="border border-top-0 rounded-bottom p-3 bg-white">
+  {% for member in members %}
+    <div class="border rounded p-3 mb-3 d-flex align-items-center member-item">
+      <img src="{{ asset('uploads/' ~ member.userid.avatar) }}" class="rounded-circle me-3" width="50" height="50" alt="Avatar">
+      <div>
+        <strong>{{ member.userid.nom }} {{ member.userid.prenom }}</strong><br>
+        <small class="text-muted">{{ member.userid.email }}</small><br>
+        <small class="text-muted">Depuis le {{ member.joindate ? member.joindate|date('d/m/Y') : 'Inconnu' }}</small>
+      </div>
+    </div>
+  {% else %}
+    <div class="text-center text-muted">Aucun membre pour ce club.</div>
+  {% endfor %}
+</div>

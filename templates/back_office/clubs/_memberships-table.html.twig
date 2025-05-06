@@ -1,0 +1,105 @@
+<table class="table table-hover">
+  <thead class="table-light">
+    <tr>
+      <th>Membre</th>
+      <th>Club</th>
+      <th>Date de demande</th>
+      <th>Statut</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for membership in memberships %}
+      <tr>
+        <td>
+          {% if membership.memberid is defined and membership.memberid is not null %}
+            <img src="{{ asset('uploads/' ~ membership.memberid.avatar) }}" alt="avatar" class="rounded-circle" width="32" height="32">
+            {{ membership.memberid.nom ~ ' ' ~ membership.memberid.prenom }}
+          {% else %}
+            <em>Membre inconnu</em>
+          {% endif %}
+        </td>
+        <td>
+          {% if membership.clubid is defined and membership.clubid is not null %}
+            <img src="{{ asset('uploads/' ~ membership.clubid.clublogo) }}" alt="logo" class="rounded-circle" width="32" height="32">
+            {{ membership.clubid.clubname }}
+          {% else %}
+            <em>Club inconnu</em>
+          {% endif %}
+        </td>
+        <td>
+          {{ membership.requestdate is not null ? membership.requestdate|date('d/m/Y') : '—' }}
+        </td>
+        <td>
+          <span class="badge bg-label-{{ membership.membershipstatus == 'ACCEPTE' ? 'success' : (membership.membershipstatus == 'REJETE' ? 'danger' : 'warning') }}">
+            {{ membership.membershipstatus|replace({'_': ' '}) }}
+          </span>
+        </td>
+        <td class="text-center">
+          <button class="btn btn-sm btn-success btn-validate btn-circle"
+                  data-id="{{ membership.membershipid }}"
+                  {% if membership.membershipstatus != 'EN_ATTENTE' %}disabled{% endif %}>
+            <i class="ri-check-line"></i>
+          </button>
+
+          <button class="btn btn-sm btn-danger btn-decline btn-circle"
+                  data-id="{{ membership.membershipid }}"
+                  {% if membership.membershipstatus != 'EN_ATTENTE' %}disabled{% endif %}>
+            <i class="ri-close-line"></i>
+          </button>
+        </td>
+      </tr>
+    {% else %}
+      <tr>
+        <td colspan="5" class="text-center">Aucune demande trouvée.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{{ knp_pagination_render(memberships) }}
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.btn-validate').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+
+      fetch(`/admin/membership/accept/${id}`, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          btn.disabled = true;
+          btn.closest('tr').querySelector('.btn-decline').disabled = true;
+          btn.closest('tr').querySelector('span.badge').innerText = 'ACCEPTÉ';
+          btn.closest('tr').querySelector('span.badge').className = 'badge bg-label-success';
+        }
+      });
+    });
+  });
+
+  document.querySelectorAll('.btn-decline').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+
+      fetch(`/admin/membership/refuse/${id}`, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          btn.disabled = true;
+          btn.closest('tr').querySelector('.btn-validate').disabled = true;
+          btn.closest('tr').querySelector('span.badge').innerText = 'REFUSÉ';
+          btn.closest('tr').querySelector('span.badge').className = 'badge bg-label-danger';
+        }
+      });
+    });
+  });
+});
+</script>

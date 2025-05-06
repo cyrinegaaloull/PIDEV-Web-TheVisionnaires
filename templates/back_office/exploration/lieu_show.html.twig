@@ -2,82 +2,264 @@
 
 {% block body %}
 <div class="container-xxl flex-grow-1 container-p-y">
-  <h4 class="fw-bold mb-3 text-primary">
-    <i class="ri-map-pin-line me-1"></i> Détails du lieu
-  </h4>
-
-  <div class="card shadow-sm mb-4">
-    <div class="card-body">
-      <h5 class="card-title text-dark">{{ lieu.lieuname }}</h5>
-      <p class="mb-2"><i class="ri-map-pin-2-line me-1 text-muted"></i> <strong>Adresse:</strong> {{ lieu.lieuaddress }}</p>
-      <p class="mb-2"><i class="ri-information-line me-1 text-muted"></i> <strong>Description:</strong> {{ lieu.lieudescription }}</p>
-      <p class="mb-2"><i class="ri-price-tag-3-line me-1 text-muted"></i> <strong>Catégorie:</strong> {{ lieu.lieucategory }}</p>
-      <p class="mb-2"><i class="ri-map-pin-user-line me-1 text-muted"></i> <strong>Coordonnées:</strong> {{ lieu.latitude }}, {{ lieu.longitude }}</p>
-
-      <a href="{{ path('admin_event_add', { id: lieu.lieuid }) }}" class="btn btn-success mt-3">
-        <i class="ri-calendar-event-line me-1"></i> Ajouter un événement
+  <!-- Header with breadcrumb -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-2 text-primary">
+        <i class="ri-map-pin-line me-1"></i> Détails du lieu
+      </h4>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('admin_lieux') }}">Lieux</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ lieu.lieuname }}</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ path('admin_lieu_edit', { id: lieu.lieuid }) }}" class="btn btn-primary">
+        <i class="ri-edit-line me-1"></i> Modifier
       </a>
+      <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLieuModal">
+        <i class="ri-delete-bin-line me-1"></i> Supprimer
+      </button>
     </div>
   </div>
 
-  <h5 class="fw-bold mb-3"><i class="ri-calendar-line me-1"></i> Événements associés</h5>
-  {% if events %}
-    <div class="row">
-      {% for event in events %}
-        <div class="col-md-6 col-lg-4 mb-3">
-          <div class="card h-100 shadow-sm">
-            <div class="card-body">
-              <h6 class="card-title">{{ event.eventname }}</h6>
-<p class="mb-1 text-muted">
-  <i class="ri-time-line me-1"></i> 
-  {{ event.eventdate ? event.eventdate|date('d/m/Y') : 'Pas de date' }}
-</p>
-<span class="badge bg-label-primary mb-2 d-inline-block">
-  <i class="ri-bookmark-line me-1"></i> {{ event.eventcategory }}
-</span>
+  <!-- Lieu Details Card -->
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between py-3">
+          <h5 class="card-title mb-0 text-dark"><i class="ri-information-line me-1 text-primary"></i> Informations</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label text-muted mb-1">Nom</label>
+                <div class="fs-5 fw-semibold">{{ lieu.lieuname }}</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-muted mb-1">Adresse</label>
+                <div>
+                  <i class="ri-map-pin-2-line me-1 text-muted"></i> {{ lieu.lieuaddress }}
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-muted mb-1">Catégorie</label>
+                <div>
+                  <span class="badge bg-light text-dark">
+                    <i class="ri-price-tag-3-line me-1"></i> {{ lieu.lieucategory }}
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-muted mb-1">Coordonnées</label>
+                <div>
+                  <i class="ri-map-pin-user-line me-1 text-muted"></i> 
+                  <code>{{ lieu.latitude }}, {{ lieu.longitude }}</code>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              {% if lieu.lieuimage %}
+                <div class="mb-3 text-center">
+                  <img src="{{ asset('assets/exploration/images/' ~ lieu.lieuimage) }}" alt="{{ lieu.lieuname }}" 
+                    class="img-fluid rounded shadow-sm" style="max-height: 200px; object-fit: cover;">
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="mt-2">
+            <label class="form-label text-muted mb-1">Description</label>
+            <div class="bg-light p-3 rounded">
+              {{ lieu.lieudescription|nl2br }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="card-title mb-0 text-dark"><i class="ri-map-2-line me-1 text-primary"></i> Carte</h5>
+        </div>
+        <div class="card-body p-0">
+          <div id="lieu-map" style="height: 300px; border-radius: 0 0 0.375rem 0.375rem;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div class="d-flex gap-2 mt-2">
-  <a href="{{ path('admin_event_edit', { id: event.eventid }) }}" class="btn btn-sm btn-outline-primary">
-    <i class="ri-edit-line"></i> Modifier
-  </a>
-  <!-- Delete Button triggers modal -->
-<button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ event.eventid }}">
-  <i class="ri-delete-bin-line"></i> Supprimer
-</button>
+  <!-- Events Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+          <h5 class="card-title mb-0">
+            <i class="ri-calendar-line me-1 text-primary"></i> Événements associés
+          </h5>
+          <a href="{{ path('admin_event_add', { id: lieu.lieuid }) }}" class="btn btn-success btn-sm">
+            <i class="ri-calendar-event-line me-1"></i> Ajouter un événement
+          </a>
+        </div>
+        <div class="card-body">
+          {% if events %}
+            <div class="row g-3">
+              {% for event in events %}
+                <div class="col-md-6 col-lg-4">
+                  <div class="card h-100 shadow-sm hover-shadow">
+                    <div class="card-body">
+                      <h6 class="card-title text-primary">{{ event.eventname }}</h6>
+                      <div class="d-flex flex-column gap-2 mt-3">
+                        <div class="d-flex align-items-center">
+                          <i class="ri-time-line me-2 text-muted"></i>
+                          <div>
+                            <span class="d-block">
+                              {{ event.eventdate ? event.eventdate|date('d/m/Y') : 'Pas de date' }}
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <span class="badge bg-label-primary">
+                            <i class="ri-bookmark-line me-1"></i> {{ event.eventcategory }}
+                          </span>
+                        </div>
+                        {% if event.eventdescription %}
+                          <div class="mt-2 mb-2 small">
+                            {{ event.eventdescription|length > 100 ? event.eventdescription|slice(0, 100) ~ '...' : event.eventdescription }}
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="d-flex gap-2 mt-3">
+                        <a href="{{ path('admin_event_edit', { id: event.eventid }) }}" class="btn btn-sm btn-outline-primary flex-grow-1">
+                          <i class="ri-edit-line me-1"></i> Modifier
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ event.eventid }}">
+                          <i class="ri-delete-bin-line"></i>
+                        </button>
 
-<!-- Modal for this specific event -->
-<div class="modal fade" id="deleteModal{{ event.eventid }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ event.eventid }}" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content">
-      <div class="modal-body text-center py-4">
-        <i class="ri-error-warning-line text-danger" style="font-size: 2rem;"></i>
-        <h5 class="mt-3 mb-2">Supprimer l’événement ?</h5>
-        <p class="text-muted mb-3">Cette action est irréversible.</p>
-        <div class="d-flex justify-content-center gap-2">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-            <i class="ri-close-line me-1"></i> Annuler
-          </button>
-          <form method="post" action="{{ path('admin_event_delete', { id: event.eventid }) }}">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete_event_' ~ event.eventid) }}">
-            <button class="btn btn-danger">
-              <i class="ri-delete-bin-2-line me-1"></i> Supprimer
-            </button>
-          </form>
+                        <!-- Modal for this specific event -->
+                        <div class="modal fade" id="deleteModal{{ event.eventid }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ event.eventid }}" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered modal-sm">
+                            <div class="modal-content">
+                              <div class="modal-body text-center py-4">
+                                <i class="ri-error-warning-line text-danger" style="font-size: 2rem;"></i>
+                                <h5 class="mt-3 mb-2">Supprimer l'événement ?</h5>
+                                <p class="text-muted mb-3 small">Cette action est irréversible.</p>
+                                <div class="d-flex justify-content-center gap-2">
+                                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                    <i class="ri-close-line me-1"></i> Annuler
+                                  </button>
+                                  <form method="post" action="{{ path('admin_event_delete', { id: event.eventid }) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_event_' ~ event.eventid) }}">
+                                    <button class="btn btn-danger">
+                                      <i class="ri-delete-bin-2-line me-1"></i> Supprimer
+                                    </button>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <div class="mb-3">
+                <i class="ri-calendar-line" style="font-size: 2.5rem; color: #d9e1f2;"></i>
+              </div>
+              <h6 class="text-muted mb-3">Aucun événement lié à ce lieu</h6>
+              <a href="{{ path('admin_event_add', { id: lieu.lieuid }) }}" class="btn btn-primary">
+                <i class="ri-calendar-event-line me-1"></i> Créer un événement
+              </a>
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Delete Lieu Modal -->
+<div class="modal fade" id="deleteLieuModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Supprimer ce lieu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <i class="ri-error-warning-line text-danger" style="font-size: 3rem;"></i>
+          <h5 class="mt-3">Êtes-vous sûr de vouloir supprimer ce lieu ?</h5>
+          <p class="text-muted">Cette action supprimera également tous les événements associés.</p>
+        </div>
+        <div class="alert alert-warning">
+          <i class="ri-information-line me-1"></i> La suppression de <strong>{{ lieu.lieuname }}</strong> est irréversible.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="ri-close-line me-1"></i> Annuler
+        </button>
+        <a href="{{ path('admin_lieu_delete', { id: lieu.lieuid }) }}" class="btn btn-danger">
+          <i class="ri-delete-bin-2-line me-1"></i> Supprimer définitivement
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
 
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="alert alert-info">Aucun événement lié à ce lieu.</div>
-  {% endif %}
-</div>
+<style>
+  .bg-label-primary {
+    background-color: rgba(105, 108, 255, 0.16) !important;
+    color: #696cff !important;
+  }
+  
+  .hover-shadow {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .hover-shadow:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+</style>
+
+{% block stylesheets %}
+  {{ parent() }}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Leaflet Map initialization
+      const lat = {{ lieu.latitude|default(0) }};
+      const lng = {{ lieu.longitude|default(0) }};
+      const map = L.map('lieu-map').setView([lat, lng], 15);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+      
+      const marker = L.marker([lat, lng]).addTo(map);
+      marker.bindPopup("<strong>{{ lieu.lieuname|e('js') }}</strong><br>{{ lieu.lieuaddress|e('js') }}").openPopup();
+      
+      // Fix map rendering issues by triggering a resize after the map is visible
+      setTimeout(function() {
+        map.invalidateSize();
+      }, 100);
+    });
+  </script>
+{% endblock %}
 {% endblock %}

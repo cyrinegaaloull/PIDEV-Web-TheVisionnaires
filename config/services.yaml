@@ -1,9 +1,29 @@
+
 # config/services.yaml
 parameters:
   avatars_directory: "%kernel.project_dir%/public/uploads/avatars"
   your_upload_directory: "%kernel.project_dir%/public/assets/exploration/images"
 
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+    your_upload_directory: '%kernel.project_dir%/public/assets/exploration/images'
+    uploads_directory: '%kernel.project_dir%/public/uploads'
+    uploads_directory_web: '/uploads'
+
+    
+    # Add the OpenRouter API key parameter
+    openrouter_api_key: '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'
+
+
+
+    
 services:
+
   # default configuration for services in *this* file
   _defaults:
     autowire: true
@@ -37,3 +57,56 @@ services:
       $twilioToken: "%env(TWILIO_AUTH_TOKEN)%"
       $whatsappNumber: "%env(TWILIO_WHATSAPP_NUMBER)%"
       $senderEmail: "cyrinegaaloul6@gmail.com"
+
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            string $secretKey: '%env(EWZ_RECAPTCHA_SECRET_KEY)%'
+
+    Doctrine\Common\Annotations\AnnotationReader:
+        class: Doctrine\Common\Annotations\AnnotationReader
+        public: true
+    App\Service\NotificationService:
+        public: true
+    Symfony\Contracts\HttpClient\HttpClientInterface: '@http_client'
+
+
+    annotation_reader:
+        alias: Doctrine\Common\Annotations\AnnotationReader
+  
+    App\Service\GeocodingService:
+        arguments:
+            $providerAggregator: '@bazinga_geocoder.geocoder'
+
+    App\EventListener\RecaptchaValidationListener:
+        arguments:
+            $secretKey: '%env(EWZ_RECAPTCHA_SECRET_KEY)%'
+        tags:
+            - { name: 'kernel.event_subscriber' }
+
+    # Updated ChatbotService definition to use the parameter directly
+    App\Service\ChatbotService:
+
+            
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # Define the login listener service explicitly
+    App\EventListener\LoginSuccessListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'security.interactive_login', method: 'onSecurityInteractiveLogin' }
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+symfonycasts_reset_password:
+    request_password_repository: App\Repository\ResetPasswordRequestRepository
+

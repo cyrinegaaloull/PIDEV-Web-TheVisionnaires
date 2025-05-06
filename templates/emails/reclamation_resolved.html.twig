@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reclamation Resolved</title>
+    <style>
+        /* Base styles for email clients */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333333;
+        }
+        .email-wrapper {
+            width: 100%;
+            padding: 40px 0;
+            background-color: #f4f6f8;
+        }
+        .email-content {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .email-header {
+            background-color: #28a745;
+            color: white;
+            padding: 20px 30px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .email-body {
+            padding: 30px;
+        }
+        .email-body p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        .highlight {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .email-footer {
+            padding: 20px 30px;
+            font-size: 13px;
+            color: #777777;
+            background-color: #f9fafb;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .email-body, .email-header, .email-footer {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-wrapper">
+    <div class="email-content">
+        <div class="email-header">
+            ✅ Reclamation Resolved
+        </div>
+        <div class="email-body">
+            <p>Hello <strong>{{ user.prenom }} {{ user.nom }}</strong>,</p>
+
+            <p>
+                We’re pleased to inform you that your reclamation
+                <strong>#{{ reclamation.reclamationId }}</strong> has been
+                <span class="highlight">successfully resolved</span>.
+            </p>
+
+            <p>
+                We appreciate your feedback and thank you for helping us improve our platform.
+            </p>
+
+            <p>If you have further concerns, feel free to reach out at any time.</p>
+
+            <a href="{{ support_url|default('#') }}" class="btn">Contact Support</a>
+
+            <p>Thank you,<br><strong>The Administration Team</strong></p>
+        </div>
+        <div class="email-footer">
+            &copy; {{ "now"|date("Y") }} YourCompany. All rights reserved.<br>
+            <small>This is an automated message — please do not reply.</small>
+        </div>
+    </div>
+</div>
+</body>
+</html>

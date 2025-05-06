@@ -1,43 +1,285 @@
 {% extends 'front_office/base-front-office.html.twig' %}
 
 {% block body %}
-<section class="ftco-section">
+
+<link rel="stylesheet" href="{{ asset('assets/exploration/css/style.css') }}">
+{# Hero Section with Background Image #}
+<div class="hero-wrap js-fullheight" style="background-image: url('{{ asset('assets/exploration/images/bg_3.jpg') }}');">
+  <div class="overlay"></div>
   <div class="container">
-    <div class="row justify-content-center mb-4">
-      <div class="col-md-8 text-center heading-section ftco-animate">
-        <span class="subheading">Détails de l'événement</span>
-        <h2 class="mb-4">{{ event.eventname }}</h2>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-6">
-        <img src="{{ asset('assets/exploration/images/' ~ (event.eventimage ?: 'default.jpg')) }}" class="img-fluid rounded shadow" alt="Event Image">
-      </div>
-      <div class="col-md-6">
-        <p><strong>Date:</strong> {{ event.eventdate ? event.eventdate|date('d/m/Y') : 'Non précisée' }}</p>
-        <p><strong>Catégorie:</strong> {{ event.eventcategory }}</p>
-        <p><strong>Description:</strong> {{ event.eventdescription }}</p>
-        <p><strong>Prix:</strong> {{ event.ticketprice }} TND</p>
-        {% set available = event.maxtickets - event.reservedtickets %}
-
-{% if available > 0 %}
-  <form method="POST" action="{{ path('event_reserve', {'id': event.eventid}) }}">
-    <button type="submit" class="btn btn-primary">
-      <i class="ri-ticket-line"></i> Réserver
-    </button>
-  </form>
-  <p class="mt-2 text-muted">🎟️ Places restantes : {{ available }}</p>
-{% else %}
-  <p class="text-danger fw-bold mt-2">Événement complet ❌</p>
-{% endif %}
-
-
-        <form action="{{ path('event_notify', { id: event.eventid }) }}" method="post">
-  <button class="btn btn-success">🔔 Me notifier</button>
-</form>
-
+    <div class="row no-gutters slider-text js-fullheight align-items-center justify-content-center" data-scrollax-parent="true">
+      <div class="col-md-9 text-center ftco-animate">
+        <p class="breadcrumbs"><span class="mr-2"><a href="{{ path('app_home') }}">Home</a></span> <span class="mr-2"><a href="{{ path('app_exploration') }}">Exploration</a></span> <span>Détails</span></p>
+        <h1 class="mb-3 bread">{{ event.eventname }}</h1>
+        <p class="caps">{{ event.eventdate ? event.eventdate|date('d/m/Y') : 'Date à venir' }} • {{ event.eventcategory }}</p>
       </div>
     </div>
   </div>
+</div>
+
+<section class="ftco-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 mb-4 mb-md-0">
+        <img src="{{ asset('assets/exploration/images/' ~ (event.eventimage ?: 'default.jpg')) }}" class="img-fluid rounded shadow" alt="Event Image">
+        
+        <div class="event-actions mt-4">
+          {% set available = event.maxtickets - event.reservedtickets %}
+          {% set hasReserved = userReservations|filter(r => r.event.eventid == event.eventid)|length > 0 %}
+
+          <div class="d-flex align-items-center mb-3">
+            <div class="ticket-status mr-3">
+              {% if available > 0 %}
+                <span class="badge bg-success text-white p-2">
+                  <i class="fa fa-ticket"></i> {{ available }} places disponibles
+                </span>
+              {% else %}
+                <span class="badge bg-danger text-white p-2">
+                  <i class="fa fa-times-circle"></i> Complet
+                </span>
+              {% endif %}
+            </div>
+            
+            <div class="ticket-price">
+              <span class="badge bg-primary text-white p-2">
+                <i class="fa fa-tag"></i> {{ event.ticketprice }} TND
+              </span>
+            </div>
+          </div>
+
+          <div class="d-flex">
+            {% if available > 0 %}
+              {% if hasReserved %}
+                <button type="button" class="btn btn-secondary mr-2" disabled>
+                  <i class="fa fa-ticket"></i> Déjà réservé
+                </button>
+              {% else %}
+                <form method="POST" action="{{ path('event_reserve', {'id': event.eventid}) }}" class="mr-2">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-ticket"></i> Réserver
+                  </button>
+                </form>
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="event-details p-4 bg-light rounded shadow-sm">
+          <h3 class="mb-4">À propos de l'événement</h3>
+          
+          <div class="event-description mb-4">
+            <p>{{ event.eventdescription }}</p>
+          </div>
+          
+          <div class="event-meta">
+            <div class="meta-item d-flex align-items-center mb-3">
+              <div class="icon mr-3">
+                <span class="fa fa-calendar text-primary"></span>
+              </div>
+              <div class="text">
+                <h5 class="mb-0">Date</h5>
+                <p class="mb-0">{{ event.eventdate ? event.eventdate|date('d/m/Y') : 'À déterminer' }}</p>
+              </div>
+            </div>
+            
+            <div class="meta-item d-flex align-items-center mb-3">
+              <div class="icon mr-3">
+                <span class="fa fa-bookmark text-primary"></span>
+              </div>
+              <div class="text">
+                <h5 class="mb-0">Catégorie</h5>
+                <p class="mb-0">{{ event.eventcategory }}</p>
+              </div>
+            </div>
+            
+            <div class="meta-item d-flex align-items-center mb-3">
+              <div class="icon mr-3">
+                <span class="fa fa-users text-primary"></span>
+              </div>
+              <div class="text">
+                <h5 class="mb-0">Capacité</h5>
+                <p class="mb-0">{{ event.maxtickets }} personnes</p>
+              </div>
+            </div>
+            
+            <div class="meta-item d-flex align-items-center">
+              <div class="icon mr-3">
+                <span class="fa fa-check-circle text-primary"></span>
+              </div>
+              <div class="text">
+                <h5 class="mb-0">Réservations</h5>
+                <p class="mb-0">{{ event.reservedtickets }} / {{ event.maxtickets }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="share-event mt-4 p-3 bg-light rounded shadow-sm">
+          <h5 class="mb-3">Partager l'événement</h5>
+          <div class="social-icons">
+            <a href="#" class="mr-2"><span class="fa fa-facebook-square fa-2x text-primary"></span></a>
+            <a href="#" class="mr-2"><span class="fa fa-twitter-square fa-2x text-info"></span></a>
+            <a href="#" class="mr-2"><span class="fa fa-linkedin-square fa-2x text-primary"></span></a>
+            <a href="#"><span class="fa fa-envelope fa-2x text-danger"></span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {# Add this extra spacing div to ensure proper spacing before footer #}
+    <div class="footer-spacing" style="height: 80px;"></div>
+  </div>
 </section>
+
+<style>
+  /* Hero section styling */
+  .hero-wrap {
+    position: relative;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+  
+  .hero-wrap .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    content: '';
+    opacity: .5;
+    background: #000000;
+  }
+  
+  .hero-wrap .slider-text {
+    color: #fff;
+    height: 450px; /* Slightly shorter than exploration page */
+  }
+  
+  .hero-wrap .slider-text h1 {
+    font-size: 48px;
+    color: #fff;
+    line-height: 1.2;
+    font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+  
+  .hero-wrap .slider-text p.caps {
+    font-weight: 400;
+    font-size: 20px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  
+  .hero-wrap .breadcrumbs {
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    z-index: 99;
+  }
+  
+  .hero-wrap .breadcrumbs span {
+    color: white;
+  }
+  
+  .hero-wrap .breadcrumbs span a {
+    color: white;
+  }
+  
+  /* Event details styling */
+  .event-details {
+    height: 100%;
+  }
+  
+  .event-meta .icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(33, 119, 127, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .event-meta .icon span {
+    font-size: 18px;
+  }
+  
+  .meta-item h5 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .meta-item p {
+    font-size: 15px;
+    color: #666;
+  }
+  
+  .badge {
+    font-weight: 500;
+    font-size: 14px;
+  }
+  
+  .bg-success {
+    background-color: #28a745 !important;
+  }
+  
+  .bg-danger {
+    background-color: #dc3545 !important;
+  }
+  
+  .bg-primary {
+    background-color: #21777F !important;
+  }
+  
+  .text-white {
+    color: white !important;
+  }
+  
+  .btn-outline-primary {
+    color: #21777F;
+    border-color: #21777F;
+  }
+  
+  .btn-outline-primary:hover {
+    background-color: #21777F;
+    color: white;
+  }
+  
+  /* Fix for footer spacing issue */
+  .ftco-section {
+    padding-bottom: 80px !important; /* Force extra padding at the bottom */
+  }
+  
+  .share-event {
+    margin-bottom: 20px !important; /* Ensure margin is applied */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 767px) {
+    .hero-wrap .slider-text {
+      height: 350px;
+    }
+    
+    .hero-wrap .slider-text h1 {
+      font-size: 32px;
+    }
+    
+    .hero-wrap .slider-text p.caps {
+      font-size: 16px;
+    }
+    
+    /* Adjust footer spacing for mobile */
+    .ftco-section {
+      padding-bottom: 60px !important;
+    }
+    
+    .footer-spacing {
+      height: 60px !important;
+    }
+  }
+</style>
 {% endblock %}

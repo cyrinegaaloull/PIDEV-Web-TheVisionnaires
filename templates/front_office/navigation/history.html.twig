@@ -1,0 +1,128 @@
+{# templates/front_office/navigation/history.html.twig #}
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}Historique des itinéraires - Local Lens{% endblock %}
+
+{% block body %}
+<div class="hero-wrap js-fullheight" style="background-image: url('{{ asset('assets/front_office/images/bg_5.jpg') }}'); height: 300px !important;" data-stellar-background-ratio="0.5">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row no-gutters slider-text js-fullheight align-items-center justify-content-center" data-scrollax-parent="true" style="height: 300px !important;">
+      <div class="col-md-9 text text-center ftco-animate" data-scrollax=" properties: { translateY: '70%' }">
+        <h1 data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Historique des itinéraires</h1>
+        <p class="caps" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Consultez et gérez vos itinéraires enregistrés</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="ftco-section navigation-container">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        {% if routes is empty %}
+          <div class="alert alert-info">
+            <p class="mb-0">Vous n'avez pas encore d'itinéraires enregistrés. <a href="{{ path('app_navigation') }}" class="text-primary font-weight-bold">Trouvez un itinéraire</a> pour l'enregistrer.</p>
+          </div>
+        {% else %}
+          <div class="card shadow-sm">
+            <div class="card-header bg-white">
+              <h5 class="card-title mb-0">Vos itinéraires enregistrés</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>Nom</th>
+                      <th>De</th>
+                      <th>À</th>
+                      <th>Mode de transport</th>
+                      <th>Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for route in routes %}
+                      <tr>
+                        <td><span class="font-weight-medium">{{ route.name }}</span></td>
+                        <td>{{ route.departurePlaceName|default('Inconnu') }}</td>
+                        <td>{{ route.arrivalPlaceName|default('Inconnu') }}</td>
+                        <td>
+                          {% if route.transportMode == 'driving' %}
+                            <span class="badge badge-light">🚗 Voiture</span>
+                          {% elseif route.transportMode == 'walking' %}
+                            <span class="badge badge-light">🚶 Marche</span>
+                          {% elseif route.transportMode == 'cycling' %}
+                            <span class="badge badge-light">🚲 Vélo</span>
+                          {% elseif route.transportMode == 'public_transport' %}
+                            <span class="badge badge-light">🚍 Transport public</span>
+                          {% else %}
+                            <span class="badge badge-light">{{ route.transportMode }}</span>
+                          {% endif %}
+                        </td>
+                        <td>{{ route.timestamp|date('Y-m-d H:i') }}</td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a href="{{ path('app_navigation') }}?route={{ route.id }}" class="btn btn-sm btn-primary">Voir</a>
+                            <button type="button" class="btn btn-sm btn-danger delete-route" data-route-id="{{ route.id }}">Supprimer</button>
+                          </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+ <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Setup delete route buttons
+      const deleteButtons = document.querySelectorAll('.delete-route');
+      let routeToDelete = null;
+      
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          routeToDelete = this.getAttribute('data-route-id');
+          $('#deleteModal').modal('show');
+        });
+      });
+      
+      document.getElementById('confirmDelete').addEventListener('click', function() {
+        if (routeToDelete) {
+          deleteRoute(routeToDelete);
+          $('#deleteModal').modal('hide');
+        }
+      });
+      
+      function deleteRoute(routeId) {
+        fetch(`/navigation/history/delete/${routeId}`, {
+          method: 'DELETE'
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Reload the page to show updated list
+              window.location.reload();
+            } else {
+              alert('Erreur lors de la suppression: ' + (data.error || 'Erreur inconnue'));
+            }
+          })
+          .catch(error => {
+            console.error('Error deleting route:', error);
+            alert('Échec de la suppression de l\'itinéraire');
+          });
+      }
+    });
+  </script>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+ 
+{% endblock %}

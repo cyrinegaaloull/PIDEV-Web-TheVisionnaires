@@ -1,0 +1,325 @@
+{# templates/front_office/navigation/index.html.twig #}
+{% extends 'front_office/base-front-office.html.twig' %}
+
+{% block title %}Navigation - Local Lens{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+<style>
+    #navigationMap { 
+      height: 500px; 
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    .location-suggestions {
+      position: absolute;
+      z-index: 1000;
+      background: white;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      display: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .suggestion-item {
+      padding: 8px 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background-color 0.2s;
+    }
+
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+
+    .suggestion-item:hover,
+    .suggestion-item.selected {
+      background-color: #f8f9fa;
+    }
+
+    /* Add loading indicator for the input fields */
+    .input-loading {
+      background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"%3E%3Ccircle cx="50" cy="50" fill="none" stroke="%23f15d30" stroke-width="10" r="35" stroke-dasharray="164.93361431346415 56.97787143782138"%3E%3CanimateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 50 50;360 50 50" keyTimes="0;1"%3E%3C/animateTransform%3E%3C/circle%3E%3C/svg%3E');
+      background-position: right 10px center;
+      background-repeat: no-repeat;
+      background-size: 20px 20px;
+    }
+    .loading-spinner {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      background-color: rgba(255, 255, 255, 0.7);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .btn-primary {
+      background-color: #f15d30 !important;
+      border-color: #f15d30 !important;
+    }
+    .btn-outline-secondary {
+      color: #6c757d;
+      border-color: #6c757d;
+    }
+    .btn-outline-secondary:hover {
+      background-color: #6c757d;
+      color: white;
+    }
+    .card {
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .card-header {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
+    /* Fix for Google Maps controls */
+    .gm-style .gm-style-iw {
+      font-weight: 400;
+    }
+    .gm-style-cc {
+      display: none;
+    }
+    /* Additional CSS for Public Transport Options */
+    #publicTransportComboBox option {
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    /* Make icon slightly larger and add spacing */
+    #publicTransportComboBox option span {
+      margin-left: 5px;
+      margin-right: 5px;
+      font-weight: 500;
+    }
+
+    /* Custom styling for public transport panel */
+    #publicTransportOptionsPanel {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      border: 1px solid #dee2e6;
+      margin-top: 20px;
+    }
+
+    #publicTransportOptionsPanel h5 {
+      color: #343a40;
+      margin-bottom: 10px;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    /* Style for the select element */
+    #publicTransportComboBox {
+      padding: 8px 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    /* Make arrival time label more readable with transport icons */
+    #arrivalTimeLabel {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+<div class="hero-wrap js-fullheight" style="background-image: url('{{ asset('assets/front_office/images/bg_5.jpg') }}'); height: 300px !important;" data-stellar-background-ratio="0.5">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row no-gutters slider-text js-fullheight align-items-center justify-content-center" data-scrollax-parent="true" style="height: 300px !important;">
+      <div class="col-md-9 text text-center ftco-animate" data-scrollax=" properties: { translateY: '70%' }">
+        <h1 data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Navigation</h1>
+        <p class="caps" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Find the best route to move around the city</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="ftco-section ftco-no-pb ftco-no-pt">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white">
+            <h5 class="card-title mb-0">Route</h5>
+          </div>
+          <div class="card-body">
+            <form id="routeForm">
+              <!-- Departure Location -->
+              <div class="mb-3">
+                <label for="departurePlaceField" class="form-label">Departure</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="departurePlaceField" placeholder="Enter departure place">
+                  <button class="btn btn-outline-secondary" type="button" id="currentLocationButton">
+                    <i class="fa fa-map-marker"></i> Current
+                  </button>
+                </div>
+                <div class="location-suggestions" id="departureSuggestions"></div>
+                <div class="row mt-2">
+                  <div class="col">
+                    <input type="text" class="form-control form-control-sm" id="departureLatField" placeholder="Latitude" readonly>
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control form-control-sm" id="departureLonField" placeholder="Longitude" readonly>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Arrival Location -->
+              <div class="mb-3">
+                <label for="arrivalPlaceField" class="form-label">Arrival</label>
+                <input type="text" class="form-control" id="arrivalPlaceField" placeholder="Enter arrival place">
+                <div class="location-suggestions" id="arrivalSuggestions"></div>
+                <div class="row mt-2">
+                  <div class="col">
+                    <input type="text" class="form-control form-control-sm" id="arrivalLatField" placeholder="Latitude" readonly>
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control form-control-sm" id="arrivalLonField" placeholder="Longitude" readonly>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="swapLocationsButton">
+                  <i class="fa fa-exchange"></i> Swap Locations
+                </button>
+              </div>
+
+              <!-- Transport Mode -->
+              <div class="mb-3">
+                <label for="transportModeComboBox" class="form-label">Transport Mode</label>
+                <select class="form-select form-control" id="transportModeComboBox">
+                  {% for mode in transportModes %}
+                    <option value="{{ mode.name }}">{{ mode.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Date and Time (for public transport) -->
+              <div class="mb-3" id="dateTimeSection" style="display: none;">
+                <label class="form-label">Departure Date & Time</label>
+                <div class="row">
+                  <div class="col">
+                    <input type="date" class="form-control" id="departureDatePicker">
+                  </div>
+                  <div class="col">
+                    <select class="form-select form-control" id="departureTimeComboBox">
+                      {% for h in 0..23 %}
+                        <option value="{{ h|format('%02d') }}:00">{{ h|format('%02d') }}:00</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Route Name -->
+              <div class="mb-3">
+                <label for="routeNameField" class="form-label">Route Name (for saving)</label>
+                <input type="text" class="form-control" id="routeNameField" placeholder="Optional">
+              </div>
+
+              <!-- Buttons -->
+              <div class="d-grid gap-2">
+                <button type="button" class="btn btn-primary" id="showRouteButton" disabled>
+                  Show Route
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="clearRouteButton">
+                  Clear
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Saved Routes -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white">
+            <h5 class="card-title mb-0">Saved Routes</h5>
+          </div>
+          <div class="card-body">
+            <select class="form-select form-control mb-2" id="savedRoutesComboBox">
+              <option value="">Select a saved route</option>
+              {% for route in savedRoutes %}
+                <option value="{{ route.id }}">{{ route.name }}</option>
+              {% endfor %}
+            </select>
+            <button type="button" class="btn btn-outline-danger btn-sm" id="deleteRouteButton">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <!-- Map and Route Information -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white">
+            <h5 class="card-title mb-0">Route Map</h5>
+          </div>
+          <div class="card-body" style="overflow:hidden; position:relative;">
+            <div id="navigationMap" style="height: 500px; border-radius: 12px;"></div>
+            <div class="mt-3">
+              <div class="alert alert-info" id="arrivalTimeLabel">
+                Route information will appear here
+              </div>
+            </div>
+            
+            <!-- Loading Spinner -->
+            <div class="text-center loading-spinner" id="progressIndicator">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Public Transport Options -->
+            <div id="publicTransportOptionsPanel" style="display: none;" class="mt-3">
+              <h5>Public Transport Options</h5>
+              <select class="form-select form-control mb-2" id="publicTransportComboBox">
+                <option value="">Loading options...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Google Maps Scripts -->
+<script>
+  // Remove any previous Google Maps initializations
+  window.preventGoogleMapsInit = false;
+</script>
+
+<!-- Load Google Maps API with required libraries - Updated for 2025 APIs -->
+<script src="https://maps.googleapis.com/maps/api/js?key=googleApiKey&libraries=places,geometry,routes&callback=initMap&v=weekly" async defer></script>
+<script>
+  function initMap() {
+    console.log('Google Maps API loaded');
+    // This is a callback function that will be called when Google Maps API is loaded
+  }
+</script>
+
+<!-- Load our custom navigation script -->
+<script type="module" src="{{ asset('js/navigation/main.js') }}"></script>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+{% endblock %}

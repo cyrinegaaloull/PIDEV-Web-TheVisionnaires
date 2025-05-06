@@ -1,0 +1,83 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block title %}Gestion des Réclamations{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Gestion des Réclamations</h1>
+
+        {% if pendingCount > 0 %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        title: 'Pending Reclamations!',
+                        text: 'You have {{ pendingCount }} pending reclamation(s).',
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            </script>
+        {% endif %}
+
+
+        <!-- Filter Section -->
+        <div class="mb-4">
+            <label for="statusFilter" class="form-label">Filtrer par statut:</label>
+            <select id="statusFilter" class="form-select" onchange="applyFilter()">
+                <option value="all" {% if filterStatus == 'all' %}selected{% endif %}>Tous</option>
+                <option value="Resolved" {% if filterStatus == 'Resolved' %}selected{% endif %}>Résolues</option>
+                <option value="Declined" {% if filterStatus == 'Declined' %}selected{% endif %}>Refusées</option>
+                <option value="Pending" {% if filterStatus == 'Pending' %}selected{% endif %}>En attente</option>
+            </select>
+        </div>
+
+        <!-- Reclamations List -->
+        {% if reclamations|length == 0 %}
+            <p>Aucune réclamation à afficher.</p>
+        {% else %}
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Contenu</th>
+                    <th>Statut</th>
+                    <th>Post ID</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for reclamation in reclamations %}
+                    <tr>
+                        <td>{{ reclamation.reclamationId }}</td>
+                        <td>{{ reclamation.content }}</td>
+                        <td>{{ reclamation.status }}</td>
+                        <td>{{ reclamation.postId }}</td>
+                        <td>
+                            <a href="{{ path('admin_reclamation_details', {'id': reclamation.reclamationId}) }}" class="btn btn-info btn-sm">Détails</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript to Handle Filtering -->
+    <script>
+        function applyFilter() {
+            const selectedStatus = document.getElementById('statusFilter').value;
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('status', selectedStatus);
+            window.location.href = currentUrl.toString();
+        }
+
+        // Automatically select the correct filter option based on the URL parameter
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const statusFilter = urlParams.get('status');
+            if (statusFilter) {
+                document.getElementById('statusFilter').value = statusFilter;
+            }
+        });
+    </script>
+{% endblock %}

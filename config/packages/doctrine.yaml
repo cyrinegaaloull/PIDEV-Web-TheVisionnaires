@@ -22,10 +22,13 @@ doctrine:
         alias: App
 
 when@test:
-  doctrine:
-    dbal:
-      # "TEST_TOKEN" is typically set by ParaTest
-      dbname_suffix: "_test%env(default::TEST_TOKEN)%"
+
+    doctrine:
+        dbal:
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+            types:
+                enum: string
 
 when@prod:
   doctrine:
@@ -39,10 +42,11 @@ when@prod:
         type: pool
         pool: doctrine.result_cache_pool
 
-  framework:
-    cache:
-      pools:
-        doctrine.result_cache_pool:
-          adapter: cache.app
-        doctrine.system_cache_pool:
-          adapter: cache.system
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

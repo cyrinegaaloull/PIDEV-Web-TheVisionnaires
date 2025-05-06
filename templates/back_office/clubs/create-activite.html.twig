@@ -1,0 +1,118 @@
+{% extends 'back_office/base-back-office.html.twig' %}
+
+{% block body %}
+<div class="container mt-5">
+  <h2 class="mb-1">
+    <i class="ri-add-line text-primary me-2" style="font-size: 1.7rem;"></i> Ajouter une Activité
+  </h2>
+  <p class="text-muted">Tous les champs sont obligatoires. Veuillez remplir soigneusement chaque section.</p>
+
+  <div id="form-messages"></div>
+
+  {{ form_start(form, {
+    'attr': {
+      'enctype': 'multipart/form-data',
+      'novalidate': 'novalidate',
+      'id': 'activite-form',
+      'class': 'ajax-form'
+    }
+  }) }}
+
+  <div class="row">
+    {% for field in ['activitename', 'activitedescription', 'activiteimage', 'activitedate', 
+                     'activitelocation', 'starttime', 'endtime', 'activitetype', 'activitestatus', 'clubid'] %}
+      <div class="col-md-{{ field in ['activitedescription'] ? '12' : '6' }} mb-3">
+        {{ form_label(attribute(form, field)) }}
+        {{ form_widget(attribute(form, field), {'attr': {'class': 'form-control'}}) }}
+        <div class="invalid-feedback" data-error-for="{{ field }}"></div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {{ form_widget(form.submit, {'attr': {'class': 'btn btn-primary mt-3'}}) }}
+  {{ form_end(form) }}
+</div>
+
+<style>
+  .invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
+  .is-invalid {
+    border-color: #dc3545;
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('activite-form');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Clear previous errors
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        document.getElementById('form-messages').innerHTML = '';
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const successAlert = document.createElement('div');
+                successAlert.className = 'alert alert-success';
+                successAlert.textContent = data.message;
+                document.getElementById('form-messages').appendChild(successAlert);
+
+                if (data.redirect) {
+                    setTimeout(() => window.location.href = data.redirect, 1500);
+                }
+            } else {
+                if (data.errors) {
+                    for (const field in data.errors) {
+                        if (field === 'form') {
+                            const generalAlert = document.createElement('div');
+                            generalAlert.className = 'alert alert-danger';
+                            generalAlert.textContent = data.errors[field].join(' ');
+                            document.getElementById('form-messages').appendChild(generalAlert);
+                            continue;
+                        }
+
+                        const input = form.querySelector(`[name="activite[${field}]"]`);
+                        const errorContainer = document.querySelector(`[data-error-for="${field}"]`);
+
+                        if (input) input.classList.add('is-invalid');
+                        if (errorContainer) errorContainer.textContent = data.errors[field];
+                    }
+                }
+
+                if ((!data.errors || Object.keys(data.errors).length === 0) && data.message) {
+                    const errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert alert-danger';
+                    errorAlert.textContent = data.message;
+                    document.getElementById('form-messages').appendChild(errorAlert);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const errorAlert = document.createElement('div');
+            errorAlert.className = 'alert alert-danger';
+            errorAlert.textContent = 'Une erreur est survenue. Veuillez réessayer.';
+            document.getElementById('form-messages').appendChild(errorAlert);
+        });
+    });
+});
+</script>
+{% endblock %}
