@@ -113,19 +113,16 @@ This module handles user-generated posts and comments within the application:
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Desktop Application**: JavaFX, FXML, CSS, QML
 - **Web Application**: HTML, Twig templates, CSS, JavaScript, Bootstrap
 - **Interactive Components**: AJAX for dynamic content loading, Leaflet.js for maps
 
 ### Backend
-- **Desktop Application**: Java with Maven for dependency management
 - **Web Application**: PHP with Symfony framework, Doctrine ORM for database operations
 - **Authentication**: OpenCV 4.9 (face detection), DeepFace4j (facial recognition)
 
 ### Other Tools
 - **APIs**: 
   - SightEngine API & Google Vision API (content moderation)
-  - Resend API (email)
   - Brevo API (notifications)
   - Foursquare API (locations)
   - OpenWeather API (weather data)
@@ -144,8 +141,6 @@ This module handles user-generated posts and comments within the application:
 ## 🔧 Installation
 
 ### Prerequisites
-- Java (version 17 or higher)
-- Maven (version 3.6 or higher)
 - PHP (version 8 or higher)
 - Symfony (version 6 or higher)
 - Composer for PHP dependency management
@@ -154,29 +149,6 @@ This module handles user-generated posts and comments within the application:
 - OpenCV 4.9 installed and linked properly
 - DeepFace4j library included in the project dependencies
 - API keys properly configured
-
-### Desktop Application
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-organization/local-lens.git
-   cd local-lens
-   ```
-
-2. Set up the database:
-   ```bash
-   # Import the database schema
-   mysql -u username -p database_name < database/schema.sql
-   ```
-
-3. Configure environment variables:
-   - Create a `.env` file based on `.env.example`
-   - Add your API keys and database connection details
-
-4. Build and run the desktop application:
-   ```bash
-   mvn clean install
-   mvn javafx:run
-   ```
 
 ### Web Application
 1. If using WAMP or XAMPP:
