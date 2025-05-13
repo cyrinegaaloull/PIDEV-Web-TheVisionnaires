@@ -123,6 +123,7 @@ This module handles user-generated posts and comments within the application:
 ### Other Tools
 - **APIs**: 
   - SightEngine API & Google Vision API (content moderation)
+  - Resend API (email)
   - Brevo API (notifications)
   - Foursquare API (locations)
   - OpenWeather API (weather data)
